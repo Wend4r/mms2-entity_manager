@@ -90,7 +90,7 @@ def ResolveEnvPath(env, folder):
 def Normalize(path):	
   return os.path.abspath(os.path.normpath(path))
 
-class MMSPluginConfig(object):
+class EntityManagerConfig(object):
   def __init__(self):
     self.sdks = {}
     self.binaries = []
@@ -101,12 +101,12 @@ class MMSPluginConfig(object):
     if builder.options.plugin_name is not None:
       self.plugin_name = builder.options.plugin_name
     else:
-      self.plugin_name = 'sample_mm'
+      self.plugin_name = 'entity_manager'
 
     if builder.options.plugin_alias is not None:
       self.plugin_alias = builder.options.plugin_alias
     else:
-      self.plugin_alias = 'sample'
+      self.plugin_alias = 'entity_manager'
 
     if builder.options.targets:
       target_archs = builder.options.targets.split(',')
@@ -491,9 +491,9 @@ class MMSPluginConfig(object):
 
     return binary
 
-MMSPlugin = MMSPluginConfig()
-MMSPlugin.detectSDKs()
-MMSPlugin.configure()
+EntityManager = EntityManagerConfig()
+EntityManager.detectSDKs()
+EntityManager.configure()
 
 src_dir = 'src'
 
@@ -502,4 +502,4 @@ BuildScripts = [
   os.path.join(src_dir, 'PackageScript'),
 ]
 
-builder.Build(BuildScripts, { 'MMSPlugin': MMSPlugin })
+builder.Build(BuildScripts, { 'EntityManager': EntityManager })

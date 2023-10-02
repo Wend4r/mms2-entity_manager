@@ -6,17 +6,17 @@ import os
 # which in the end would ruin the multi-platform (unix, win etc) loading by metamod as it won't be able to append platform specific extension
 # so just fall back to the single binary.
 # Multi-sdk solutions should be manually loaded with a custom plugin loader (examples being sourcemod, stripper:source)
-for sdk_name in MMSPlugin.sdks:
-  for cxx in MMSPlugin.all_targets:
-    sdk = MMSPlugin.sdks[sdk_name]
+for sdk_name in EntityManager.sdks:
+  for cxx in EntityManager.all_targets:
+    sdk = EntityManager.sdks[sdk_name]
 
     if not cxx.target.arch in sdk.platformSpec[cxx.target.platform]:
       continue
 
-    binary = MMSPlugin.HL2Library(builder, cxx, MMSPlugin.plugin_name, sdk)
+    binary = EntityManager.HL2Library(builder, cxx, EntityManager.plugin_name, sdk)
 
     binary.sources += [
-      'sample_mm.cpp',
+      'entity_manager.cpp',
     ]
 
     if sdk_name in ['dota', 'cs2']:
@@ -28,6 +28,6 @@ for sdk_name in MMSPlugin.sdks:
     if cxx.target.arch == 'x86':
       binary.sources += ['sourcehook/sourcehook_hookmangen.cpp']
     nodes = builder.Add(binary)
-    MMSPlugin.binaries += [nodes]
+    EntityManager.binaries += [nodes]
     
   break
