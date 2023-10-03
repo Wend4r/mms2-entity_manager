@@ -18,6 +18,10 @@
 #include <iplayerinfo.h>
 #include <sh_vector.h>
 
+#include "entity_manager/settings.h"
+
+#define PREFIX_ENTITY_MANAGER "entity_manager"
+
 class EntityManager : public ISmmPlugin, public IMetamodListener
 {
 public:
@@ -27,8 +31,11 @@ public:
 	bool Unpause(char *error, size_t maxlen);
 	void AllPluginsLoaded();
 
+private: // Commands.
+	CON_COMMAND_MEMBER_F(EntityManager, PREFIX_ENTITY_MANAGER "_set_basepath", OnSetBasePathCommand, "Set base path for Entity Manager", FCVAR_LINKED_CONCOMMAND);
+
 public: // SourceHooks.
-	void OnLevelInit(char const *pMapName, char const *pMapEntities, char const *pOldLevel, char const *pLandmarkName, bool loadGame, bool background );
+	void OnLevelInit(char const *pszMapName, char const *pszMapEntities, char const *pszOldLevel, char const *pszLandmarkName, bool bIsLoadGame, bool bIsBackground);
 	void OnGameFrameHook(bool simulating, bool bFirstTick, bool bLastTick);
 
 public:
@@ -40,6 +47,15 @@ public:
 	const char *GetVersion();
 	const char *GetDate();
 	const char *GetLogTag();
+
+private:
+#ifdef PLATFORM_WINDOWS
+	std::string m_sBasePath = "addons\\sourcemod";
+#else
+	std::string m_sBasePath = "addons/sourcemod";
+#endif
+
+	EntityManagerSpace::Settings m_aSettings;
 };
 
 extern EntityManager g_aEntityManager;

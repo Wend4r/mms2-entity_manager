@@ -11,8 +11,15 @@
  */
 
 #include <stdio.h>
+#include <string>
+
+// Game SDK.
+#include <tier0/dbg.h>
+#include <tier1/convar.h>
+#include <eiface.h>
+#include <iserver.h>
+
 #include "entity_manager.h"
-#include "iserver.h"
 
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 
@@ -20,7 +27,7 @@ EntityManager g_aEntityManager;
 
 ICvar *icvar = NULL;
 IVEngineServer *engine = NULL;
-IFileSystem* filesystem = NULL;
+IFileSystem *filesystem = NULL;
 IServerGameDLL *server = NULL;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
@@ -33,16 +40,6 @@ CGlobalVars *GetGameGlobals()
 		return nullptr;
 
 	return g_pNetworkServerService->GetIGameServer()->GetGlobals();
-}
-
-#if 0
-// Currently unavailable, requires hl2sdk work!
-ConVar sample_cvar("em_cvar", "42", 0);
-#endif
-
-CON_COMMAND_F(em_command, "Entity Manager command", FCVAR_NONE)
-{
-	META_CONPRINTF( "Command called by %d. Command: %s\n", context.GetPlayerSlot(), args.GetCommandString() );
 }
 
 PLUGIN_EXPOSE(EntityManager, g_aEntityManager);
@@ -65,7 +62,7 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 	META_CONPRINTF( "All hooks started!\n" );
 
 	g_pCVar = icvar;
-	ConVar_Register( FCVAR_RELEASE | FCVAR_CLIENT_CAN_EXECUTE | FCVAR_GAMEDLL );
+	ConVar_Register(FCVAR_RELEASE | FCVAR_GAMEDLL);
 
 	return true;
 }
@@ -84,6 +81,40 @@ void EntityManager::AllPluginsLoaded()
 	 */
 }
 
+void EntityManager::OnSetBasePathCommand(const CCommandContext &context, const CCommand &args)
+{
+	if(args.ArgC() != 2)
+	{
+		Msg("Usage: %s <base path>\n", args[0]);
+
+		return;
+	}
+
+	this->m_sBasePath = std::string(args[1]);
+
+	Msg("Base path is \"%s\"\n", this->m_sBasePath.c_str());
+}
+
+// Potentially might not work
+void EntityManager::OnLevelInit(char const *pszMapName,
+                                char const *pszMapEntities,
+                                char const *pszOldLevel,
+                                char const *pszLandmarkName,
+                                bool bIsLoadGame,
+                                bool bIsBackground)
+{
+	META_CONPRINTF("OnLevelInit(%s)\n", pszMapName);
+
+	{
+		char sBuffer[256];
+
+		if(!this->m_aSettings.Load(this->m_sBasePath.c_str(), pszMapName, (char *)sBuffer, sizeof(sBuffer)))
+		{
+			g_SMAPI->LogMsg(g_PLAPI, "Failed to load settings: %s\n", sBuffer);
+		}
+	}
+}
+
 void EntityManager::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLastTick )
 {
 	/**
@@ -92,17 +123,6 @@ void EntityManager::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLas
 	 * true  | game is ticking
 	 * false | game is not ticking
 	 */
-}
-
-// Potentially might not work
-void EntityManager::OnLevelInit( char const *pMapName,
-									 char const *pMapEntities,
-									 char const *pOldLevel,
-									 char const *pLandmarkName,
-									 bool loadGame,
-									 bool background )
-{
-	META_CONPRINTF("OnLevelInit(%s)\n", pMapName);
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)
