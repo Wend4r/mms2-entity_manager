@@ -71,6 +71,18 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 	g_pCVar = icvar;
 	ConVar_Register(FCVAR_RELEASE | FCVAR_GAMEDLL);
 
+	if(late)
+	{
+		INetworkGameServer *pServer = g_pNetworkServerService->GetIGameServer();
+
+		if(pServer)
+		{
+			const char *pszMapName = pServer->GetMapName();
+
+			g_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sOldMap.c_str(), nullptr, false, false);
+			this->m_sOldMap = std::string(pszMapName);
+		}
+	}
 
 	return true;
 }
