@@ -25,8 +25,9 @@ SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 
 EntityManager g_aEntityManager;
 
-ICvar *icvar = NULL;
 IVEngineServer *engine = NULL;
+ICvar *icvar = NULL;
+IGameEventManager2 *gameevents = NULL;
 IFileSystem *filesystem = NULL;
 IServerGameDLL *server = NULL;
 
@@ -47,8 +48,9 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 {
 	PLUGIN_SAVEVARS();
 
-	GET_V_IFACE_CURRENT(GetEngineFactory, icvar, ICvar, CVAR_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetEngineFactory, engine, IVEngineServer, INTERFACEVERSION_VENGINESERVER);
+	GET_V_IFACE_CURRENT(GetEngineFactory, icvar, ICvar, CVAR_INTERFACE_VERSION);
+	GET_V_IFACE_CURRENT(GetEngineFactory, gameevents, IGameEventManager2, INTERFACEVERSION_SERVERGAMECLIENTS);
 	GET_V_IFACE_CURRENT(GetFileSystemFactory, filesystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetServerFactory, server, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL);
 
@@ -64,12 +66,16 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 	g_pCVar = icvar;
 	ConVar_Register(FCVAR_RELEASE | FCVAR_GAMEDLL);
 
+	this->m_aGameNewMap.Init();
+
 	return true;
 }
 
 bool EntityManager::Unload(char *error, size_t maxlen)
 {
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnGameFrameHook, true);
+
+	this->m_aGameNewMap.Destroy();
 
 	return true;
 }
@@ -123,6 +129,25 @@ void EntityManager::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLas
 	 * true  | game is ticking
 	 * false | game is not ticking
 	 */
+}
+
+bool EntityManager::GameNewMapEvent::Init()
+{
+	return gameevents->AddListener(this, "game_newmap", true);
+}
+
+void EntityManager::GameNewMapEvent::Destroy()
+{
+	gameevents->RemoveListener(this);
+}
+
+// Adapter of EntityManager::OnLevelInit()
+void EntityManager::GameNewMapEvent::FireGameEvent(IGameEvent *pEvent)
+{
+	const char *pszMapName = pEvent->GetString("mapname", "none");
+
+	g_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sOldMap.c_str(), nullptr, false, false);
+	this->m_sOldMap = std::string(pszMapName);
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)

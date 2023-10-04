@@ -22,7 +22,7 @@
 
 #define PREFIX_ENTITY_MANAGER "entity_manager"
 
-class EntityManager : public ISmmPlugin, public IMetamodListener
+class EntityManager final : public ISmmPlugin, public IMetamodListener
 {
 public:
 	bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late);
@@ -37,6 +37,20 @@ private: // Commands.
 public: // SourceHooks.
 	void OnLevelInit(char const *pszMapName, char const *pszMapEntities, char const *pszOldLevel, char const *pszLandmarkName, bool bIsLoadGame, bool bIsBackground);
 	void OnGameFrameHook(bool simulating, bool bFirstTick, bool bLastTick);
+
+private: // IGameEventListener2
+	class GameNewMapEvent final : public IGameEventListener2
+	{
+	public:
+		bool Init();
+		void Destroy();
+
+	private:
+		void FireGameEvent(IGameEvent *pEvent);
+
+	private: // Feilds
+		std::string m_sOldMap;
+	};
 
 public:
 	const char *GetAuthor();
@@ -55,6 +69,7 @@ private:
 	std::string m_sBasePath = "addons/sourcemod";
 #endif
 
+	GameNewMapEvent m_aGameNewMap;
 	EntityManagerSpace::Settings m_aSettings;
 };
 

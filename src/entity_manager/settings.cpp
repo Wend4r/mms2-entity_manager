@@ -39,10 +39,15 @@ bool EntityManagerSpace::Settings::Load(const char *pszBasePath, const char *psz
 	}
 	else if(psError)
 	{
-		snprintf(psError, nMaxLength, "Can't to load KeyValue from \"%s\" file\n");
+		snprintf(psError, nMaxLength, "Can't to load KeyValue from \"%s\" file\n", sConfigFile);
 	}
 
 	return bResult;
+}
+
+void EntityManagerSpace::Settings::Clear()
+{
+	this->m_pEntities->Clear();
 }
 
 void EntityManagerSpace::Settings::Destroy()
