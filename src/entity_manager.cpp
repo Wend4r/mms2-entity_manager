@@ -21,7 +21,10 @@
 
 #include "entity_manager.h"
 
+class GameSessionConfiguration_t { };
+
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
+SH_DECL_HOOK3_void(INetworkServerService, StartupServer, SH_NOATTRIB, 0, const GameSessionConfiguration_t &, ISource2WorldSession *, const char *);
 
 EntityManager g_aEntityManager;
 
@@ -51,6 +54,7 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 	GET_V_IFACE_CURRENT(GetEngineFactory, engine, IVEngineServer, INTERFACEVERSION_VENGINESERVER);
 	GET_V_IFACE_CURRENT(GetEngineFactory, icvar, ICvar, CVAR_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetEngineFactory, gameevents, IGameEventManager2, INTERFACEVERSION_SERVERGAMECLIENTS);
+	GET_V_IFACE_ANY(GetEngineFactory, g_pNetworkServerService, INetworkServerService, NETWORKSERVERSERVICE_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetFileSystemFactory, filesystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetServerFactory, server, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL);
 
@@ -59,14 +63,14 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 
 	META_CONPRINTF( "Starting %s plugin.\n", this->GetName());
 
-	SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnGameFrameHook, true);
+	// SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnGameFrameHook, true);
+	SH_ADD_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManager::OnStartupServerHook, true);
 
 	META_CONPRINTF( "All hooks started!\n" );
 
 	g_pCVar = icvar;
 	ConVar_Register(FCVAR_RELEASE | FCVAR_GAMEDLL);
 
-	this->m_aGameNewMap.Init();
 
 	return true;
 }
@@ -74,8 +78,7 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 bool EntityManager::Unload(char *error, size_t maxlen)
 {
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnGameFrameHook, true);
-
-	this->m_aGameNewMap.Destroy();
+	SH_REMOVE_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManager::OnStartupServerHook, true);
 
 	return true;
 }
@@ -109,14 +112,12 @@ void EntityManager::OnLevelInit(char const *pszMapName,
                                 bool bIsLoadGame,
                                 bool bIsBackground)
 {
-	META_CONPRINTF("OnLevelInit(%s)\n", pszMapName);
-
 	{
 		char sBuffer[256];
 
 		if(!this->m_aSettings.Load(this->m_sBasePath.c_str(), pszMapName, (char *)sBuffer, sizeof(sBuffer)))
 		{
-			g_SMAPI->LogMsg(g_PLAPI, "Failed to load settings: %s\n", sBuffer);
+			Error("Failed to load settings: %s\n", sBuffer);
 		}
 	}
 }
@@ -131,21 +132,8 @@ void EntityManager::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLas
 	 */
 }
 
-bool EntityManager::GameNewMapEvent::Init()
+void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *pszMapName)
 {
-	return gameevents->AddListener(this, "game_newmap", true);
-}
-
-void EntityManager::GameNewMapEvent::Destroy()
-{
-	gameevents->RemoveListener(this);
-}
-
-// Adapter of EntityManager::OnLevelInit()
-void EntityManager::GameNewMapEvent::FireGameEvent(IGameEvent *pEvent)
-{
-	const char *pszMapName = pEvent->GetString("mapname", "none");
-
 	g_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sOldMap.c_str(), nullptr, false, false);
 	this->m_sOldMap = std::string(pszMapName);
 }

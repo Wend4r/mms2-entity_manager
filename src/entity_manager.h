@@ -37,20 +37,7 @@ private: // Commands.
 public: // SourceHooks.
 	void OnLevelInit(char const *pszMapName, char const *pszMapEntities, char const *pszOldLevel, char const *pszLandmarkName, bool bIsLoadGame, bool bIsBackground);
 	void OnGameFrameHook(bool simulating, bool bFirstTick, bool bLastTick);
-
-private: // IGameEventListener2
-	class GameNewMapEvent final : public IGameEventListener2
-	{
-	public:
-		bool Init();
-		void Destroy();
-
-	private:
-		void FireGameEvent(IGameEvent *pEvent);
-
-	private: // Feilds
-		std::string m_sOldMap;
-	};
+	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *pszMapName);
 
 public:
 	const char *GetAuthor();
@@ -69,8 +56,9 @@ private:
 	std::string m_sBasePath = "addons/sourcemod";
 #endif
 
-	GameNewMapEvent m_aGameNewMap;
 	EntityManagerSpace::Settings m_aSettings;
+
+	std::string m_sOldMap;
 };
 
 extern EntityManager g_aEntityManager;
