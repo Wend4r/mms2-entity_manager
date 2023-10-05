@@ -129,7 +129,7 @@ void EntityManager::OnLevelInit(char const *pszMapName,
 
 		if(!this->m_aSettings.Load(this->m_sBasePath.c_str(), pszMapName, (char *)sBuffer, sizeof(sBuffer)))
 		{
-			Error("Failed to load settings: %s\n", sBuffer);
+			Warning("Failed to load settings: %s\n", sBuffer);
 		}
 	}
 }

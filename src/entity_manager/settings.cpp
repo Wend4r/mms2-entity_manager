@@ -39,7 +39,7 @@ bool EntityManagerSpace::Settings::Load(const char *pszBasePath, const char *psz
 	}
 	else if(psError)
 	{
-		snprintf(psError, nMaxLength, "Can't to load KeyValue from \"%s\" file\n", sConfigFile);
+		snprintf(psError, nMaxLength, "Can't to load KeyValue from \"%s\" file", sConfigFile);
 	}
 
 	return bResult;
