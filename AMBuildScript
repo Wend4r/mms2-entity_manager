@@ -350,6 +350,7 @@ class EntityManagerConfig(object):
     compiler.defines += defines
     paths = [['public'],
              ['public', 'engine'],
+             ['public', 'entity2'],
              ['public', 'mathlib'],
              ['public', 'vstdlib'],
              ['public', 'tier0'], ['public', 'tier1']]
@@ -358,6 +359,7 @@ class EntityManagerConfig(object):
       paths.append(['game_shared'])
     else:
       paths.append(['public', 'game', 'server'])
+      paths.append(['game', 'server'])
       paths.append(['game', 'shared'])
       paths.append(['common'])
     compiler.defines += ['SOURCE_ENGINE=' + sdk.code]

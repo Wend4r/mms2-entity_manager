@@ -1,10 +1,12 @@
-#include "settings.h"
+#include <stdio.h>
 
 #include <tier0/dbg.h>
 #include <tier0/platform.h>
 #include <tier1/KeyValues.h>
 #include <tier1/utlstring.h> // For filesystem.h
 #include <filesystem.h>
+
+#include "settings.h"
 
 #define ENTITY_MANAGER_MAP_CONFIG_FILE "entities.vdf"
 
@@ -14,7 +16,16 @@ bool EntityManagerSpace::Settings::Init(char *psError, size_t nMaxLength)
 {
 	this->m_pEntities = new KeyValues("Entities");
 
-	return true;
+	char sPlacementError[256];
+
+	bool bResult = this->m_aPlacement.Init((char *)sPlacementError, sizeof(sPlacementError));
+
+	if(!bResult)
+	{
+		snprintf(psError, nMaxLength, "Failed to init a placement: %s", sPlacementError);
+	}
+
+	return bResult;
 }
 
 bool EntityManagerSpace::Settings::Load(const char *pszBasePath, const char *pszMapName, char *psError, size_t nMaxLength)
@@ -58,10 +69,12 @@ void EntityManagerSpace::Settings::Destroy()
 	this->m_pEntities = nullptr;
 }
 
-bool EntityManagerSpace::Settings::InternalLoad(const KeyValues *pEntities, char *psError = NULL, size_t nMaxLength = 0)
+bool EntityManagerSpace::Settings::InternalLoad(const KeyValues *pEntities, char *psError, size_t nMaxLength)
 {
 	FOR_EACH_VALUE(pEntities, pEntity)
 	{
 		Msg("Detect \"%s\" classname\n", pEntity->GetName());
 	}
+
+	return true;
 }

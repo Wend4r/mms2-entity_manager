@@ -16,6 +16,7 @@ for sdk_name in EntityManager.sdks:
     binary = EntityManager.HL2Library(builder, cxx, EntityManager.plugin_name, sdk)
 
     binary.sources += [
+      'entity_manager/placement.cpp',
       'entity_manager/settings.cpp',
       'entity_manager.cpp',
     ]

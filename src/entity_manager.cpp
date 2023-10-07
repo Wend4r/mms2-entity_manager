@@ -14,6 +14,7 @@
 #include <string>
 
 // Game SDK.
+#include <entity2/entitysystem.h>
 #include <tier0/dbg.h>
 #include <tier1/convar.h>
 #include <eiface.h>
@@ -33,6 +34,8 @@ ICvar *icvar = NULL;
 IGameEventManager2 *gameevents = NULL;
 IFileSystem *filesystem = NULL;
 IServerGameDLL *server = NULL;
+
+CEntitySystem *g_pEntitySystem;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
 // otherwise that'll be nullptr!
@@ -55,6 +58,7 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 	GET_V_IFACE_CURRENT(GetEngineFactory, icvar, ICvar, CVAR_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetEngineFactory, gameevents, IGameEventManager2, INTERFACEVERSION_SERVERGAMECLIENTS);
 	GET_V_IFACE_ANY(GetEngineFactory, g_pNetworkServerService, INetworkServerService, NETWORKSERVERSERVICE_INTERFACE_VERSION);
+	GET_V_IFACE_CURRENT(GetEngineFactory, g_pGameResourceServiceServer, IGameResourceServiceServer, GAMERESOURCESERVICESERVER_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetFileSystemFactory, filesystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetServerFactory, server, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL);
 
@@ -71,6 +75,20 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 	g_pCVar = icvar;
 	ConVar_Register(FCVAR_RELEASE | FCVAR_GAMEDLL);
 
+	bool bResult = true;
+
+	{
+		char sSettingsError[256];
+
+		bResult = this->m_aSettings.Init(sSettingsError, sizeof(sSettingsError));
+
+		if(!bResult)
+		{
+			snprintf(error, maxlen, "Failed to init a settings: %s", sSettingsError);
+		}
+	}
+
+
 	if(late)
 	{
 		INetworkGameServer *pServer = g_pNetworkServerService->GetIGameServer();
@@ -84,11 +102,13 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 		}
 	}
 
-	return true;
+	return bResult;
 }
 
 bool EntityManager::Unload(char *error, size_t maxlen)
 {
+	this->m_aSettings.Destroy();
+
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnGameFrameHook, true);
 	SH_REMOVE_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManager::OnStartupServerHook, true);
 
@@ -124,6 +144,8 @@ void EntityManager::OnLevelInit(char const *pszMapName,
                                 bool bIsLoadGame,
                                 bool bIsBackground)
 {
+	this->m_aSettings.Clear();
+
 	{
 		char sBuffer[256];
 
@@ -146,6 +168,16 @@ void EntityManager::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLas
 
 void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *pszMapName)
 {
+	g_pEntitySystem = *reinterpret_cast<CEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) 
+#if defined(_WINDOWS) && defined(X64BITS)
+	+ 0x58
+#elif defined(_LINUX) && defined(X64BITS)
+	+ 0x50
+#else
+#	error Unsupported platform
+#endif
+	);
+
 	g_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sOldMap.c_str(), nullptr, false, false);
 	this->m_sOldMap = std::string(pszMapName);
 }
