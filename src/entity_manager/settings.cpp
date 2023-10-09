@@ -66,7 +66,7 @@ void EntityManagerSpace::Settings::Destroy()
 
 bool EntityManagerSpace::Settings::InternalLoad(const KeyValues *pEntities, char *psError, size_t nMaxLength)
 {
-	FOR_EACH_VALUE(pEntities, pEntity)
+	FOR_EACH_SUBKEY(pEntities, pEntity)
 	{
 		Msg("Detect \"%s\" classname\n", pEntity->GetName());
 	}
