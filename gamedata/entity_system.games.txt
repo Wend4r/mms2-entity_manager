@@ -1,0 +1,49 @@
+"Games"
+{
+	"cs2"
+	{
+		"Signatures"
+		{
+			// Used strings:
+			// "Attempted to create unknown entity classname \"%s\"!\n"
+			// 
+			// Declaration: 
+			// CEntityInstance *__fastcall CEntitySystem::CreateEntity(
+			//         CEntitySystem *const this,
+			//         SpawnGroupHandle_t hSpawnGroup,
+			//         const char *pszNameOrDesignName,
+			//         EntityNetworkingMode_t networkMode,
+			//         CEntityIndex iForcedIndex,
+			//         int iForcedSerial,
+			//         const V_uuid_t *pForcedId,
+			//         bool bCreateInIsolatedPrecacheList)
+			// 
+			// Type declarations:
+			// typedef uint32_t SpawnGroupHandle_t;
+			// enum EntityNetworkingMode_t
+			// {
+			// 	ENTITY_NETWORKING_MODE_DEFAULT = 0,
+			// 	ENTITY_NETWORKING_MODE_NETWORKED,
+			// 	ENTITY_NETWORKING_MODE_NOT_NETWORKED,
+			// };
+			// 
+			// Basic usage:
+			// (CBaseEntity *)CEntitySystem::CreateEntity(g_pEntitySystem, 0xFFFFFFFF, pClassName, ENTITY_NETWORKING_MODE_DEFAULT, iForceEdictIndex, -1, nullptr, false);
+			"CEntitySystem::CreateEntitySystem"
+			{
+				"library"       "server"
+				"windows64"     "0F 85 ? ? ? ? 8B DE"
+				"linux64"       "E8 ? ? ? ? 5F 49 89 C5"
+			}
+		}
+
+		"Offsets"
+		{
+			"CGameResourceService::m_pEntitySystem"
+			{
+				"windows64"     "0x58"
+				"linux64"       "0x50"
+			}
+		}
+	}
+}

@@ -57,11 +57,13 @@ private:
 #endif
 
 	EntityManagerSpace::Settings m_aSettings;
+	ptrdiff_t m_nGameResourceServiceEntitySystemOffset = -1;
 
 	std::string m_sOldMap;
 };
 
-extern EntityManager g_aEntityManager;
+extern EntityManager *g_pEntityManager;
+extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
 
 PLUGIN_GLOBALVARS();
 

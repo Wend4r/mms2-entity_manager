@@ -3,6 +3,31 @@ import os
 
 builder.SetBuildFolder('package')
 
+# Add any folders you need to this list
+folder_list = [
+  os.path.join('addons', EntityManager.plugin_name, 'gamedata'),
+]
+
+# Create the distribution folder hierarchy.
+folder_map = {}
+for folder in folder_list:
+  norm_folder = os.path.normpath(folder)
+  folder_map[folder] = builder.AddFolder(norm_folder)
+
+# Do all straight-up file copies from the source tree.
+def CopyFiles(src, dest, files):
+  if not dest:
+    dest = src
+  dest_entry = folder_map[dest]
+  for source_file in files:
+    source_path = os.path.join(builder.sourcePath, src, source_file)
+    builder.AddCopy(source_path, dest_entry)
+
+# Package GameData files.
+CopyFiles('gamedata', folder_list[0],
+ [ 'entity_system.games.txt', ]
+)
+
 metamod_folder = builder.AddFolder(os.path.join('addons', 'metamod'))
 bin_folder_path = os.path.join('addons', EntityManager.plugin_name, 'bin')
 bin_folder = builder.AddFolder(bin_folder_path)

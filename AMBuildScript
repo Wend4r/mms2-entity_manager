@@ -503,7 +503,7 @@ src_dir = 'src'
 
 BuildScripts = [
   os.path.join(src_dir, 'AMBuilder'),
-  os.path.join(src_dir, 'PackageScript'),
+  os.path.join('PackageScript'),
 ]
 
 builder.Build(BuildScripts, { 'EntityManager': EntityManager })

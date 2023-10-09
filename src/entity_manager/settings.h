@@ -2,8 +2,6 @@
 
 class KeyValues;
 
-#include "placement.h"
-
 namespace EntityManagerSpace
 {
 	class Settings
@@ -18,8 +16,6 @@ namespace EntityManagerSpace
 		bool InternalLoad(const KeyValues *pEntities, char *psError = NULL, size_t nMaxLength = 0);
 
 	private:
-		Placement m_aPlacement;
-
 		KeyValues *m_pEntities;
 	};
 };

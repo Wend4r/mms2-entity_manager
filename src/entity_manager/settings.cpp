@@ -6,11 +6,14 @@
 #include <tier1/utlstring.h> // For filesystem.h
 #include <filesystem.h>
 
+#include "placement.h"
 #include "settings.h"
 
 #define ENTITY_MANAGER_MAP_CONFIG_FILE "entities.vdf"
 
 extern IFileSystem *filesystem;
+
+EntityManagerSpace::Placement m_aEntityManagerPlacement;
 
 bool EntityManagerSpace::Settings::Init(char *psError, size_t nMaxLength)
 {
@@ -18,7 +21,7 @@ bool EntityManagerSpace::Settings::Init(char *psError, size_t nMaxLength)
 
 	char sPlacementError[256];
 
-	bool bResult = this->m_aPlacement.Init((char *)sPlacementError, sizeof(sPlacementError));
+	bool bResult = m_aEntityManagerPlacement.Init((char *)sPlacementError, sizeof(sPlacementError));
 
 	if(!bResult)
 	{
