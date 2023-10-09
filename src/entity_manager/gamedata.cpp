@@ -104,9 +104,7 @@ CMemory EntityManagerSpace::GameData::GetEntitySystemAddress(const std::string &
 {
 	CMemory pResult = this->m_aEntitySystemConfig.GetAddress(sName);
 
-#ifdef DEBUG
-	Msg("Address (or signature) \"%s\" is %p\n", sName.c_str(), pResult);
-#endif
+	DebugMsg("Address (or signature) \"%s\" is %p\n", sName.c_str(), (void *)pResult);
 
 	return pResult;
 }
@@ -115,9 +113,7 @@ ptrdiff_t EntityManagerSpace::GameData::GetEntitySystemOffset(const std::string 
 {
 	ptrdiff_t nResult = this->m_aEntitySystemConfig.GetOffset(sName);
 
-#ifdef DEBUG
-	Msg("Offset \"%s\" is 0x%X (%d)\n", sName.c_str(), nResult, nResult);
-#endif
+	DebugMsg("Offset \"%s\" is 0x%tX (%td)\n", sName.c_str(), nResult, nResult);
 
 	return nResult;
 }

@@ -41,7 +41,7 @@ bool EntityManagerSpace::Settings::Load(const char *pszBasePath, const char *psz
 
 	if(bResult)
 	{
-		Msg("EntityManagerSpace::Settings::Load(): config file is \"%s\" (key value is %p)\n", sConfigFile, pKVEntities);
+		DevMsg("EntityManagerSpace::Settings::Load(): config file is \"%s\" (key value is %p)\n", sConfigFile, pKVEntities);
 
 		bResult = this->InternalLoad(pKVEntities, psError, nMaxLength);
 	}
