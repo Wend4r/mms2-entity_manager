@@ -149,6 +149,7 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 bool EntityManager::Unload(char *error, size_t maxlen)
 {
 	this->m_aSettings.Destroy();
+	s_aEntityManagerGameData.Destroy();
 
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnGameFrameHook, true);
 	SH_REMOVE_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManager::OnStartupServerHook, true);
