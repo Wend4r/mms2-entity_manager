@@ -105,7 +105,7 @@ CMemory EntityManagerSpace::GameData::GetEntitySystemAddress(const std::string &
 	CMemory pResult = this->m_aEntitySystemConfig.GetAddress(sName);
 
 #ifdef DEBUG
-	Msg("Address (or signature) \"%s\" is %p", sName.c_str(), pResult);
+	Msg("Address (or signature) \"%s\" is %p\n", sName.c_str(), pResult);
 #endif
 
 	return pResult;
