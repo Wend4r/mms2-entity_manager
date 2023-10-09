@@ -40,7 +40,7 @@ IGameEventManager2 *gameevents = NULL;
 IFileSystem *filesystem = NULL;
 IServerGameDLL *server = NULL;
 
-CEntitySystem *g_pEntitySystem;
+CGameEntitySystem *g_pEntitySystem;
 
 
 // Should only be called within the active game loop (i e map should be loaded and active)
@@ -256,7 +256,7 @@ void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config
 	this->m_sCurrentMap = pszMapName;
 	s_aEntityManager.OnLevelInit(pszMapName, nullptr, pszOldMap, nullptr, false, false);
 
-	g_pEntitySystem = *reinterpret_cast<CEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + s_aEntityManagerGameData.GetEntitySystemOffset(""));
+	g_pEntitySystem = *reinterpret_cast<CGameEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + s_aEntityManagerGameData.GetEntitySystemOffset(""));
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)

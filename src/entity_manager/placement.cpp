@@ -3,7 +3,7 @@
 
 #include <entity2/entitysystem.h>
 
-extern CEntitySystem *g_pEntitySystem;
+extern CGameEntitySystem *g_pEntitySystem;
 
 extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
 
