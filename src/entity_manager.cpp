@@ -81,12 +81,13 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 	g_pCVar = icvar;
 	ConVar_Register(FCVAR_RELEASE | FCVAR_GAMEDLL);
 
+	// Initialize and load a gamedata.
 	{
 		char sGameDataError[1024];
 
 		if(s_aEntityManagerGameData.Init((char *)sGameDataError, sizeof(sGameDataError)))
 		{
-			if(!s_aEntityManagerGameData.Load(this->m_sBasePath.c_str(), sGameDataError, sizeof(sGameDataError)))
+			if(!this->LoadGameData((char *)sGameDataError, sizeof(sGameDataError)))
 			{
 				snprintf(error, maxlen, "Failed to load a gamedata: %s", sGameDataError);
 
@@ -99,26 +100,9 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 
 			return false;
 		}
-
-		// Load offsets.
-		{
-			const char *pszOffsetName = "CGameResourceService::m_pEntitySystem";
-
-			ptrdiff_t nOffset = s_aEntityManagerGameData.GetEntitySystemOffset(pszOffsetName);
-
-			if(nOffset == -1)
-			{
-				snprintf(error, maxlen, "Failed to get \"%s\"", pszOffsetName);
-
-				return false;
-			}
-			else
-			{
-				this->m_nGameResourceServiceEntitySystemOffset = nOffset;
-			}
-		}
 	}
 
+	// Initialize a settings.
 	{
 		char sSettingsError[256];
 
@@ -138,8 +122,8 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 		{
 			const char *pszMapName = pServer->GetMapName();
 
-			s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sOldMap.c_str(), nullptr, false, false);
-			this->m_sOldMap = std::string(pszMapName);
+			s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
+			this->m_sCurrentMap = pszMapName;
 		}
 	}
 
@@ -164,6 +148,64 @@ void EntityManager::AllPluginsLoaded()
 	 */
 }
 
+bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
+{
+	s_aEntityManagerGameData.Clear();
+
+	bool bResult = s_aEntityManagerGameData.Load(this->m_sBasePath.c_str(), psError, nMaxLength);
+
+	// Load offsets.
+	if(bResult)
+	{
+		const char *pszOffsetName = "CGameResourceService::m_pEntitySystem";
+
+		ptrdiff_t nOffset = s_aEntityManagerGameData.GetEntitySystemOffset(pszOffsetName);
+
+		bResult = nOffset != -1;
+
+		if(bResult)
+		{
+			this->m_nGameResourceServiceEntitySystemOffset = nOffset;
+		}
+		else
+		{
+			snprintf(psError, nMaxLength, "Failed to get \"%s\" offset", pszOffsetName);
+		}
+	}
+
+	return bResult;
+}
+
+bool EntityManager::LoadSettings(char *psError, size_t nMaxLength)
+{
+	return this->m_aSettings.Load(this->m_sBasePath.c_str(), this->m_sCurrentMap.c_str(), psError, nMaxLength);
+}
+
+void EntityManager::OnBasePathChanged(const char *pszNewOne)
+{
+	this->m_sBasePath = std::string(pszNewOne);
+
+	// Load a gamedata.
+	{
+		char sGameDataError[1024];
+
+		if(!this->LoadGameData((char *)sGameDataError, sizeof(sGameDataError)))
+		{
+			Error("FATAL: Failed to load a gamedata: %s\n", sGameDataError);
+		}
+	}
+
+	// Load a settings.
+	{
+		char sSettingsError[256];
+
+		if(!this->LoadSettings((char *)sSettingsError, sizeof(sSettingsError)))
+		{
+			Warning("Failed to load a settings: %s\n", sSettingsError);
+		}
+	}
+}
+
 void EntityManager::OnSetBasePathCommand(const CCommandContext &context, const CCommand &args)
 {
 	if(args.ArgC() != 2)
@@ -173,8 +215,7 @@ void EntityManager::OnSetBasePathCommand(const CCommandContext &context, const C
 		return;
 	}
 
-	this->m_sBasePath = std::string(args[1]);
-
+	this->OnBasePathChanged(args[1]);
 	Msg("Base path is \"%s\"\n", this->m_sBasePath.c_str());
 }
 
@@ -191,7 +232,7 @@ void EntityManager::OnLevelInit(char const *pszMapName,
 	{
 		char sSettingsError[256];
 
-		if(!this->m_aSettings.Load(this->m_sBasePath.c_str(), pszMapName, (char *)sSettingsError, sizeof(sSettingsError)))
+		if(!this->LoadSettings((char *)sSettingsError, sizeof(sSettingsError)))
 		{
 			Warning("Failed to load a settings: %s\n", sSettingsError);
 		}
@@ -210,8 +251,10 @@ void EntityManager::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLas
 
 void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *pszMapName)
 {
-	s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sOldMap.c_str(), nullptr, false, false);
-	this->m_sOldMap = std::string(pszMapName);
+	const char *pszOldMap = this->m_sCurrentMap.c_str();
+
+	this->m_sCurrentMap = pszMapName;
+	s_aEntityManager.OnLevelInit(pszMapName, nullptr, pszOldMap, nullptr, false, false);
 
 	g_pEntitySystem = *reinterpret_cast<CEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + s_aEntityManagerGameData.GetEntitySystemOffset(""));
 }

@@ -20,7 +20,7 @@
 
 #include "entity_manager/settings.h"
 
-#define PREFIX_ENTITY_MANAGER "entity_manager"
+#define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
 
 class EntityManager final : public ISmmPlugin, public IMetamodListener
 {
@@ -31,8 +31,13 @@ public:
 	bool Unpause(char *error, size_t maxlen);
 	void AllPluginsLoaded();
 
+protected:
+	bool LoadGameData(char *psError = NULL, size_t nMaxLength = 0);
+	bool LoadSettings(char *psError = NULL, size_t nMaxLength = 0);
+	virtual void OnBasePathChanged(const char *pszNewOne);
+
 private: // Commands.
-	CON_COMMAND_MEMBER_F(EntityManager, PREFIX_ENTITY_MANAGER "_set_basepath", OnSetBasePathCommand, "Set base path for Entity Manager", FCVAR_LINKED_CONCOMMAND);
+	CON_COMMAND_MEMBER_F(EntityManager, "mm_" PREFIX_ENTITY_MANAGER "_set_basepath", OnSetBasePathCommand, "Set base path for Entity Manager", FCVAR_LINKED_CONCOMMAND);
 
 public: // SourceHooks.
 	void OnLevelInit(char const *pszMapName, char const *pszMapEntities, char const *pszOldLevel, char const *pszLandmarkName, bool bIsLoadGame, bool bIsBackground);
@@ -60,7 +65,7 @@ private:
 	EntityManagerSpace::Settings m_aSettings;
 	ptrdiff_t m_nGameResourceServiceEntitySystemOffset = -1;
 
-	std::string m_sOldMap;
+	std::string m_sCurrentMap;
 };
 
 extern EntityManager *g_pEntityManager;

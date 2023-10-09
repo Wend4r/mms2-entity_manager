@@ -267,7 +267,7 @@ bool EntityManagerSpace::GameData::InternalLoadSignatures(KeyValues *pSignatures
 			}
 			else if(psError)
 			{
-				snprintf(psError, nMaxLength, "Failed to get library (\"%s\" key) at \"%s\" signature", pszLibraryKey, pszSigName);
+				snprintf(psError, nMaxLength, "Failed to get alibrary (\"%s\" key) at \"%s\" signature", pszLibraryKey, pszSigName);
 			}
 
 			pSigSection = pSigSection->GetNextKey();
