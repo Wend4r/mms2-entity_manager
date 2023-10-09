@@ -34,6 +34,7 @@ public:
 
 protected:
 	bool LoadGameData(char *psError = NULL, size_t nMaxLength = 0);
+	bool LoadPlacement(char *psError = NULL, size_t nMaxLength = 0);
 	bool LoadSettings(char *psError = NULL, size_t nMaxLength = 0);
 	virtual void OnBasePathChanged(const char *pszNewOne);
 

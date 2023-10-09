@@ -105,13 +105,20 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 		}
 	}
 
-	// Initialize a gamedata.
+	// Initialize and load a placement.
 	{
 		char sPlacementError[256];
 
-		bool bResult = s_aEntityManagerPlacement.Init((char *)sPlacementError, sizeof(sPlacementError));
+		if(s_aEntityManagerPlacement.Init((char *)sPlacementError, sizeof(sPlacementError)))
+		{
+			if(!this->LoadPlacement((char *)sPlacementError, sizeof(sPlacementError)))
+			{
+				snprintf(error, maxlen, "Failed to load a placement: %s", sPlacementError);
 
-		if(!bResult)
+				return false;
+			}
+		}
+		else
 		{
 			snprintf(error, maxlen, "Failed to init a placement: %s", sPlacementError);
 
@@ -192,6 +199,20 @@ bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
 	return bResult;
 }
 
+bool EntityManager::LoadPlacement(char *psError, size_t nMaxLength)
+{
+	char sPlacementError[256];
+
+	bool bResult = s_aEntityManagerPlacement.Load((char *)sPlacementError, sizeof(sPlacementError));
+
+	if(!bResult)
+	{
+		snprintf(psError, nMaxLength, "Failed to init a placement: %s", sPlacementError);
+	}
+
+	return bResult;
+}
+
 bool EntityManager::LoadSettings(char *psError, size_t nMaxLength)
 {
 	return this->m_aSettings.Load(this->m_sBasePath.c_str(), this->m_sCurrentMap.c_str(), psError, nMaxLength);
@@ -208,6 +229,16 @@ void EntityManager::OnBasePathChanged(const char *pszNewOne)
 		if(!this->LoadGameData((char *)sGameDataError, sizeof(sGameDataError)))
 		{
 			Error("FATAL: Failed to load a gamedata: %s\n", sGameDataError);
+		}
+	}
+
+	// Load a placement.
+	{
+		char sPlacementError[256];
+
+		if(!this->LoadPlacement((char *)sPlacementError, sizeof(sPlacementError)))
+		{
+			Warning("Failed to load a placement: %s\n", sPlacementError);
 		}
 	}
 
