@@ -140,7 +140,6 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 			const char *pszMapName = pServer->GetMapName();
 
 			s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
-			this->m_sCurrentMap = pszMapName;
 		}
 	}
 
@@ -244,6 +243,7 @@ void EntityManager::OnLevelInit(char const *pszMapName,
                                 bool bIsLoadGame,
                                 bool bIsBackground)
 {
+	this->m_sCurrentMap = pszMapName;
 	this->m_aSettings.Clear();
 
 	{
@@ -270,10 +270,9 @@ void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config
 {
 	const char *pszOldMap = this->m_sCurrentMap.c_str();
 
-	this->m_sCurrentMap = pszMapName;
 	s_aEntityManager.OnLevelInit(pszMapName, nullptr, pszOldMap, nullptr, false, false);
 
-	g_pEntitySystem = *reinterpret_cast<CGameEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + s_aEntityManagerGameData.GetEntitySystemOffset(""));
+	g_pEntitySystem = *reinterpret_cast<CGameEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + this->m_nGameResourceServiceEntitySystemOffset);
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)
