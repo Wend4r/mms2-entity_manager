@@ -50,10 +50,11 @@ public:
 	const char *GetLogTag();
 
 private:
+
 #ifdef PLATFORM_WINDOWS
-	std::string m_sBasePath = "addons\\sourcemod";
+	std::string m_sBasePath = "addons\\" META_PLUGIN_NAME;
 #else
-	std::string m_sBasePath = "addons/sourcemod";
+	std::string m_sBasePath = "addons/" META_PLUGIN_NAME;
 #endif
 
 	EntityManagerSpace::Settings m_aSettings;
