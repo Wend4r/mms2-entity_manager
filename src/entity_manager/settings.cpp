@@ -9,6 +9,7 @@
 #include "placement.h"
 #include "settings.h"
 
+#define ENTITY_MANAGER_MAP_CONFIG_DIR "configs/maps"
 #define ENTITY_MANAGER_MAP_CONFIG_FILE "entities.vdf"
 
 extern IFileSystem *filesystem;
@@ -28,11 +29,11 @@ bool EntityManagerSpace::Settings::Load(const char *pszBasePath, const char *psz
 
 	snprintf(sConfigFile, sizeof(sConfigFile), 
 #ifdef PLATFORM_WINDOWS
-	                                           "%s\\%s\\" ENTITY_MANAGER_MAP_CONFIG_FILE,
+	                                           "%s\\%s\\%s\\%s",
 #else
-	                                           "%s/%s/" ENTITY_MANAGER_MAP_CONFIG_FILE,
+	                                           "%s/%s/%s/%s",
 #endif
-	                                           pszBasePath, pszMapName);
+	                                           pszBasePath, ENTITY_MANAGER_MAP_CONFIG_DIR, pszMapName, ENTITY_MANAGER_MAP_CONFIG_FILE);
 
 	KeyValues *pKVEntities = this->m_pEntities;
 
