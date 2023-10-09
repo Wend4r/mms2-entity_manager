@@ -32,7 +32,10 @@ static EntityManager s_aEntityManager;
 EntityManager *g_pEntityManager = &s_aEntityManager;  // To extern usage.
 
 static EntityManagerSpace::GameData s_aEntityManagerGameData;
-EntityManagerSpace::GameData *g_pEntityManagerGameData = &s_aEntityManagerGameData; // To extern usage.
+EntityManagerSpace::GameData *g_pEntityManagerGameData = &s_aEntityManagerGameData;
+
+EntityManagerSpace::Placement s_aEntityManagerPlacement;
+EntityManagerSpace::Placement *g_pEntityManagerPlacement = &s_aEntityManagerPlacement;
 
 IVEngineServer *engine = NULL;
 ICvar *icvar = NULL;
@@ -97,6 +100,20 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 		else
 		{
 			snprintf(error, maxlen, "Failed to init a gamedata: %s", sGameDataError);
+
+			return false;
+		}
+	}
+
+	// Initialize a gamedata.
+	{
+		char sPlacementError[256];
+
+		bool bResult = s_aEntityManagerPlacement.Init((char *)sPlacementError, sizeof(sPlacementError));
+
+		if(!bResult)
+		{
+			snprintf(error, maxlen, "Failed to init a placement: %s", sPlacementError);
 
 			return false;
 		}

@@ -18,6 +18,7 @@
 #include <iplayerinfo.h>
 #include <sh_vector.h>
 
+#include "entity_manager/placement.h"
 #include "entity_manager/settings.h"
 
 #define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
@@ -70,6 +71,7 @@ private:
 
 extern EntityManager *g_pEntityManager;
 extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
+extern EntityManagerSpace::Placement *g_pEntityManagerPlacement;
 
 PLUGIN_GLOBALVARS();
 

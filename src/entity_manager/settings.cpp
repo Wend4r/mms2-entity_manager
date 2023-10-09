@@ -13,22 +13,13 @@
 
 extern IFileSystem *filesystem;
 
-EntityManagerSpace::Placement m_aEntityManagerPlacement;
+extern EntityManagerSpace::Placement *g_pEntityManagerPlacement;
 
 bool EntityManagerSpace::Settings::Init(char *psError, size_t nMaxLength)
 {
 	this->m_pEntities = new KeyValues("Entities");
 
-	char sPlacementError[256];
-
-	bool bResult = m_aEntityManagerPlacement.Init((char *)sPlacementError, sizeof(sPlacementError));
-
-	if(!bResult)
-	{
-		snprintf(psError, nMaxLength, "Failed to init a placement: %s", sPlacementError);
-	}
-
-	return bResult;
+	return true;
 }
 
 bool EntityManagerSpace::Settings::Load(const char *pszBasePath, const char *pszMapName, char *psError, size_t nMaxLength)
