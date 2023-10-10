@@ -43,7 +43,7 @@ bool EntityManagerSpace::Settings::Load(const char *pszBasePath, const char *psz
 	{
 		DevMsg("EntityManagerSpace::Settings::Load(): config file is \"%s\" (key value is %p)\n", sConfigFile, pKVEntities);
 
-		bResult = this->InternalLoad(pKVEntities, psError, nMaxLength);
+		bResult = this->LoadAndCreateEntities(pKVEntities, psError, nMaxLength);
 	}
 	else if(psError)
 	{
@@ -64,11 +64,11 @@ void EntityManagerSpace::Settings::Destroy()
 	this->m_pEntities = nullptr;
 }
 
-bool EntityManagerSpace::Settings::InternalLoad(const KeyValues *pEntities, char *psError, size_t nMaxLength)
+bool EntityManagerSpace::Settings::LoadAndCreateEntities(const KeyValues *pEntityValues, char *psError, size_t nMaxLength)
 {
-	FOR_EACH_SUBKEY(pEntities, pEntity)
+	FOR_EACH_SUBKEY(pEntityValues, pEntitySection)
 	{
-		Msg("Detect \"%s\" classname\n", pEntity->GetName());
+		g_pEntityManagerPlacement->CreateEntity(pEntitySection->GetName());
 	}
 
 	return true;

@@ -43,8 +43,7 @@ IGameEventManager2 *gameevents = NULL;
 IFileSystem *filesystem = NULL;
 IServerGameDLL *server = NULL;
 
-CGameEntitySystem *g_pEntitySystem;
-
+CGameEntitySystem *g_pEntitySystem = NULL;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
 // otherwise that'll be nullptr!
@@ -144,9 +143,8 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 
 		if(pServer)
 		{
-			const char *pszMapName = pServer->GetMapName();
-
-			s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
+			this->InitEntitySystem();
+			s_aEntityManager.OnLevelInit(pServer->GetMapName(), nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
 		}
 	}
 
@@ -169,6 +167,11 @@ void EntityManager::AllPluginsLoaded()
 	/* This is where we'd do stuff that relies on the mod or other plugins 
 	 * being initialized (for example, cvars added and events registered).
 	 */
+}
+
+void EntityManager::InitEntitySystem()
+{
+	g_pEntitySystem = *reinterpret_cast<CGameEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + this->m_nGameResourceServiceEntitySystemOffset);
 }
 
 bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
@@ -299,11 +302,9 @@ void EntityManager::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLas
 
 void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *pszMapName)
 {
-	const char *pszOldMap = this->m_sCurrentMap.c_str();
+	this->InitEntitySystem();
 
-	s_aEntityManager.OnLevelInit(pszMapName, nullptr, pszOldMap, nullptr, false, false);
-
-	g_pEntitySystem = *reinterpret_cast<CGameEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + this->m_nGameResourceServiceEntitySystemOffset);
+	s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)

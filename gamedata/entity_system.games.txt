@@ -8,14 +8,13 @@
 			// "Attempted to create unknown entity classname \"%s\"!\n"
 			// 
 			// Declaration: 
-			// CEntityInstance *__fastcall CEntitySystem::CreateEntity(
+			// CEntityInstance *CEntitySystem::CreateEntity(
 			//         CEntitySystem *const this,
-			//         SpawnGroupHandle_t hSpawnGroup,
+			//         CEntityIndex iForcedIndex,
 			//         const char *pszNameOrDesignName,
 			//         EntityNetworkingMode_t networkMode,
-			//         CEntityIndex iForcedIndex,
+			//         SpawnGroupHandle_t hSpawnGroup,
 			//         int iForcedSerial,
-			//         const V_uuid_t *pForcedId,
 			//         bool bCreateInIsolatedPrecacheList)
 			// 
 			// Type declarations:
@@ -25,21 +24,14 @@
 			// 	ENTITY_NETWORKING_MODE_NETWORKED,
 			// 	ENTITY_NETWORKING_MODE_NOT_NETWORKED,
 			// };
-			// struct V_uuid_t
-			// {
-			// 	uint32 Data1;
-			// 	uint16 Data2;
-			// 	uint16 Data3;
-			// 	uint8 Data4[8];
-			// };
 			// 
 			// Basic usage:
-			// (CBaseEntity *)CEntitySystem::CreateEntity(g_pEntitySystem, 0xFFFFFFFF, pClassName, ENTITY_NETWORKING_MODE_DEFAULT, iForceEdictIndex, -1, nullptr, false);
+			// (CBaseEntity *)CEntitySystem::CreateEntity(g_pEntitySystem, iForceEdictIndex, pClassName, ENTITY_NETWORKING_MODE_DEFAULT, (SpawnGroupHandle_t)-1, -1, nullptr, false);
 			"CEntitySystem::CreateEntity"
 			{
 				"library"       "server"
-				"windows64"     "0F 85 ? ? ? ? 8B DE"
-				"linux64"       "E8 ? ? ? ? 5F 49 89 C5"
+				"windows64"     "48 8B C4 55 56 48 8B EC"
+				"linux64"       "55 48 89 E5 41 57 4C 8D 7D C8 41 56 41 55 45 89 C5"
 			}
 		}
 

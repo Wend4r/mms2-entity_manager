@@ -13,7 +13,7 @@ namespace EntityManagerSpace
 		void Destroy();
 
 	protected:
-		bool InternalLoad(const KeyValues *pEntities, char *psError = NULL, size_t nMaxLength = 0);
+		bool LoadAndCreateEntities(const KeyValues *pEntities, char *psError = NULL, size_t nMaxLength = 0);
 
 	private:
 		KeyValues *m_pEntities;

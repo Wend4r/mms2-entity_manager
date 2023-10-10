@@ -6,21 +6,11 @@
 #include <entity2/entitysystem.h>
 #include <tier0/platform.h>
 
-typedef uint32_t SpawnGroupHandle_t;
-
 enum EntityNetworkingMode_t
 {
 	ENTITY_NETWORKING_MODE_DEFAULT = 0,
 	ENTITY_NETWORKING_MODE_NETWORKED,
 	ENTITY_NETWORKING_MODE_NOT_NETWORKED,
-};
-
-struct V_uuid_t
-{
-	uint32 Data1;
-	uint16 Data2;
-	uint16 Data3;
-	uint8 Data4[8];
 };
 
 namespace EntityManagerSpace
@@ -33,18 +23,14 @@ namespace EntityManagerSpace
 		void Destroy();
 
 	public:
-		CBaseEntity *CreateEntity(const char *pszClassname, CEntityIndex iForceEdictIndex = CEntityIndex(-1));
+		CBaseEntity *CreateEntity(const char *pszClassName, CEntityIndex iForceEdictIndex = CEntityIndex(-1));
 
 	protected:
 		bool LoadGameData(char *psError = NULL, size_t nMaxLength = 0);
 
 	private:
-		class CEntitySystemCaller : public CEntitySystem
-		{
-		public:
-			typedef CEntityInstance *(CEntitySystem::*CreateEntity)(SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, const V_uuid_t *pForcedId, bool bCreateInIsolatedPrecacheList);
-		};
+		typedef CEntityInstance *(*CEntitySystem__CreateEntity)(CEntitySystem * const pThis, CEntityIndex iForcedIndex, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, SpawnGroupHandle_t hSpawnGroup, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
 
-		CEntitySystemCaller::CreateEntity m_pfnEntitySystemCreateEntity;
+		CEntitySystem__CreateEntity m_pfnEntitySystemCreateEntity;
 	};
 };

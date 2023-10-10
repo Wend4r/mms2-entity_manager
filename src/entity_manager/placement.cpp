@@ -31,7 +31,18 @@ void EntityManagerSpace::Placement::Destroy()
 
 CBaseEntity *EntityManagerSpace::Placement::CreateEntity(const char *pszClassName, CEntityIndex iForceEdictIndex)
 {
-	return (CBaseEntity *)(g_pEntitySystem->*(this->m_pfnEntitySystemCreateEntity))((SpawnGroupHandle_t)-1, pszClassName, ENTITY_NETWORKING_MODE_DEFAULT, iForceEdictIndex, -1, nullptr, 0);
+	CEntityInstance *pEntity = (this->m_pfnEntitySystemCreateEntity)(g_pEntitySystem, iForceEdictIndex, pszClassName, ENTITY_NETWORKING_MODE_DEFAULT, (SpawnGroupHandle_t)-1, -1, false);
+
+	if(pEntity)
+	{
+		DebugMsg("Created \"%s\" (requested edict index is %d, result index is %d) entity\n", pszClassName, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+	}
+	else
+	{
+		DevWarning("Failed to create \"%s\" (requested edict index is %d) entity\n", pszClassName, iForceEdictIndex.Get());
+	}
+
+	return (CBaseEntity *)pEntity;
 }
 
 bool EntityManagerSpace::Placement::LoadGameData(char *psError, size_t nMaxLength)
@@ -44,7 +55,7 @@ bool EntityManagerSpace::Placement::LoadGameData(char *psError, size_t nMaxLengt
 
 	if(bResult)
 	{
-		this->m_pfnEntitySystemCreateEntity = pCreateEntity.FCast<CEntitySystemCaller::CreateEntity>();
+		this->m_pfnEntitySystemCreateEntity = pCreateEntity.RCast<CEntitySystem__CreateEntity>();
 	}
 	else if(psError)
 	{
