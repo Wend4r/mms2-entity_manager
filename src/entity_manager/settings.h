@@ -16,10 +16,13 @@ namespace EntityManagerSpace
 		void Destroy();
 
 	protected:
-		bool LoadAndCreateEntities(const KeyValues *pEntities, char *psError = NULL, size_t nMaxLength = 0);
+		bool LoadWorld(const char *pszBaseConfigsDir, char *psError = NULL, size_t nMaxLength = 0);
+		bool LoadWorldEntity(KeyValues *pEntityValues, CBaseEntity *&pResultEntity, CEntityKeyValues *&pResultKeyValues, char *psError = NULL, size_t nMaxLength = 0);
+
+	protected:
 
 	private:
-		KeyValues *m_pEntities;
+		KeyValues *m_pWorld;
 	};
 };
 

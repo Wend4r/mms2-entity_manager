@@ -1,0 +1,9 @@
+"World"
+{
+	"entity"
+	{
+		"classname"     "prop_dynamic"
+		"model"         "models/props_office/windows/office_window_59x104.vmdl_c"
+		"origin"        "0 0 0"
+	}
+}

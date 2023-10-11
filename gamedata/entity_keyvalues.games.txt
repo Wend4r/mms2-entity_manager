@@ -1,0 +1,72 @@
+"Games"
+{
+	"cs2"
+	{
+		"Signatures"
+		{
+			// Used into CEntitySpawner<T>::StartNewEntity(CEntitySpawner<T> *const this)
+			//   Is virtual table fucntion;
+			//   Has "kv 0x%p AddRef refcount == %d\n" string
+			// 
+			// Declaration:
+			// void CEntityKeyValues::CEntityKeyValues(
+			//         CEntityKeyValues *const this, 
+			//         void *pEntitySystemSubobject, // Can be nullptr by 0 type.
+			//         char eSubobjectType) // Usually, 0 or 3
+			"CEntityKeyValues::CEntityKeyValues"
+			{
+				"library"       "server"
+				"windows64"     "48 89 5C 24 08 57 48 83 EC 20 33 FF 48 8B D9 89 79 28"
+				"linux64"       "55 48 89 E5 53 48 89 FB 48 83 EC 08 48 8D 05 ? ? ? ? C7 47 ? ? ? ? ? 48 C7 47"
+			}
+
+			// Used into entity spawn functions.
+			// Located near CEntityKeyValues::CEntityKeyValues().
+			// 
+			// Declaration:
+			// void *CEntityKeyValues::GetAttribute( // Returns an unknown attribute structure.
+			//         CEntityKeyValues *const this, 
+			//         const EntityKey *key,
+			//         char *psValue) // Can be nullptr
+			// 
+			// Type declarations:
+			// class EntityKey // Like CUtlStringToken
+			// {
+			// 	uint32 m_nHashCode;
+			// 	const char *pszName;
+			// };
+			"CEntityKeyValues::GetAttribute"
+			{
+				"library"       "server"
+				"windows64"     "40 53 55 41 57 48 83 EC 30 66 83 79 22 00"
+				"linux64"       "55 48 89 E5 41 55 49 89 D5 41 54 49 89 F4 53 48 89 FB 48 83 EC 38"
+			}
+
+			// Used into entity spawn functions.
+			// Located near CEntityKeyValues::GetAttribute().
+			// 
+			// Declaration:
+			// void CEntityKeyValues::SetAttributeValue(
+			//         CEntityKeyValues *const this, 
+			//         void *pAttribute, 
+			//         const char *pString)
+			// 
+			"CEntityKeyValues::SetAttributeValue"
+			{
+				"library"       "server"
+				"windows64"     "48 89 6C 24 10 48 89 74 24 18 57 48 83 EC 20 48 83 39 00"
+				"linux64"       "55 48 89 E5 41 55 49 89 D5 41 54 49 89 F4 E8 ? ? ? ? 4C 89 EE"
+			}
+		}
+
+		"Offsets"
+		{
+			// Read "CEntityKeyValues::CEntityKeyValues" signature.
+			"sizeof(CEntityKeyValues)"
+			{
+				"windows64"     "0x38"
+				"linux64"       "0x38"
+			}
+		}
+	}
+}

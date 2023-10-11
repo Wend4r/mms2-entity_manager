@@ -17,12 +17,14 @@ for sdk_name in EntityManager.sdks:
 
     binary.sources += [
       'entity_manager/gamedata.cpp',
+      'entity_manager/placement/entitykeyvalues_provider.cpp',
       'entity_manager/placement/entitysystem_provider.cpp',
       'entity_manager/placement.cpp',
       'entity_manager/settings.cpp',
       'memory_utils/memaddr.cpp',
       'memory_utils/module.cpp',
       'entity_manager.cpp',
+      'murmur_hash.cpp',
     ]
 
     if sdk_name in ['dota', 'cs2']:

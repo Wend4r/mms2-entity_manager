@@ -18,6 +18,8 @@ namespace EntityManagerSpace
 	{
 	public:
 		CEntityInstance *CreateEntity(CEntityIndex iForcedIndex, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, SpawnGroupHandle_t hSpawnGroup, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
+		void QueueSpawnEntity(CEntityIdentity *pEntity, const CEntityKeyValues *pInitializationData);
+		void ExecuteQueuedCreation();
 	};
 };
 
