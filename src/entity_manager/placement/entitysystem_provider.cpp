@@ -4,8 +4,6 @@
 
 #include <entity_manager/placement.h>
 
-extern CGameEntitySystem *g_pEntitySystem;
-
 extern EntityManagerSpace::Placement *g_pEntityManagerPlacement;
 
 CEntityInstance *EntityManagerSpace::CEntitySystemProvider::CreateEntity(CEntityIndex iForcedIndex, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, SpawnGroupHandle_t hSpawnGroup, int iForcedSerial, bool bCreateInIsolatedPrecacheList)

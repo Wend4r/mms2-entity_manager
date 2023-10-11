@@ -19,9 +19,6 @@ namespace EntityManagerSpace
 		bool Load(char *psError = NULL, size_t nMaxLength = 0);
 		void Destroy();
 
-	public:
-		CBaseEntity *CreateEntity(const char *pszClassName, CEntityIndex iForceEdictIndex = CEntityIndex(-1));
-
 	protected:
 		bool LoadGameData(char *psError = NULL, size_t nMaxLength = 0);
 
