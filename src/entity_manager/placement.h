@@ -4,23 +4,17 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <eiface.h>
-#include <entity2/entityidentity.h>
-#include <entity2/entitysystem.h>
 #include <tier0/platform.h>
 
-enum EntityNetworkingMode_t
-{
-	ENTITY_NETWORKING_MODE_DEFAULT = 0,
-	ENTITY_NETWORKING_MODE_NETWORKED,
-	ENTITY_NETWORKING_MODE_NOT_NETWORKED,
-};
+#include "placement/entitysystem_provider.h"
 
 namespace EntityManagerSpace
 {
 	class Placement
 	{
 	public:
+		friend class CEntitySystemProvider;
+
 		bool Init(char *psError, size_t nMaxLength);
 		bool Load(char *psError = NULL, size_t nMaxLength = 0);
 		void Destroy();
@@ -32,9 +26,20 @@ namespace EntityManagerSpace
 		bool LoadGameData(char *psError = NULL, size_t nMaxLength = 0);
 
 	private:
-		typedef CEntityInstance *(*CEntitySystem__CreateEntity)(CEntitySystem * const pThis, CEntityIndex iForcedIndex, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, SpawnGroupHandle_t hSpawnGroup, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
+		class GameData
+		{
+		public:
+			class EntitySystem
+			{
+			public:
+				typedef CEntityInstance *(*CreateEntityFuncType)(CEntitySystem * const pThis, CEntityIndex iForcedIndex, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, SpawnGroupHandle_t hSpawnGroup, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
+				CreateEntityFuncType m_pfnCreateEntity;
+			};
 
-		CEntitySystem__CreateEntity m_pfnEntitySystemCreateEntity;
+			EntitySystem m_aEntitySystem;
+		};
+
+		GameData m_aData;
 	};
 };
 

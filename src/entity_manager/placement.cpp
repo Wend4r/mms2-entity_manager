@@ -31,7 +31,7 @@ void EntityManagerSpace::Placement::Destroy()
 
 CBaseEntity *EntityManagerSpace::Placement::CreateEntity(const char *pszClassName, CEntityIndex iForceEdictIndex)
 {
-	CEntityInstance *pEntity = (this->m_pfnEntitySystemCreateEntity)(g_pEntitySystem, iForceEdictIndex, pszClassName, ENTITY_NETWORKING_MODE_DEFAULT, (SpawnGroupHandle_t)-1, -1, false);
+	CEntityInstance *pEntity = ((CEntitySystemProvider *)g_pEntitySystem)->CreateEntity(iForceEdictIndex, pszClassName, ENTITY_NETWORKING_MODE_DEFAULT, (SpawnGroupHandle_t)-1, -1, false);
 
 	if(pEntity)
 	{
@@ -55,7 +55,7 @@ bool EntityManagerSpace::Placement::LoadGameData(char *psError, size_t nMaxLengt
 
 	if(bResult)
 	{
-		this->m_pfnEntitySystemCreateEntity = pCreateEntity.RCast<CEntitySystem__CreateEntity>();
+		this->m_aData.m_aEntitySystem.m_pfnCreateEntity = pCreateEntity.RCast<GameData::EntitySystem::CreateEntityFuncType>();
 	}
 	else if(psError)
 	{

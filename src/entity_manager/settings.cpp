@@ -6,7 +6,7 @@
 #include <tier1/utlstring.h> // For filesystem.h
 #include <filesystem.h>
 
-#include "placement.h"
+#include "placement/entitysystem_provider.h"
 #include "settings.h"
 
 #define ENTITY_MANAGER_MAP_CONFIG_DIR "configs/maps"
@@ -14,7 +14,7 @@
 
 extern IFileSystem *filesystem;
 
-extern EntityManagerSpace::Placement *g_pEntityManagerPlacement;
+extern CGameEntitySystem *g_pEntitySystem;
 
 bool EntityManagerSpace::Settings::Init(char *psError, size_t nMaxLength)
 {
@@ -68,7 +68,7 @@ bool EntityManagerSpace::Settings::LoadAndCreateEntities(const KeyValues *pEntit
 {
 	FOR_EACH_SUBKEY(pEntityValues, pEntitySection)
 	{
-		g_pEntityManagerPlacement->CreateEntity(pEntitySection->GetName());
+		((CEntitySystemProvider *)g_pEntitySystem)->CreateEntity(CEntityIndex(-1), pEntitySection->GetName(), ENTITY_NETWORKING_MODE_DEFAULT, (SpawnGroupHandle_t)-1, -1, false);
 	}
 
 	return true;
