@@ -10,8 +10,8 @@
  * the use of this software.
  */
 
-#ifndef _INCLUDE_METAMOD_SOURCE_STUB_PLUGIN_H_
-#define _INCLUDE_METAMOD_SOURCE_STUB_PLUGIN_H_
+#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_H_
+#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_H_
 
 #include <ISmmPlugin.h>
 #include <igameevents.h>
@@ -79,4 +79,4 @@ extern EntityManagerSpace::Placement *g_pEntityManagerPlacement;
 
 PLUGIN_GLOBALVARS();
 
-#endif //_INCLUDE_METAMOD_SOURCE_STUB_PLUGIN_H_
+#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_H_

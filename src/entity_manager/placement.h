@@ -1,3 +1,6 @@
+#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PLACEMENT_H_
+#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PLACEMENT_H_
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -34,3 +37,5 @@ namespace EntityManagerSpace
 		CEntitySystem__CreateEntity m_pfnEntitySystemCreateEntity;
 	};
 };
+
+#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PLACEMENT_H_

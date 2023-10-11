@@ -1,3 +1,6 @@
+#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_SETTINGS_H_
+#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_SETTINGS_H_
+
 #include <stddef.h>
 
 class KeyValues;
@@ -19,3 +22,5 @@ namespace EntityManagerSpace
 		KeyValues *m_pEntities;
 	};
 };
+
+#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_SETTINGS_H_

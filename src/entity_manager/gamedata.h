@@ -1,3 +1,6 @@
+#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_GAMEDATA_H_
+#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_GAMEDATA_H_
+
 #include <stddef.h>
 #include <map>
 #include <string>
@@ -56,3 +59,5 @@ namespace EntityManagerSpace
 		Config m_aEntitySystemConfig;
 	};
 };
+
+#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_GAMEDATA_H_
