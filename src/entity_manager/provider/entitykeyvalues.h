@@ -6,8 +6,6 @@
 #include <entity2/entitysystem.h>
 #include <tier1/utlstring.h>
 
-typedef CUtlStringToken EntityKeyId_t;
-
 class CEntityKeyValues
 {
 };
