@@ -18,7 +18,8 @@
 #include <iplayerinfo.h>
 #include <sh_vector.h>
 
-#include "entity_manager/placement.h"
+#include "entity_manager/gamedata.h"
+#include "entity_manager/provider.h"
 #include "entity_manager/settings.h"
 
 #define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
@@ -36,8 +37,11 @@ public:
 
 protected:
 	void InitEntitySystem();
+	void DestroyEntitySystem();
+
+protected:
 	bool LoadGameData(char *psError = NULL, size_t nMaxLength = 0);
-	bool LoadPlacement(char *psError = NULL, size_t nMaxLength = 0);
+	bool LoadProvider(char *psError = NULL, size_t nMaxLength = 0);
 	bool LoadSettings(char *psError = NULL, size_t nMaxLength = 0);
 	virtual void OnBasePathChanged(const char *pszNewOne);
 
@@ -48,6 +52,7 @@ public: // SourceHooks.
 	void OnLevelInit(char const *pszMapName, char const *pszMapEntities, char const *pszOldLevel, char const *pszLandmarkName, bool bIsLoadGame, bool bIsBackground);
 	void OnGameFrameHook(bool simulating, bool bFirstTick, bool bLastTick);
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *pszMapName);
+	void OnEntitySystemSpawn(int nCount, const EntitySpawnInfo_t *pInfo);
 
 public:
 	const char *GetAuthor();
@@ -75,7 +80,7 @@ private:
 
 extern EntityManager *g_pEntityManager;
 extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
-extern EntityManagerSpace::Placement *g_pEntityManagerPlacement;
+extern EntityManagerSpace::Provider *g_pEntityManagerProvider;
 
 PLUGIN_GLOBALVARS();
 

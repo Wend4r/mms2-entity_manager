@@ -4,6 +4,8 @@
 #include <stddef.h>
 
 class KeyValues;
+class CBaseEntity;
+class CEntityKeyValues;
 
 namespace EntityManagerSpace
 {

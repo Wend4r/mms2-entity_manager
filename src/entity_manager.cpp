@@ -20,7 +20,6 @@
 #include <eiface.h>
 #include <iserver.h>
 
-#include "entity_manager/gamedata.h"
 #include "entity_manager.h"
 
 class GameSessionConfiguration_t { };
@@ -28,14 +27,16 @@ class GameSessionConfiguration_t { };
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 SH_DECL_HOOK3_void(INetworkServerService, StartupServer, SH_NOATTRIB, 0, const GameSessionConfiguration_t &, ISource2WorldSession *, const char *);
 
+SH_DECL_HOOK2_void(CEntitySystem, Spawn, SH_NOATTRIB, 0, int, const EntitySpawnInfo_t *);
+
 static EntityManager s_aEntityManager;
 EntityManager *g_pEntityManager = &s_aEntityManager;  // To extern usage.
 
 static EntityManagerSpace::GameData s_aEntityManagerGameData;
 EntityManagerSpace::GameData *g_pEntityManagerGameData = &s_aEntityManagerGameData;
 
-EntityManagerSpace::Placement s_aEntityManagerPlacement;
-EntityManagerSpace::Placement *g_pEntityManagerPlacement = &s_aEntityManagerPlacement;
+static EntityManagerSpace::Provider s_aEntityManagerProvider;
+EntityManagerSpace::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
 
 IVEngineServer *engine = NULL;
 ICvar *icvar = NULL;
@@ -104,22 +105,22 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 		}
 	}
 
-	// Initialize and load a placement.
+	// Initialize and load a provider.
 	{
-		char sPlacementError[256];
+		char sProviderError[256];
 
-		if(s_aEntityManagerPlacement.Init((char *)sPlacementError, sizeof(sPlacementError)))
+		if(s_aEntityManagerProvider.Init((char *)sProviderError, sizeof(sProviderError)))
 		{
-			if(!this->LoadPlacement((char *)sPlacementError, sizeof(sPlacementError)))
+			if(!this->LoadProvider((char *)sProviderError, sizeof(sProviderError)))
 			{
-				snprintf(error, maxlen, "Failed to load a placement: %s", sPlacementError);
+				snprintf(error, maxlen, "Failed to load a provider: %s", sProviderError);
 
 				return false;
 			}
 		}
 		else
 		{
-			snprintf(error, maxlen, "Failed to init a placement: %s", sPlacementError);
+			snprintf(error, maxlen, "Failed to init a provider: %s", sProviderError);
 
 			return false;
 		}
@@ -159,6 +160,8 @@ bool EntityManager::Unload(char *error, size_t maxlen)
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnGameFrameHook, true);
 	SH_REMOVE_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManager::OnStartupServerHook, true);
 
+	this->DestroyEntitySystem();
+
 	return true;
 }
 
@@ -172,6 +175,16 @@ void EntityManager::AllPluginsLoaded()
 void EntityManager::InitEntitySystem()
 {
 	g_pEntitySystem = *reinterpret_cast<CGameEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + this->m_nGameResourceServiceEntitySystemOffset);
+
+	SH_ADD_HOOK_MEMFUNC(CEntitySystem, Spawn, g_pEntitySystem, this, &EntityManager::OnEntitySystemSpawn, true);
+}
+
+void EntityManager::DestroyEntitySystem()
+{
+	if(g_pEntitySystem)
+	{
+		SH_REMOVE_HOOK_MEMFUNC(CEntitySystem, Spawn, g_pEntitySystem, this, &EntityManager::OnEntitySystemSpawn, true);
+	}
 }
 
 bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
@@ -202,15 +215,15 @@ bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
 	return bResult;
 }
 
-bool EntityManager::LoadPlacement(char *psError, size_t nMaxLength)
+bool EntityManager::LoadProvider(char *psError, size_t nMaxLength)
 {
-	char sPlacementError[256];
+	char sProviderError[256];
 
-	bool bResult = s_aEntityManagerPlacement.Load((char *)sPlacementError, sizeof(sPlacementError));
+	bool bResult = s_aEntityManagerProvider.Load((char *)sProviderError, sizeof(sProviderError));
 
 	if(!bResult)
 	{
-		snprintf(psError, nMaxLength, "Failed to init a placement: %s", sPlacementError);
+		snprintf(psError, nMaxLength, "Failed to init a provider: %s", sProviderError);
 	}
 
 	return bResult;
@@ -235,13 +248,13 @@ void EntityManager::OnBasePathChanged(const char *pszNewOne)
 		}
 	}
 
-	// Load a placement.
+	// Load a provider.
 	{
-		char sPlacementError[256];
+		char sProviderError[256];
 
-		if(!this->LoadPlacement((char *)sPlacementError, sizeof(sPlacementError)))
+		if(!this->LoadProvider((char *)sProviderError, sizeof(sProviderError)))
 		{
-			Warning("Failed to load a placement: %s\n", sPlacementError);
+			Warning("Failed to load a provider: %s\n", sProviderError);
 		}
 	}
 
@@ -305,6 +318,11 @@ void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config
 	this->InitEntitySystem();
 
 	s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
+}
+
+void EntityManager::OnEntitySystemSpawn(int nCount, const EntitySpawnInfo_t *pInfo)
+{
+
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)

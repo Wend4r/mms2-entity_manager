@@ -1,21 +1,21 @@
-#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PLACEMENT_H_
-#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PLACEMENT_H_
+#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_H_
+#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_H_
 
 #include <stddef.h>
 #include <stdint.h>
 
 #include <tier0/platform.h>
 
-#include "placement/entitykeyvalues_provider.h"
-#include "placement/entitysystem_provider.h"
+#include "provider/entitykeyvalues.h"
+#include "provider/entitysystem.h"
 
 namespace EntityManagerSpace
 {
-	class Placement
+	class Provider
 	{
 	public:
-		friend class CEntitySystemProvider;
 		friend class CEntityKeyValuesProvider;
+		friend class CEntitySystemProvider;
 
 		bool Init(char *psError, size_t nMaxLength);
 		bool Load(char *psError = NULL, size_t nMaxLength = 0);
@@ -67,4 +67,4 @@ namespace EntityManagerSpace
 	};
 };
 
-#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PLACEMENT_H_
+#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_H_

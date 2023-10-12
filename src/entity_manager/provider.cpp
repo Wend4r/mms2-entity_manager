@@ -1,4 +1,4 @@
-#include "placement.h"
+#include "provider.h"
 #include "gamedata.h"
 
 #include <entity2/entitysystem.h>
@@ -7,12 +7,12 @@ extern CGameEntitySystem *g_pEntitySystem;
 
 extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
 
-bool EntityManagerSpace::Placement::Init(char *psError, size_t nMaxLength)
+bool EntityManagerSpace::Provider::Init(char *psError, size_t nMaxLength)
 {
 	return true;
 }
 
-bool EntityManagerSpace::Placement::Load(char *psError, size_t nMaxLength)
+bool EntityManagerSpace::Provider::Load(char *psError, size_t nMaxLength)
 {
 	bool bResult = this->LoadGameData(psError, nMaxLength);
 
@@ -24,12 +24,12 @@ bool EntityManagerSpace::Placement::Load(char *psError, size_t nMaxLength)
 	return bResult;
 }
 
-void EntityManagerSpace::Placement::Destroy()
+void EntityManagerSpace::Provider::Destroy()
 {
 	// ...
 }
 
-bool EntityManagerSpace::Placement::LoadGameData(char *psError, size_t nMaxLength)
+bool EntityManagerSpace::Provider::LoadGameData(char *psError, size_t nMaxLength)
 {
 	bool bResult = this->LoadEntitySystemGameData(psError, nMaxLength);
 
@@ -41,7 +41,7 @@ bool EntityManagerSpace::Placement::LoadGameData(char *psError, size_t nMaxLengt
 	return bResult;
 }
 
-bool EntityManagerSpace::Placement::LoadEntityKeyValuesGameData(char *psError, size_t nMaxLength)
+bool EntityManagerSpace::Provider::LoadEntityKeyValuesGameData(char *psError, size_t nMaxLength)
 {
 	const char *pszSignatureName = "CEntityKeyValues::CEntityKeyValues";
 
@@ -81,7 +81,7 @@ bool EntityManagerSpace::Placement::LoadEntityKeyValuesGameData(char *psError, s
 }
 
 
-bool EntityManagerSpace::Placement::LoadEntitySystemGameData(char *psError, size_t nMaxLength)
+bool EntityManagerSpace::Provider::LoadEntitySystemGameData(char *psError, size_t nMaxLength)
 {
 	const char *pszSignatureName = "CEntitySystem::CreateEntity";
 

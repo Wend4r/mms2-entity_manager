@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include "settings.h"
+
 #include <tier0/dbg.h>
 #include <tier0/platform.h>
 #include <tier1/KeyValues.h>
@@ -7,9 +9,8 @@
 #include <tier1/utlvector.h>
 #include <filesystem.h>
 
-#include "placement/entitykeyvalues_provider.h"
-#include "placement/entitysystem_provider.h"
-#include "settings.h"
+#include "provider/entitykeyvalues.h"
+#include "provider/entitysystem.h"
 
 #define ENTITY_MANAGER_MAP_CONFIG_DIR "configs/maps"
 #define ENTITY_MANAGER_MAP_CONFIG_WORLD_FILE "world.vdf"
