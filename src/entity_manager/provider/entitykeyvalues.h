@@ -13,7 +13,7 @@ class CEntityKeyValues
 struct EntityKey
 {
 	uint32 m_nHashCode;
-	const char *pszName;
+	const char *m_pszName;
 };
 
 namespace EntityManagerSpace
