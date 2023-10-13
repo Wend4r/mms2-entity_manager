@@ -38,6 +38,9 @@ EntityManagerSpace::GameData *g_pEntityManagerGameData = &s_aEntityManagerGameDa
 static EntityManagerSpace::Provider s_aEntityManagerProvider;
 EntityManagerSpace::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
 
+static EntityManagerSpace::ProviderAgent s_aEntityManagerProviderAgent;
+EntityManagerSpace::ProviderAgent *g_pEntityManagerProviderAgent = &s_aEntityManagerProviderAgent;
+
 IVEngineServer *engine = NULL;
 ICvar *icvar = NULL;
 IGameEventManager2 *gameevents = NULL;
@@ -123,6 +126,16 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 			snprintf(error, maxlen, "Failed to init a provider: %s", sProviderError);
 
 			return false;
+		}
+	}
+
+	// Initialize a provider agent.
+	{
+		char sProviderAgentError[256];
+
+		if(!s_aEntityManagerProviderAgent.Init((char *)sProviderAgentError, sizeof(sProviderAgentError)))
+		{
+			snprintf(error, maxlen, "Failed to init a provider agent: %s", sProviderAgentError);
 		}
 	}
 
@@ -322,7 +335,7 @@ void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config
 
 void EntityManager::OnEntitySystemSpawn(int nCount, const EntitySpawnInfo_t *pInfo)
 {
-
+	g_pEntityManagerProviderAgent->SpawnQueued();
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)

@@ -9,15 +9,14 @@
 #include <tier1/utlvector.h>
 #include <filesystem.h>
 
-#include "provider/entitykeyvalues.h"
-#include "provider/entitysystem.h"
+#include "provider_agent.h"
 
 #define ENTITY_MANAGER_MAP_CONFIG_DIR "configs/maps"
 #define ENTITY_MANAGER_MAP_CONFIG_WORLD_FILE "world.vdf"
 
 extern IFileSystem *filesystem;
 
-extern CGameEntitySystem *g_pEntitySystem;
+extern EntityManagerSpace::ProviderAgent *g_pEntityManagerProviderAgent;
 
 bool EntityManagerSpace::Settings::Init(char *psError, size_t nMaxLength)
 {
@@ -77,98 +76,14 @@ bool EntityManagerSpace::Settings::LoadWorld(const char *pszBaseConfigsDir, char
 
 	if(bResult)
 	{
-		CUtlVector<CUtlString> vecErrors;
-
-		CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pEntitySystem;
-
+		FOR_EACH_SUBKEY(pWorldValues, pEntityValues)
 		{
-			char sEntityError[256];
-
-			CBaseEntity *pEntity;
-
-			CEntityKeyValues *pEntityKeyValues;
-
-			FOR_EACH_SUBKEY(pWorldValues, pEntityValues)
-			{
-				if(this->LoadWorldEntity(pEntityValues, pEntity, pEntityKeyValues, (char *)sEntityError, sizeof(sEntityError)))
-				{
-					pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pEntityKeyValues);
-				}
-				else
-				{
-					vecErrors.AddToTail(CUtlString((const char *)sEntityError));
-				}
-			}
-
-			pEntitySystem->ExecuteQueuedCreation();
-		}
-
-		// Print errors.
-		FOR_EACH_VEC(vecErrors, i)
-		{
-			Warning("Failed to create entity: %s", vecErrors[i].Get());
+			g_pEntityManagerProviderAgent->PushSpawnQueue(pEntityValues);
 		}
 	}
 	else if(psError)
 	{
 		snprintf(psError, nMaxLength, "Can't to load KeyValue from \"%s\" file", sConfigFile);
-	}
-
-	return bResult;
-}
-
-bool EntityManagerSpace::Settings::LoadWorldEntity(KeyValues *pEntityValues, CBaseEntity *&pResultEntity, CEntityKeyValues *&pResultKeyValues, char *psError, size_t nMaxLength)
-{
-	const char *pszClassname = pEntityValues->GetString("classname");
-
-	CEntityIndex iForceEdictIndex = CEntityIndex(-1);
-
-	pResultEntity = (CBaseEntity *)((CEntitySystemProvider *)g_pEntitySystem)->CreateEntity(iForceEdictIndex, pszClassname, ENTITY_NETWORKING_MODE_DEFAULT, (SpawnGroupHandle_t)-1, -1, false);
-
-	bool bResult = pResultEntity != nullptr;
-
-	if(bResult)
-	{
-		int iIndex = pResultEntity->m_pEntity->m_EHandle.GetEntryIndex();
-
-		DebugMsg("Created \"%s\" (requested edict index is %d, result index is %d) entity\n", pszClassname, iForceEdictIndex.Get(), iIndex);
-
-		CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create();
-
-		bResult = pNewKeyValues != nullptr;
-
-		if(bResult)
-		{
-			FOR_EACH_VALUE(pEntityValues, pKeyValue)
-			{
-				const char *pszKey = pKeyValue->GetName();
-
-				void *pAttr = pNewKeyValues->GetAttribute({ /* Meow */ MurmurHash2LowerCase(pszKey, 0x31415926u), pszKey});
-
-				if(pAttr)
-				{
-					const char *pszValue = pKeyValue->GetString(NULL);
-
-					DebugMsg("%d: \"%s\" has \"%s\" value\n", iIndex, pszKey, pszValue);
-
-					pNewKeyValues->SetAttributeValue(pAttr, pszValue);
-				}
-				else
-				{
-					Warning("Failed to get \"%s\" attribute ", pszKey);
-				}
-			}
-
-			pResultKeyValues = pNewKeyValues;
-		}
-		else if(psError)
-		{
-			snprintf(psError, nMaxLength, "Can't create key values of \"%s\"", pszClassname);
-		}
-	}
-	else if(psError)
-	{
-		snprintf(psError, nMaxLength, "Can't create \"%s\"", pszClassname);
 	}
 
 	return bResult;

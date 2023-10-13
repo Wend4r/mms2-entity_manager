@@ -6,6 +6,8 @@
 #include <entity2/entitysystem.h>
 #include <tier1/utlstring.h>
 
+#define ENTITY_KEY_MAGIC_MEOW 0x31415926u
+
 class CEntityKeyValues
 {
 };

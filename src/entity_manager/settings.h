@@ -19,7 +19,6 @@ namespace EntityManagerSpace
 
 	protected:
 		bool LoadWorld(const char *pszBaseConfigsDir, char *psError = NULL, size_t nMaxLength = 0);
-		bool LoadWorldEntity(KeyValues *pEntityValues, CBaseEntity *&pResultEntity, CEntityKeyValues *&pResultKeyValues, char *psError = NULL, size_t nMaxLength = 0);
 
 	protected:
 

@@ -20,6 +20,7 @@
 
 #include "entity_manager/gamedata.h"
 #include "entity_manager/provider.h"
+#include "entity_manager/provider_agent.h"
 #include "entity_manager/settings.h"
 
 #define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
@@ -81,6 +82,7 @@ private:
 extern EntityManager *g_pEntityManager;
 extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
 extern EntityManagerSpace::Provider *g_pEntityManagerProvider;
+extern EntityManagerSpace::ProviderAgent *g_pEntityManagerProviderAgent;
 
 PLUGIN_GLOBALVARS();
 
