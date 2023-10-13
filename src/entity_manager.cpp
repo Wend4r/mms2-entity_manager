@@ -159,6 +159,8 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 		{
 			this->InitEntitySystem();
 			s_aEntityManager.OnLevelInit(pServer->GetMapName(), nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
+
+			SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnStartupFirstFrame, true);
 		}
 	}
 
@@ -188,16 +190,11 @@ void EntityManager::AllPluginsLoaded()
 void EntityManager::InitEntitySystem()
 {
 	g_pEntitySystem = *reinterpret_cast<CGameEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + this->m_nGameResourceServiceEntitySystemOffset);
-
-	SH_ADD_HOOK_MEMFUNC(CEntitySystem, Spawn, g_pEntitySystem, this, &EntityManager::OnEntitySystemSpawn, true);
 }
 
 void EntityManager::DestroyEntitySystem()
 {
-	if(g_pEntitySystem)
-	{
-		SH_REMOVE_HOOK_MEMFUNC(CEntitySystem, Spawn, g_pEntitySystem, this, &EntityManager::OnEntitySystemSpawn, true);
-	}
+	// ...
 }
 
 bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
@@ -329,13 +326,16 @@ void EntityManager::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLas
 void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *pszMapName)
 {
 	this->InitEntitySystem();
-
 	s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
+
+	SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnStartupFirstFrame, true);
 }
 
-void EntityManager::OnEntitySystemSpawn(int nCount, const EntitySpawnInfo_t *pInfo)
+void EntityManager::OnStartupFirstFrame(bool bIsSimulating, bool bIsFirstTick, bool bILastTick)
 {
-	g_pEntityManagerProviderAgent->SpawnQueued();
+	s_aEntityManagerProviderAgent.SpawnQueued();
+
+	SH_REMOVE_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnStartupFirstFrame, true);
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)

@@ -53,7 +53,7 @@ public: // SourceHooks.
 	void OnLevelInit(char const *pszMapName, char const *pszMapEntities, char const *pszOldLevel, char const *pszLandmarkName, bool bIsLoadGame, bool bIsBackground);
 	void OnGameFrameHook(bool simulating, bool bFirstTick, bool bLastTick);
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *pszMapName);
-	void OnEntitySystemSpawn(int nCount, const EntitySpawnInfo_t *pInfo);
+	void OnStartupFirstFrame(bool bIsSimulating, bool bIsFirstTick, bool bIsLastTick);
 
 public:
 	const char *GetAuthor();
