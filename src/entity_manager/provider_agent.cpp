@@ -8,9 +8,14 @@
 
 extern CGameEntitySystem *g_pEntitySystem;
 
+inline EntityKey CalcEntityKey(const char *pszName, int nLength)
+{
+	return {MurmurHash2LowerCase(pszName, nLength, ENTITY_KEY_MAGIC_MEOW), pszName};
+}
+
 inline EntityKey CalcEntityKey(const char *pszName)
 {
-	return {MurmurHash2LowerCase(pszName, ENTITY_KEY_MAGIC_MEOW), pszName};
+	return CalcEntityKey(pszName, strlen(pszName));
 }
 
 bool EntityManagerSpace::ProviderAgent::Init(char *psError, size_t nMaxLength)
@@ -67,11 +72,13 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued()
 		char psClassname[128] = "\0", 
 		     sEntityError[256];
 
+		static const char szClassnameKey[] = "classname";
+
 		CUtlVector<CUtlString> vecErrors;
 
 		const CEntityIndex iForceEdictIndex = CEntityIndex(-1);
 
-		const EntityKey aClassnameKey = CalcEntityKey("classname");
+		const EntityKey aClassnameKey = CalcEntityKey(szClassnameKey, sizeof(szClassnameKey));
 
 		for(int i = 0; i < iQueueLength; i++)
 		{
