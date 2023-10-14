@@ -307,7 +307,6 @@ bool EntityManagerSpace::GameData::Config::LoadEngineSignatures(KeyValues *pSign
 
 						if(bResult)
 						{
-							Msg("pszSigName = %s (%p)\n", pszSigName, pSigResult);
 							this->SetAddress(pszSigName, pSigResult);
 						}
 						else if(psError)
@@ -362,7 +361,6 @@ bool EntityManagerSpace::GameData::Config::LoadEngineOffsets(KeyValues *pOffsets
 
 			if(pPlatformValues)
 			{
-				Msg("pszOffsetName = %s\n", pszOffsetName);
 				this->SetOffset(pszOffsetName, EntityManagerSpace::GameData::ReadOffset(pPlatformValues->GetString(NULL)));
 			}
 			else if(psError)
