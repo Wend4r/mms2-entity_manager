@@ -153,12 +153,12 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 
 	if(late)
 	{
-		INetworkGameServer *pServer = g_pNetworkServerService->GetIGameServer();
+		INetworkGameServer *pNewServer = g_pNetworkServerService->GetIGameServer();
 
-		if(pServer)
+		if(pNewServer)
 		{
 			this->InitEntitySystem();
-			s_aEntityManager.OnLevelInit(pServer->GetMapName(), nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
+			s_aEntityManager.OnLevelInit(pNewServer->GetMapName(), nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
 
 			SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnStartupFirstFrame, true);
 		}
@@ -323,12 +323,23 @@ void EntityManager::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLas
 	 */
 }
 
-void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *pszMapName)
+void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *)
 {
-	this->InitEntitySystem();
-	s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
+	INetworkGameServer *pNetServer = g_pNetworkServerService->GetIGameServer();
 
-	SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnStartupFirstFrame, true);
+	if(pNetServer)
+	{
+		const char *pszMapName = pNetServer->GetMapName();
+
+		this->InitEntitySystem();
+		s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
+
+		SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnStartupFirstFrame, true);
+	}
+	else
+	{
+		Warning("Failed to get a net server\n");
+	}
 }
 
 void EntityManager::OnStartupFirstFrame(bool bIsSimulating, bool bIsFirstTick, bool bILastTick)
