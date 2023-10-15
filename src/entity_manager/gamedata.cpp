@@ -195,23 +195,23 @@ const char *EntityManagerSpace::GameData::GetSourceEngineName()
 #endif
 }
 
-const char *EntityManagerSpace::GameData::GetPlatformName()
+EntityManagerSpace::GameData::Platform EntityManagerSpace::GameData::GetCurrentPlatform()
 {
 #if defined(_WINDOWS)
 #	if defined(X64BITS)
-	return "windows64";
+	return Platform::WINDOWS64;
 #	else
-	return "windows";
+	return Platform::WINDOWS;
 #	endif
 #elif defined(_LINUX)
 #	if defined(X64BITS)
-	return "linux64";
+	return Platform::LINUX64;
 #	else
-	return "linux";
+	return Platform::LINUX;
 #	endif
 #else
 #	error Unsupported platform
-	return "unknown";
+	return Platform::UNKNOWN;
 #endif
 }
 
@@ -273,7 +273,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineSignatures(KeyValues *pSign
 	if(bResult)
 	{
 		const char *pszLibraryKey = "library", 
-		           *pszPlatformKey = EntityManagerSpace::GameData::GetPlatformName();
+		           *pszPlatformKey = EntityManagerSpace::GameData::GetCurrentPlatformName();
 
 		do
 		{
@@ -349,7 +349,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineOffsets(KeyValues *pOffsets
 
 	if(bResult)
 	{
-		const char *pszPlatformKey = EntityManagerSpace::GameData::GetPlatformName();
+		const char *pszPlatformKey = EntityManagerSpace::GameData::GetCurrentPlatformName();
 
 		do
 		{

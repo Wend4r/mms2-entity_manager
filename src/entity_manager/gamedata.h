@@ -14,6 +14,8 @@ namespace EntityManagerSpace
 {
 	class GameData
 	{
+		typedef GameData ThisClass;
+
 	public:
 		bool Init(char *psError, size_t nMaxLength);
 		bool Load(const char *pszBasePath, char *psError = NULL, size_t nMaxLength = 0);
@@ -36,7 +38,28 @@ namespace EntityManagerSpace
 
 	protected:
 		static const char *GetSourceEngineName();
-		static const char *GetPlatformName();
+
+		enum Platform : int
+		{
+			UNKNOWN = -1,
+			PLATFORM_FIRST = 0,
+
+			WINDOWS = 0,
+			WINDOWS64,
+
+			LINUX,
+			LINUX64,
+
+			MAC,
+			MAC64,
+
+			PLATFORM_MAX
+		};
+
+		inline static Platform GetCurrentPlatform();
+		inline static const char *GetCurrentPlatformName();
+		inline static const char *GetPlatformName(Platform eElm);
+
 		static ptrdiff_t ReadOffset(const char *pszValue);
 
 	private:
