@@ -347,6 +347,7 @@ class EntityManagerConfig(object):
       os.path.join(mms_core_path),	
       os.path.join(mms_core_path, 'sourcehook'),
       os.path.join(context.currentSourcePath),
+      os.path.join(context.currentSourcePath, 'public'),
     ]
 
     defines = ['SE_' + PossibleSDKs[i].define + '=' + PossibleSDKs[i].code for i in PossibleSDKs]

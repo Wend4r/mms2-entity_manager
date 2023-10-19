@@ -1,6 +1,5 @@
 #include "provider_agent.h"
 
-#include "provider/entitykeyvalues.h"
 #include "provider/entitysystem.h"
 
 #include <tier1/generichash.h>
@@ -8,14 +7,38 @@
 
 extern CGameEntitySystem *g_pGameEntitySystem;
 
-inline EntityKey CalcEntityKey(const char *pszName, int nLength)
+inline EntityKey CalcEntityKey(const char *pszName, const char *pszSafeName, int nLength)
 {
-	return {MurmurHash2LowerCase(pszName, nLength, ENTITY_KEY_MAGIC_MEOW), pszName};
+	return {MurmurHash2LowerCase(pszName, nLength, ENTITY_KEY_MAGIC_MEOW), pszSafeName};
 }
 
 inline EntityKey CalcEntityKey(const char *pszName)
 {
-	return CalcEntityKey(pszName, strlen(pszName));
+	return CalcEntityKey(pszName, pszName, strlen(pszName));
+}
+
+class CDefOpsString
+{
+public:
+	static bool LessFunc( const CUtlString &lhs, const CUtlString &rhs )
+	{
+		return StringLessThan(lhs.Get(), rhs.Get());
+	}
+};
+
+EntityManagerSpace::ProviderAgent::ProviderAgent()
+ :   m_mapCachedKeys(CDefOpsString::LessFunc)
+{
+	// Cache the classname.
+	{
+		static const char szClassname[] = "classname";
+
+		const int iClassnameLength = strlen(szClassname);
+
+		const CUtlString sClassname((const char *)szClassname, iClassnameLength);
+
+		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert(sClassname, CalcEntityKey((const char *)szClassname, sClassname.Get(), iClassnameLength));
+	}
 }
 
 bool EntityManagerSpace::ProviderAgent::Init(char *psError, size_t nMaxLength)
@@ -42,7 +65,7 @@ void EntityManagerSpace::ProviderAgent::PushSpawnQueue(KeyValues *pEntityValues)
 	{
 		const char *pszKey = pKeyValue->GetName();
 
-		void *pAttr = pNewKeyValues->GetAttribute(CalcEntityKey(pszKey));
+		void *pAttr = pNewKeyValues->GetAttribute(this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszKey)));
 
 		if(pAttr)
 		{
@@ -61,14 +84,13 @@ void EntityManagerSpace::ProviderAgent::PushSpawnQueue(KeyValues *pEntityValues)
 	this->m_vecEntitySpawnQueue.AddToTail({pNewKeyValues});
 }
 
-int EntityManagerSpace::ProviderAgent::SpawnQueued()
+int EntityManagerSpace::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup)
 {
 	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
 
 	int iQueueLength = this->m_vecEntitySpawnQueue.Count();
 
 	{
-
 		char psClassname[128] = "\0", 
 		     sEntityError[256];
 
@@ -78,7 +100,7 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued()
 
 		const CEntityIndex iForceEdictIndex = CEntityIndex(-1);
 
-		const EntityKey aClassnameKey = CalcEntityKey(szClassnameKey, sizeof(szClassnameKey));
+		const auto &aClassnameKey = this->GetCachedClassnameKey();
 
 		for(int i = 0; i < iQueueLength; i++)
 		{
@@ -86,7 +108,7 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued()
 
 			if(pKeyValues->GetAttribute(aClassnameKey, (char *)psClassname) && psClassname[0])
 			{
-				CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(iForceEdictIndex, (const char *)psClassname, ENTITY_NETWORKING_MODE_DEFAULT, (SpawnGroupHandle_t)-1, -1, false);
+				CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(iForceEdictIndex, (const char *)psClassname, ENTITY_NETWORKING_MODE_DEFAULT, hSpawnGroup, -1, false);
 
 				if(pEntity)
 				{
@@ -124,4 +146,23 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued()
 	}
 
 	return iQueueLength;
+}
+
+const EntityKey &EntityManagerSpace::ProviderAgent::GetCachedEntityKey(CacheMapOIndexType nElm)
+{
+	return this->m_mapCachedKeys[nElm];
+}
+
+const EntityKey &EntityManagerSpace::ProviderAgent::GetCachedClassnameKey()
+{
+	return this->m_mapCachedKeys[this->m_nElmCachedClassnameKey];
+}
+
+EntityManagerSpace::ProviderAgent::CacheMapOIndexType EntityManagerSpace::ProviderAgent::CacheOrGetEntityKey(const char *pszName)
+{
+	const CUtlString sName = pszName;
+
+	CacheMapOIndexType nFindElm = this->m_mapCachedKeys.Find(sName);
+
+	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, CalcEntityKey(pszName, sName.Get(), sName.Length())) : nFindElm;
 }

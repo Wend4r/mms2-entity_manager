@@ -12,6 +12,7 @@
 #define GAMECONFIG_FOLDER_DIR "gamedata"
 #define GAMECONFIG_ENTITY_SYSTEM_FILENAME "entity_system.games.txt"
 #define GAMECONFIG_ENTITY_KEYVALUES_FILENAME "entity_keyvalues.games.txt"
+#define GAMECONFIG_SPAWN_GROUP_FILENAME "spawn_group.games.txt"
 
 extern IVEngineServer *engine;
 extern IFileSystem *filesystem;
@@ -66,6 +67,11 @@ bool EntityManagerSpace::GameData::Load(const char *pszBasePath, char *psError, 
 	if(bResult)
 	{
 		bResult = this->LoadEntitySystem((const char *)sBaseGameConfigDir, psError, nMaxLength);
+
+		if(bResult)
+		{
+			bResult = this->LoadSpawnGroup((const char *)sBaseGameConfigDir, psError, nMaxLength);
+		}
 	}
 
 	return bResult;
@@ -162,6 +168,43 @@ bool EntityManagerSpace::GameData::LoadEntitySystem(const char *pszBaseGameConfi
 	return bResult;
 }
 
+bool EntityManagerSpace::GameData::LoadSpawnGroup(const char *pszBaseGameConfigDir, char *psError, size_t nMaxLength)
+{
+	char sConfigFile[MAX_PATH];
+
+	snprintf((char *)sConfigFile, sizeof(sConfigFile), 
+#ifdef PLATFORM_WINDOWS
+		"%s\\%s",
+#else
+		"%s/%s", 
+#endif
+		pszBaseGameConfigDir, GAMECONFIG_SPAWN_GROUP_FILENAME);
+
+	KeyValues *pGamesValues = new KeyValues("Games");
+
+	bool bResult = pGamesValues->LoadFromFile(filesystem, (const char *)sConfigFile);
+
+	if(bResult)
+	{
+		char sGameConfigError[1024];
+
+		bResult = this->m_aSpawnGroupConfig.Load(pGamesValues, (char *)sGameConfigError, sizeof(sGameConfigError));
+
+		if(!bResult && psError)
+		{
+			snprintf(psError, nMaxLength, "Failed to load a spawn group: %s", sGameConfigError);
+		}
+	}
+	else if(psError)
+	{
+		snprintf(psError, nMaxLength, "Can't to load KeyValue from \"%s\" file", sConfigFile);
+	}
+
+	delete pGamesValues;
+
+	return bResult;
+}
+
 CMemory EntityManagerSpace::GameData::GetEntityKeyValuesAddress(const std::string &sName)
 {
 	return this->m_aEntityKeyValuesConfig.GetAddress(sName);
@@ -180,6 +223,16 @@ CMemory EntityManagerSpace::GameData::GetEntitySystemAddress(const std::string &
 ptrdiff_t EntityManagerSpace::GameData::GetEntitySystemOffset(const std::string &sName)
 {
 	return this->m_aEntitySystemConfig.GetOffset(sName);
+}
+
+CMemory EntityManagerSpace::GameData::GetSpawnGroupAddress(const std::string &sName)
+{
+	return this->m_aSpawnGroupConfig.GetAddress(sName);
+}
+
+ptrdiff_t EntityManagerSpace::GameData::GetSpawnGroupOffset(const std::string &sName)
+{
+	return this->m_aSpawnGroupConfig.GetOffset(sName);
 }
 
 const char *EntityManagerSpace::GameData::GetSourceEngineName()
@@ -212,6 +265,28 @@ EntityManagerSpace::GameData::Platform EntityManagerSpace::GameData::GetCurrentP
 #	error Unsupported platform
 	return Platform::UNKNOWN;
 #endif
+}
+
+const char *EntityManagerSpace::GameData::GetCurrentPlatformName()
+{
+	return ThisClass::GetPlatformName(ThisClass::GetCurrentPlatform());
+}
+
+const char *EntityManagerSpace::GameData::GetPlatformName(Platform eElm)
+{
+	const char *sPlatformNames[Platform::PLATFORM_MAX] =
+	{
+		"windows",
+		"windows64",
+
+		"linux",
+		"linux64",
+
+		"mac",
+		"mac64"
+	};
+
+	return sPlatformNames[eElm];
 }
 
 ptrdiff_t EntityManagerSpace::GameData::ReadOffset(const char *pszValue)
@@ -255,7 +330,17 @@ bool EntityManagerSpace::GameData::Config::LoadEngine(KeyValues *pEngineValues, 
 
 			if(pSectionValues) // Same ignore.
 			{
-				bResult = bResult = this->LoadEngineOffsets(pSectionValues, psError, nMaxLength);
+				bResult = this->LoadEngineOffsets(pSectionValues, psError, nMaxLength);
+			}
+
+			if(bResult)
+			{
+				pSectionValues = pEngineValues->FindKey("Addresses", false);
+
+				if(pSectionValues)
+				{
+					bResult = this->LoadEngineAddresses(pSectionValues, psError, nMaxLength);
+				}
 			}
 		}
 	}
@@ -379,6 +464,133 @@ bool EntityManagerSpace::GameData::Config::LoadEngineOffsets(KeyValues *pOffsets
 	return bResult;
 }
 
+bool EntityManagerSpace::GameData::Config::LoadEngineAddresses(KeyValues *pAddressesValues, char *psError, size_t nMaxLength)
+{
+	KeyValues *pAddrSection = pAddressesValues->GetFirstSubKey();
+
+	bool bResult = pAddrSection != nullptr;
+
+	if(bResult)
+	{
+		const char *pszSignatureKey = "signature";
+
+		char sAddressActionsError[256];
+
+		do
+		{
+			const char *pszAddressName = pAddrSection->GetName();
+
+			KeyValues *pSignatureValues = pAddrSection->FindKey(pszSignatureKey, false);
+
+			bResult = pSignatureValues != nullptr;
+
+			if(bResult)
+			{
+				const char *pszSignatureName = pSignatureValues->GetString(NULL);
+
+				CMemory pSigAddress = this->GetAddress(pszSignatureName);
+
+				if(pSigAddress)
+				{
+					uintptr_t pAddrCur = pSigAddress.GetPtr();
+
+					// Remove an extra keys.
+					{
+						pAddrSection->RemoveSubKey(pSignatureValues, true /* bDelete */, true);
+
+						int iCurrentPlat = ThisClass::GetCurrentPlatform();
+
+						for(int iPlat = PLATFORM_FIRST; iPlat < PLATFORM_MAX; iPlat++)
+						{
+							if(iCurrentPlat != iPlat)
+							{
+								pAddrSection->FindAndDeleteSubKey(ThisClass::GetPlatformName((ThisClass::Platform)iPlat));
+							}
+						}
+					}
+
+					if(this->LoadEngineAddressActions(pAddrCur, pAddrSection, (char *)sAddressActionsError, sizeof(sAddressActionsError)))
+					{
+						this->SetAddress(pszAddressName, pAddrCur);
+					}
+					else if(psError)
+					{
+						snprintf(psError, nMaxLength, "Failed to get \"%s\" address action: %s\n", pszAddressName, sAddressActionsError);
+					}
+				}
+				else if(psError)
+				{
+					snprintf(psError, nMaxLength, "Failed to get \"%s\" signature in \"%s\" address", pszSignatureName, pszAddressName);
+				}
+			}
+			else if(psError)
+			{
+				snprintf(psError, nMaxLength, "Failed to get signature (\"%s\" key) at \"%s\" address", pszSignatureKey, pszAddressName);
+			}
+
+			pAddrSection = pAddrSection->GetNextKey();
+		}
+		while(pAddrSection);
+	}
+	else if(psError)
+	{
+		strncpy(psError, "Signatures section is empty", nMaxLength);
+	}
+
+	return bResult;
+}
+
+bool EntityManagerSpace::GameData::Config::LoadEngineAddressActions(uintptr_t &pAddrCur, KeyValues *pActionSection, char *psError, size_t nMaxLength)
+{
+	KeyValues *pAction = pActionSection->GetFirstSubKey();
+
+	bool bResult = pAction != nullptr;
+
+	if(bResult)
+	{
+		do
+		{
+			const char *pszName = pAction->GetName();
+
+			ptrdiff_t nActionValue = EntityManagerSpace::GameData::ReadOffset(pAction->GetString(NULL));
+
+			if(!strcmp(pszName, "offset"))
+			{
+				pAddrCur += nActionValue;
+			}
+			else if(!strncmp(pszName, "read", 4))
+			{
+				if(!pszName[4])
+				{
+					pAddrCur = *(uintptr_t *)(pAddrCur + nActionValue);
+				}
+				else if(!strcmp(&pszName[4], "_offs32"))
+				{
+					pAddrCur = pAddrCur + nActionValue + sizeof(int32_t) + *(int32_t *)(pAddrCur + nActionValue);
+				}
+				else if(psError)
+				{
+					bResult = false;
+					snprintf(psError, nMaxLength, "Unknown \"%s\" read action", pszName);
+				}
+			}
+			else if(!strcmp(pszName, EntityManagerSpace::GameData::GetCurrentPlatformName()))
+			{
+				bResult = this->LoadEngineAddressActions(pAddrCur, pAction, psError, nMaxLength); // Recursive by platform.
+			}
+			else if(psError)
+			{
+				bResult = false;
+				snprintf(psError, nMaxLength, "Unknown \"%s\" action", pszName);
+			}
+
+			pAction = pAction->GetNextKey();
+		}
+		while(pAction);
+	}
+
+	return bResult;
+}
 
 CMemory EntityManagerSpace::GameData::Config::GetAddress(const std::string &sName) const
 {

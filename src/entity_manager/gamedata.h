@@ -28,6 +28,7 @@ namespace EntityManagerSpace
 	protected:
 		bool LoadEntityKeyValues(const char *pszBaseGameConfigDir, char *psError = NULL, size_t nMaxLength = 0);
 		bool LoadEntitySystem(const char *pszBaseGameConfigDir, char *psError = NULL, size_t nMaxLength = 0);
+		bool LoadSpawnGroup(const char *pszBaseGameConfigDir, char *psError = NULL, size_t nMaxLength = 0);
 
 	public:
 		CMemory GetEntityKeyValuesAddress(const std::string &sName);
@@ -35,6 +36,9 @@ namespace EntityManagerSpace
 
 		CMemory GetEntitySystemAddress(const std::string &sName);
 		ptrdiff_t GetEntitySystemOffset(const std::string &sName);
+
+		CMemory GetSpawnGroupAddress(const std::string &sName);
+		ptrdiff_t GetSpawnGroupOffset(const std::string &sName);
 
 	protected:
 		static const char *GetSourceEngineName();
@@ -68,8 +72,14 @@ namespace EntityManagerSpace
 		public:
 			bool Load(KeyValues *pGamesValues, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadEngine(KeyValues *pEngineValues, char *psError = NULL, size_t nMaxLength = 0);
+
 			bool LoadEngineSignatures(KeyValues *pSignaturesValues, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadEngineOffsets(KeyValues *pOffsetsValues, char *psError = NULL, size_t nMaxLength = 0);
+
+			// Step #2 - addresses.
+			bool LoadEngineAddresses(KeyValues *pAddressesValues, char *psError = NULL, size_t nMaxLength = 0);
+			bool LoadEngineAddressActions(uintptr_t &pAddrCur, KeyValues *pActionValues, char *psError = NULL, size_t nMaxLength = 0);
+
 			void Clear();
 
 		public:
@@ -90,6 +100,7 @@ namespace EntityManagerSpace
 
 		Config m_aEntityKeyValuesConfig;
 		Config m_aEntitySystemConfig;
+		Config m_aSpawnGroupConfig;
 	};
 };
 

@@ -40,6 +40,9 @@ protected:
 	void InitEntitySystem();
 	void DestroyEntitySystem();
 
+	void InitSpawnGroup();
+	void DestroySpawnGroup();
+
 protected:
 	bool LoadGameData(char *psError = NULL, size_t nMaxLength = 0);
 	bool LoadProvider(char *psError = NULL, size_t nMaxLength = 0);
@@ -53,7 +56,7 @@ public: // SourceHooks.
 	void OnLevelInit(char const *pszMapName, char const *pszMapEntities, char const *pszOldLevel, char const *pszLandmarkName, bool bIsLoadGame, bool bIsBackground);
 	void OnGameFrameHook(bool simulating, bool bFirstTick, bool bLastTick);
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *);
-	void OnStartupFirstFrame(bool bIsSimulating, bool bIsFirstTick, bool bIsLastTick);
+	void OnSpawnGroupSpawnEntitiesHook(SpawnGroupHandle_t handle);
 
 public:
 	const char *GetAuthor();
@@ -75,6 +78,7 @@ private:
 
 	EntityManagerSpace::Settings m_aSettings;
 	ptrdiff_t m_nGameResourceServiceEntitySystemOffset = -1;
+	CSpawnGroupMgrGameSystem **m_ppSpawnGroupMgrAddress = NULL;
 
 	std::string m_sCurrentMap = "\0";
 };

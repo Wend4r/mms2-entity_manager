@@ -15,6 +15,7 @@
 
 // Game SDK.
 #include <entity2/entitysystem.h>
+#include <game_systems/spawngroup_manager.h>
 #include <tier0/dbg.h>
 #include <tier1/convar.h>
 #include <eiface.h>
@@ -26,8 +27,7 @@ class GameSessionConfiguration_t { };
 
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 SH_DECL_HOOK3_void(INetworkServerService, StartupServer, SH_NOATTRIB, 0, const GameSessionConfiguration_t &, ISource2WorldSession *, const char *);
-
-SH_DECL_HOOK2_void(CEntitySystem, Spawn, SH_NOATTRIB, 0, int, const EntitySpawnInfo_t *);
+SH_DECL_HOOK1_void(CSpawnGroupMgrGameSystem, SpawnGroupSpawnEntities, SH_NOATTRIB, 0, SpawnGroupHandle_t);
 
 static EntityManager s_aEntityManager;
 EntityManager *g_pEntityManager = &s_aEntityManager;  // To extern usage.
@@ -48,6 +48,7 @@ IFileSystem *filesystem = NULL;
 IServerGameDLL *server = NULL;
 
 CGameEntitySystem *g_pGameEntitySystem = NULL;
+CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
 // otherwise that'll be nullptr!
@@ -136,6 +137,8 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 		if(!s_aEntityManagerProviderAgent.Init((char *)sProviderAgentError, sizeof(sProviderAgentError)))
 		{
 			snprintf(error, maxlen, "Failed to init a provider agent: %s", sProviderAgentError);
+
+			return false;
 		}
 	}
 
@@ -158,9 +161,8 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 		if(pNewServer)
 		{
 			this->InitEntitySystem();
+			this->InitSpawnGroup();
 			s_aEntityManager.OnLevelInit(pNewServer->GetMapName(), nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
-
-			SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnStartupFirstFrame, true);
 		}
 	}
 
@@ -176,6 +178,7 @@ bool EntityManager::Unload(char *error, size_t maxlen)
 	SH_REMOVE_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManager::OnStartupServerHook, true);
 
 	this->DestroyEntitySystem();
+	this->DestroySpawnGroup();
 
 	return true;
 }
@@ -195,6 +198,18 @@ void EntityManager::InitEntitySystem()
 void EntityManager::DestroyEntitySystem()
 {
 	// ...
+}
+
+void EntityManager::InitSpawnGroup()
+{
+	g_pSpawnGroupMgr = *this->m_ppSpawnGroupMgrAddress;
+
+	SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, SpawnGroupSpawnEntities, g_pSpawnGroupMgr, this, &EntityManager::OnSpawnGroupSpawnEntitiesHook, true);
+}
+
+void EntityManager::DestroySpawnGroup()
+{
+	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, SpawnGroupSpawnEntities, g_pSpawnGroupMgr, this, &EntityManager::OnSpawnGroupSpawnEntitiesHook, true);
 }
 
 bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
@@ -219,6 +234,25 @@ bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
 		else if(psError)
 		{
 			snprintf(psError, nMaxLength, "Failed to get \"%s\" offset", pszOffsetName);
+		}
+	}
+
+	// Load addresses.
+	if(bResult)
+	{
+		const char *pszAddressName = "&g_pSpawnGroupMgr";
+
+		CMemory pAddress = s_aEntityManagerGameData.GetSpawnGroupAddress(pszAddressName);
+
+		bResult = (bool)pAddress;
+
+		if(bResult)
+		{
+			this->m_ppSpawnGroupMgrAddress = (CSpawnGroupMgrGameSystem **)pAddress.GetPtr();
+		}
+		else if(psError)
+		{
+			snprintf(psError, nMaxLength, "Failed to get \"%s\" address", pszAddressName);
 		}
 	}
 
@@ -333,8 +367,6 @@ void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config
 
 		this->InitEntitySystem();
 		s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
-
-		SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnStartupFirstFrame, true);
 	}
 	else
 	{
@@ -342,11 +374,11 @@ void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config
 	}
 }
 
-void EntityManager::OnStartupFirstFrame(bool bIsSimulating, bool bIsFirstTick, bool bILastTick)
+void EntityManager::OnSpawnGroupSpawnEntitiesHook(SpawnGroupHandle_t handle)
 {
-	s_aEntityManagerProviderAgent.SpawnQueued();
+	Msg("EntityManager::OnSpawnGroupSpawnEntitiesHook(%d)\n", handle);
 
-	SH_REMOVE_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManager::OnStartupFirstFrame, true);
+	s_aEntityManagerProviderAgent.SpawnQueued(handle);
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)
