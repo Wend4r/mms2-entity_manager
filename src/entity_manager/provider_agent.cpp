@@ -77,7 +77,7 @@ void EntityManagerSpace::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValu
 		}
 		else
 		{
-			Warning("Failed to get \"%s\" attribute", pszKey);
+			Warning("Failed to get \"%s\" attribute\n", pszKey);
 		}
 	}
 
@@ -131,7 +131,7 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGrou
 			}
 			else
 			{
-				snprintf((char *)sEntityError, sizeof(sEntityError), "Failed to get \"%s\" key of entity queue #%d", aClassnameKey.m_pszName, i);
+				snprintf((char *)sEntityError, sizeof(sEntityError), "Failed to get \"%s\" entity key (queue number is %d)", aClassnameKey.m_pszName, i);
 				vecErrors.AddToTail((const char *)sEntityError);
 			}
 		}
@@ -139,7 +139,7 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGrou
 		// Print an errors.
 		FOR_EACH_VEC(vecErrors, i)
 		{
-			Warning("Failed to create entity: %s", vecErrors[i].Get());
+			Warning("%s\n", vecErrors[i].Get());
 		}
 
 		if(vecErrors.Count() < this->m_vecEntitySpawnQueue.Count())
