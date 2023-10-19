@@ -3,8 +3,6 @@
 
 #include <entity2/entitysystem.h>
 
-extern CGameEntitySystem *g_pEntitySystem;
-
 extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
 
 bool EntityManagerSpace::Provider::Init(char *psError, size_t nMaxLength)

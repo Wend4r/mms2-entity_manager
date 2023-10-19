@@ -47,7 +47,7 @@ IGameEventManager2 *gameevents = NULL;
 IFileSystem *filesystem = NULL;
 IServerGameDLL *server = NULL;
 
-CGameEntitySystem *g_pEntitySystem = NULL;
+CGameEntitySystem *g_pGameEntitySystem = NULL;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
 // otherwise that'll be nullptr!
@@ -189,7 +189,7 @@ void EntityManager::AllPluginsLoaded()
 
 void EntityManager::InitEntitySystem()
 {
-	g_pEntitySystem = *reinterpret_cast<CGameEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + this->m_nGameResourceServiceEntitySystemOffset);
+	g_pGameEntitySystem = *reinterpret_cast<CGameEntitySystem **>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + this->m_nGameResourceServiceEntitySystemOffset);
 }
 
 void EntityManager::DestroyEntitySystem()

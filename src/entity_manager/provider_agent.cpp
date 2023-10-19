@@ -6,7 +6,7 @@
 #include <tier1/generichash.h>
 #include <tier1/KeyValues.h>
 
-extern CGameEntitySystem *g_pEntitySystem;
+extern CGameEntitySystem *g_pGameEntitySystem;
 
 inline EntityKey CalcEntityKey(const char *pszName, int nLength)
 {
@@ -63,7 +63,7 @@ void EntityManagerSpace::ProviderAgent::PushSpawnQueue(KeyValues *pEntityValues)
 
 int EntityManagerSpace::ProviderAgent::SpawnQueued()
 {
-	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pEntitySystem;
+	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
 
 	int iQueueLength = this->m_vecEntitySpawnQueue.Count();
 

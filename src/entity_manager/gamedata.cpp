@@ -16,7 +16,6 @@
 extern IVEngineServer *engine;
 extern IFileSystem *filesystem;
 extern IServerGameDLL *server;
-extern CGameEntitySystem *g_pEntitySystem;
 
 extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
 
