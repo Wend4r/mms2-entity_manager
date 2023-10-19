@@ -231,7 +231,7 @@ bool EntityManagerSpace::GameData::Config::Load(KeyValues *pGamesValues, char *p
 	{
 		this->LoadEngine(pEngineValues, psError, nMaxLength);
 	}
-	else if(!psError)
+	else if(psError)
 	{
 		snprintf(psError, nMaxLength, "Failed to find \"%s\" section", pszEngineName);
 	}

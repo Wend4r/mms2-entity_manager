@@ -216,7 +216,7 @@ bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
 		{
 			this->m_nGameResourceServiceEntitySystemOffset = nOffset;
 		}
-		else
+		else if(psError)
 		{
 			snprintf(psError, nMaxLength, "Failed to get \"%s\" offset", pszOffsetName);
 		}
@@ -231,7 +231,7 @@ bool EntityManager::LoadProvider(char *psError, size_t nMaxLength)
 
 	bool bResult = s_aEntityManagerProvider.Load((char *)sProviderError, sizeof(sProviderError));
 
-	if(!bResult)
+	if(!bResult && psError)
 	{
 		snprintf(psError, nMaxLength, "Failed to init a provider: %s", sProviderError);
 	}
