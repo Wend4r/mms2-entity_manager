@@ -4,6 +4,7 @@
 
 class CEntityKeyValues;
 class ISpawnGroup;
+class ISpawnGroupPrerequisiteRegistry;
 
 struct SaveRestoreDataHandle_t__
 {
@@ -31,7 +32,7 @@ class CSpawnGroupMgrGameSystem
 public:
 	virtual void AllocateSpawnGroup(SpawnGroupHandle_t h, ISpawnGroup *pSpawnGroup) = 0;
 	virtual void ReleaseSpawnGroup(SpawnGroupHandle_t h) = 0;
-	virtual void SpawnGroupInit() = 0;
+	virtual void SpawnGroupInit(SpawnGroupHandle_t handle, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) = 0;
 	virtual ILoadingSpawnGroup *CreateLoadingSpawnGroup(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues) = 0;
 	virtual ILoadingSpawnGroup *CreateLoadingSpawnGroupForSaveFile(SpawnGroupHandle_t handle, const void *pSaveData, size_t nSaveDataSize) = 0;
 	virtual void SpawnGroupSpawnEntities(SpawnGroupHandle_t handle) = 0;
