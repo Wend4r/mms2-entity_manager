@@ -78,7 +78,7 @@ bool EntityManagerSpace::Settings::LoadWorld(const char *pszBaseConfigsDir, char
 	{
 		FOR_EACH_SUBKEY(pWorldValues, pEntityValues)
 		{
-			g_pEntityManagerProviderAgent->PushSpawnQueue(pEntityValues);
+			g_pEntityManagerProviderAgent->PushSpawnQueueOld(pEntityValues);
 		}
 	}
 	else if(psError)

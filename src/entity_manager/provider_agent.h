@@ -26,7 +26,8 @@ namespace EntityManagerSpace
 		void Destroy();
 
 	public:
-		void PushSpawnQueue(KeyValues *pEntityValues);
+		void PushSpawnQueueOld(KeyValues *pOldKeyValues);
+		void PushSpawnQueue(CEntityKeyValues *pOldKeyValues);
 		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup);
 
 	protected:

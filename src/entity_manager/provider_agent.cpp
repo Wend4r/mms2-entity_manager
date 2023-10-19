@@ -55,13 +55,13 @@ void EntityManagerSpace::ProviderAgent::Destroy()
 {
 }
 
-void EntityManagerSpace::ProviderAgent::PushSpawnQueue(KeyValues *pEntityValues)
+void EntityManagerSpace::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues)
 {
 	int iNewIndex = this->m_vecEntitySpawnQueue.Count();
 
 	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create();
 
-	FOR_EACH_VALUE(pEntityValues, pKeyValue)
+	FOR_EACH_VALUE(pOldKeyValues, pKeyValue)
 	{
 		const char *pszKey = pKeyValue->GetName();
 
@@ -81,7 +81,12 @@ void EntityManagerSpace::ProviderAgent::PushSpawnQueue(KeyValues *pEntityValues)
 		}
 	}
 
-	this->m_vecEntitySpawnQueue.AddToTail({pNewKeyValues});
+	this->PushSpawnQueue(pNewKeyValues);
+}
+
+void EntityManagerSpace::ProviderAgent::PushSpawnQueue(CEntityKeyValues *pKeyValues)
+{
+	this->m_vecEntitySpawnQueue.AddToTail({pKeyValues});
 }
 
 int EntityManagerSpace::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup)
