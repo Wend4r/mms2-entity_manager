@@ -92,7 +92,7 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued()
 				{
 					int iIndex = pEntity->m_pEntity->m_EHandle.GetEntryIndex();
 
-					DebugMsg("Created \"%s\" (force edict index is %d, result index is %d) entity\n", pszClassname, iForceEdictIndex.Get(), iIndex);
+					DebugMsg("Created \"%s\" (force edict index is %d, result index is %d) entity\n", psClassname, iForceEdictIndex.Get(), iIndex);
 
 					pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pKeyValues);
 				}
