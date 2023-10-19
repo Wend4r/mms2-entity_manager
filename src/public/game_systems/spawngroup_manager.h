@@ -27,7 +27,7 @@ struct EventServerPostEntityThink_t
 	bool m_bLastTick;
 };
 
-class CSpawnGroupMgrGameSystem
+class IGameSpawnGroupMgr
 {
 public:
 	virtual void AllocateSpawnGroup(SpawnGroupHandle_t h, ISpawnGroup *pSpawnGroup) = 0;
@@ -47,7 +47,7 @@ public:
 	virtual const char *SaveGame_GetLastSaveFile(SaveRestoreDataHandle_t hSaveRestore) = 0;
 	virtual bool IsGameReadyToSave() = 0;
 	virtual unsigned long UnkGetGlobal1() = 0;
-	virtual CSpawnGroupMgrGameSystem * const UnkGetGameEntitySystemSync1() = 0;
+	virtual void * const UnkGetGameEntitySystemSync1() = 0;
 	virtual void UnkRelease1() = 0;
 	virtual void UnkRelease2() = 0;
 	virtual void YouForgot_DECLARE_GAME_SYSTEM_InYourClassDefinition() = 0;
@@ -56,7 +56,11 @@ public:
 	virtual void GameShutdown(const EventGameInit_t &msg) = 0;
 	virtual void FrameBoundary(const EventGameInit_t &msg) = 0;
 	virtual void PreSpawnGroupLoad(const EventPreSpawnGroupLoad_t &msg) = 0;
-	virtual ~CSpawnGroupMgrGameSystem() = 0;
 
 	// IGameSystem is at next one.
+};
+
+class CSpawnGroupMgrGameSystem : public IGameSpawnGroupMgr //, public IGameSystem
+{
+	virtual ~CSpawnGroupMgrGameSystem() = 0;
 };
