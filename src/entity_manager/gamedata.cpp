@@ -10,9 +10,9 @@
 #include <tier1/KeyValues.h>
 
 #define GAMECONFIG_FOLDER_DIR "gamedata"
-#define GAMECONFIG_ENTITY_SYSTEM_FILENAME "entity_system.games.txt"
-#define GAMECONFIG_ENTITY_KEYVALUES_FILENAME "entity_keyvalues.games.txt"
-#define GAMECONFIG_SPAWN_GROUP_FILENAME "spawn_group.games.txt"
+#define GAMECONFIG_ENTITY_SYSTEM_FILENAME "entitysystem.games.txt"
+#define GAMECONFIG_ENTITY_KEYVALUES_FILENAME "entitykeyvalues.games.txt"
+#define GAMECONFIG_SPAWN_GROUP_FILENAME "spawngroup.games.txt"
 
 extern IVEngineServer *engine;
 extern IFileSystem *filesystem;

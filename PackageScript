@@ -40,9 +40,9 @@ CopyFiles('configs', os.path.join('addons', EntityManager.plugin_name, 'configs'
 # Package GameData files.
 CopyFiles('gamedata', os.path.join('addons', EntityManager.plugin_name, 'gamedata'),
   [
-    'entity_keyvalues.games.txt',
-    'entity_system.games.txt',
-    'spawn_group.games.txt',
+    'entitykeyvalues.games.txt',
+    'entitysystem.games.txt',
+    'spawngroup.games.txt',
   ]
 )
 
