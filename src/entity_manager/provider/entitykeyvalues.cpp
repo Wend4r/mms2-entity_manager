@@ -18,12 +18,17 @@ CEntityKeyValues *EntityManagerSpace::CEntityKeyValuesProvider::Create(void *pEn
 	return pNewKeyValues;
 }
 
-void *EntityManagerSpace::CEntityKeyValuesProvider::GetAttribute(const EntityKey &key, char *psValue)
+CEntityKeyValuesAttribute *EntityManagerSpace::CEntityKeyValuesProvider::GetAttribute(const EntityKey &key, char *psValue)
 {
 	return g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnGetAttribute(this, key, psValue);
 }
 
-void EntityManagerSpace::CEntityKeyValuesProvider::SetAttributeValue(void *pAttr, const char *pString)
+const char *EntityManagerSpace::CEntityKeyValuesAttributeProvider::GetValueString(const char *pszDefaultValue)
+{
+	return g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnGetValueString(this, pszDefaultValue);
+}
+
+void EntityManagerSpace::CEntityKeyValuesProvider::SetAttributeValue(CEntityKeyValuesAttribute *pAttr, const char *pString)
 {
 	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnSetAttributeValue(this, pAttr, pString);
 }

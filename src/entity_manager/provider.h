@@ -15,6 +15,7 @@ namespace EntityManagerSpace
 	{
 	public:
 		friend class CEntityKeyValuesProvider;
+		friend class CEntityKeyValuesAttributeProvider;
 		friend class CEntitySystemProvider;
 		friend class CSpawnGroupMgrGameSystemProvider;
 
@@ -38,10 +39,13 @@ namespace EntityManagerSpace
 				typedef void (*EntityKeyValuesFuncType)(CEntityKeyValues * const pThis, void *pEntitySystemSubobject, char eSubobjectType);
 				EntityKeyValuesFuncType m_pfnEntityKeyValues;
 
-				typedef void *(*GetAttributeFuncType)(CEntityKeyValues * const pThis, const EntityKey &key, char *psValue);
+				typedef CEntityKeyValuesAttribute *(*GetAttributeFuncType)(CEntityKeyValues * const pThis, const EntityKey &key, char *psValue);
 				GetAttributeFuncType m_pfnGetAttribute;
 
-				typedef void (*SetAttributeValueFuncType)(CEntityKeyValues * const pThis, void *pAttribute, const char *pString);
+				typedef const char *(*GetValueStringFuncType)(CEntityKeyValuesAttribute * const pThis, const char *pszDefaultValue);
+				GetValueStringFuncType m_pfnGetValueString;
+
+				typedef void (*SetAttributeValueFuncType)(CEntityKeyValues * const pThis, CEntityKeyValuesAttribute *pAttribute, const char *pString);
 				SetAttributeValueFuncType m_pfnSetAttributeValue;
 
 				size_t m_nSizeof;

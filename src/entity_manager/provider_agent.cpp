@@ -34,7 +34,7 @@ EntityManagerSpace::ProviderAgent::ProviderAgent()
 	{
 		static const char szClassname[] = "classname";
 
-		const int iClassnameLength = strlen(szClassname);
+		const int iClassnameLength = sizeof(szClassname);
 
 		const CUtlString sClassname((const char *)szClassname, iClassnameLength);
 
@@ -66,7 +66,7 @@ void EntityManagerSpace::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValu
 	{
 		const char *pszKey = pKeyValue->GetName();
 
-		void *pAttr = pNewKeyValues->GetAttribute(this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszKey)));
+		CEntityKeyValuesAttribute *pAttr = pNewKeyValues->GetAttribute(this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszKey)));
 
 		if(pAttr)
 		{
@@ -194,19 +194,31 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued()
 
 		CEntityKeyValuesProvider *pKeyValues = aSpawnEntity.GetKeyValuesProvider();
 
-		if(pKeyValues->GetAttribute(aClassnameKey, (char *)psClassname) && psClassname[0])
+		CEntityKeyValuesAttributeProvider *pAttr = (CEntityKeyValuesAttributeProvider *)pKeyValues->GetAttribute(aClassnameKey);
+
+		if(pAttr)
 		{
-			CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(iForceEdictIndex, (const char *)psClassname, ENTITY_NETWORKING_MODE_DEFAULT, aSpawnEntity.GetSpawnGroup(), -1, false);
+			const char *pszClassname = pAttr->GetValueString();
 
-			if(pEntity)
+			if(pszClassname && pszClassname[0])
 			{
-				DebugMsg("Created \"%s\" (force edict index is %d, result index is %d) entity\n", psClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+				CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(iForceEdictIndex, pszClassname, ENTITY_NETWORKING_MODE_DEFAULT, aSpawnEntity.GetSpawnGroup(), -1, false);
 
-				pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pKeyValues);
+				if(pEntity)
+				{
+					DebugMsg("Created \"%s\" (force edict index is %d, result index is %d) entity\n", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+
+					pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pKeyValues);
+				}
+				else
+				{
+					snprintf((char *)sEntityError, sizeof(sEntityError), "Failed to create \"%s\" entity (queue number is %d)", pszClassname, i);
+					vecErrors.AddToTail((const char *)sEntityError);
+				}
 			}
 			else
 			{
-				snprintf((char *)sEntityError, sizeof(sEntityError), "Failed to create \"%s\" entity (queue number is %d)", psClassname, i);
+				snprintf((char *)sEntityError, sizeof(sEntityError), "Empty entity \"%s\" key (queue number is %d)", aClassnameKey.m_pszName, i);
 				vecErrors.AddToTail((const char *)sEntityError);
 			}
 		}
@@ -239,8 +251,7 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGrou
 
 	auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
 
-	char psClassname[128] = "\0", 
-	     sEntityError[256];
+	char sEntityError[256];
 
 	const int iQueueLength = vecEntitySpawnQueue.Count();
 
@@ -252,25 +263,37 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGrou
 
 	for(int i = 0; i < vecEntitySpawnQueue.Count(); i++)
 	{
-		const EntityData &aEntity = vecEntitySpawnQueue[i];
+		const EntityData &aSpawnEntity = vecEntitySpawnQueue[i];
 
-		if(hSpawnGroup == aEntity.GetSpawnGroup())
+		if(hSpawnGroup == aSpawnEntity.GetSpawnGroup())
 		{
-			CEntityKeyValuesProvider *pKeyValues = aEntity.GetKeyValuesProvider();
+			CEntityKeyValuesProvider *pKeyValues = aSpawnEntity.GetKeyValuesProvider();
 
-			if(pKeyValues->GetAttribute(aClassnameKey, (char *)psClassname) && psClassname[0])
+			CEntityKeyValuesAttributeProvider *pAttr = (CEntityKeyValuesAttributeProvider *)pKeyValues->GetAttribute(aClassnameKey);
+
+			if(pAttr)
 			{
-				CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(iForceEdictIndex, (const char *)psClassname, ENTITY_NETWORKING_MODE_DEFAULT, hSpawnGroup, -1, false);
+				const char *pszClassname = pAttr->GetValueString();
 
-				if(pEntity)
+				if(pszClassname && pszClassname[0])
 				{
-					DebugMsg("Created \"%s\" (force edict index is %d, result index is %d) entity\n", psClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+					CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(iForceEdictIndex, (const char *)pszClassname, ENTITY_NETWORKING_MODE_DEFAULT, hSpawnGroup, -1, false);
 
-					pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pKeyValues);
+					if(pEntity)
+					{
+						DebugMsg("Created \"%s\" (force edict index is %d, result index is %d) entity\n", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+
+						pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pKeyValues);
+					}
+					else
+					{
+						snprintf((char *)sEntityError, sizeof(sEntityError), "Failed to create \"%s\" entity (queue number is %d)", pszClassname, i);
+						vecErrors.AddToTail((const char *)sEntityError);
+					}
 				}
 				else
 				{
-					snprintf((char *)sEntityError, sizeof(sEntityError), "Failed to create \"%s\" entity (queue number is %d)", psClassname, i);
+					snprintf((char *)sEntityError, sizeof(sEntityError), "Empty entity \"%s\" key (queue number is %d)", aClassnameKey.m_pszName, i);
 					vecErrors.AddToTail((const char *)sEntityError);
 				}
 			}

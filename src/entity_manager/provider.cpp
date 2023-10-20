@@ -64,13 +64,22 @@ bool EntityManagerSpace::Provider::LoadEntityKeyValuesGameData(char *psError, si
 		{
 			this->m_aData.m_aEntityKeyValues.m_pfnGetAttribute = pResult.RCast<GameData::EntityKeyValues::GetAttributeFuncType>();
 
-			pszSignatureName = "CEntityKeyValues::SetAttributeValue";
+			pszSignatureName = "CEntityKeyValuesAttribute::GetValueString";
 			pResult = g_pEntityManagerGameData->GetEntityKeyValuesAddress(pszSignatureName);
 			bResult = pResult;
 
 			if(bResult)
 			{
-				this->m_aData.m_aEntityKeyValues.m_pfnSetAttributeValue = pResult.RCast<GameData::EntityKeyValues::SetAttributeValueFuncType>();
+				this->m_aData.m_aEntityKeyValues.m_pfnGetValueString = pResult.RCast<GameData::EntityKeyValues::GetValueStringFuncType>();
+
+				pszSignatureName = "CEntityKeyValues::SetAttributeValue";
+				pResult = g_pEntityManagerGameData->GetEntityKeyValuesAddress(pszSignatureName);
+				bResult = pResult;
+
+				if(bResult)
+				{
+					this->m_aData.m_aEntityKeyValues.m_pfnSetAttributeValue = pResult.RCast<GameData::EntityKeyValues::SetAttributeValueFuncType>();
+				}
 			}
 		}
 	}

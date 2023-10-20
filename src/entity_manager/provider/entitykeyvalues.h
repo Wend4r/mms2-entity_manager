@@ -12,6 +12,10 @@ class CEntityKeyValues
 {
 };
 
+class CEntityKeyValuesAttribute
+{
+};
+
 struct EntityKey
 {
 	uint32 m_nHashCode;
@@ -26,8 +30,14 @@ namespace EntityManagerSpace
 		CEntityKeyValuesProvider(void *pUnkEntitySystemSubobject = nullptr, char eUnknownType = 0);
 		static CEntityKeyValues *Create(void *pUnkEntitySystemSubobject = nullptr, char eUnknownType = 0);
 
-		void *GetAttribute(const EntityKey &key, char *psValue = nullptr);
-		void SetAttributeValue(void *pAttr, const char *pString);
+		CEntityKeyValuesAttribute *GetAttribute(const EntityKey &key, char *psValue = nullptr);
+		void SetAttributeValue(CEntityKeyValuesAttribute *pAttr, const char *pString);
+	};
+
+	class CEntityKeyValuesAttributeProvider : public CEntityKeyValuesAttribute
+	{
+	public:
+		const char *GetValueString(const char *pszDefaultValue = "");
 	};
 };
 
