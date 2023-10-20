@@ -1,3 +1,6 @@
+#ifndef SPAWNGROUP_MANAGER_H
+#define SPAWNGROUP_MANAGER_H
+
 #include "entity2/entityidentity.h"
 #include "tier1/utlstring.h"
 #include "tier1/utlvector.h"
@@ -64,3 +67,5 @@ class CSpawnGroupMgrGameSystem : public IGameSpawnGroupMgr //, public IGameSyste
 {
 	virtual ~CSpawnGroupMgrGameSystem() = 0;
 };
+
+#endif // SPAWNGROUP_MANAGER_H
