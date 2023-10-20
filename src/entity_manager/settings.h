@@ -3,6 +3,9 @@
 
 #include <stddef.h>
 
+#include <eiface.h>
+#include <entity2/entityidentity.h>
+
 class KeyValues;
 class CBaseEntity;
 class CEntityKeyValues;
@@ -13,12 +16,12 @@ namespace EntityManagerSpace
 	{
 	public:
 		bool Init(char *psError, size_t nMaxLength);
-		bool Load(const char *pszBasePath, const char *pszMapName, char *psError = NULL, size_t nMaxLength = 0);
+		bool Load(SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1, const char *pszBasePath = "", const char *pszMapName = "NONE", char *psError = NULL, size_t nMaxLength = 0);
 		void Clear();
 		void Destroy();
 
 	protected:
-		bool LoadWorld(const char *pszBaseConfigsDir, char *psError = NULL, size_t nMaxLength = 0);
+		bool LoadWorld(SpawnGroupHandle_t hSpawnGroup, const char *pszBaseConfigsDir, char *psError = NULL, size_t nMaxLength = 0);
 
 	protected:
 

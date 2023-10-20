@@ -26,7 +26,7 @@
 			// };
 			// 
 			// Basic usage:
-			// (CBaseEntity *)CEntitySystem::CreateEntity(g_pEntitySystem, iForceEdictIndex, pClassName, ENTITY_NETWORKING_MODE_DEFAULT, (SpawnGroupHandle_t)-1, -1, nullptr, false);
+			// (CBaseEntity *)CEntitySystem::CreateEntity(g_pEntitySystem, iForceEdictIndex, pClassName, ENTITY_NETWORKING_MODE_DEFAULT, (SpawnGroupHandle_t)-1, -1, false);
 			"CEntitySystem::CreateEntity"
 			{
 				"library"       "server"
@@ -75,6 +75,16 @@
 			{
 				"windows64"     "0x58"
 				"linux64"       "0x50"
+			}
+
+			// Used into CSpawnGroupMgrGameSystem::SetActiveSpawnGroup()
+			//   Near strings: 
+			//     "%s:  CSpawnGroupMgrGameSystem::PerformActivateSpawnGroup(%s)\n" // The most.
+			//     "SV"
+			"CEntitySystem::m_ActiveSpawnGroupHandle"
+			{
+				"windows64"     "0x13B8"
+				"linux64"       "0x13E0"
 			}
 		}
 	}

@@ -34,6 +34,11 @@ bool EntityManagerSpace::Provider::LoadGameData(char *psError, size_t nMaxLength
 	if(bResult)
 	{
 		bResult = this->LoadEntityKeyValuesGameData(psError, nMaxLength);
+
+		if(bResult)
+		{
+			bResult = this->LoadSpawnGroupGameData(psError, nMaxLength);
+		}
 	}
 
 	return bResult;
@@ -113,6 +118,27 @@ bool EntityManagerSpace::Provider::LoadEntitySystemGameData(char *psError, size_
 	if(!bResult && psError)
 	{
 		snprintf(psError, nMaxLength, "Failed to get \"%s\" signature", pszSignatureName);
+	}
+
+	return bResult;
+}
+
+bool EntityManagerSpace::Provider::LoadSpawnGroupGameData(char *psError, size_t nMaxLength)
+{
+	const char *pszOffsetName = "CSpawnGroupMgrGameSystem::m_SpawnGroups";
+
+	ptrdiff_t nResult = g_pEntityManagerGameData->GetSpawnGroupOffset(pszOffsetName);
+
+	bool bResult = nResult != -1;
+
+	if(bResult)
+	{
+		this->m_aData.m_aSpawnGroup.m_nMgrGameSystemSpawnGroupsOffset = nResult;
+	}
+
+	if(!bResult && psError)
+	{
+		snprintf(psError, nMaxLength, "Failed to get \"%s\" offset", pszOffsetName);
 	}
 
 	return bResult;

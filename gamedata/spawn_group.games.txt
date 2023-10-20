@@ -57,6 +57,39 @@
 				"windows64"     "0x18"
 				"linux64"       "0x18"
 			}
+
+			// See ISpawnGroup::GetName() used.
+			"CSpawnGroupMgrGameSystem::m_SpawnGroups" // CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *>
+			{
+				"windows64"     "0x140"
+				"linux64"       "0x140"
+			}
+
+			// Used in CMapSpawnGroup::OnSpawnGroupLoad():
+			//   v37 = CSpawnGroupMgrGameSystem::Get(g_pSpawnGroupMgr, v36);
+			//   if ( !v93 )
+			//   {
+			//     if ( v37 )
+			//       v38 = (const char *)((__int64 (__fastcall *)(ISpawnGroup *))*v37->m_pSpawnGroup->_vptr_ISpawnGroup)(v37->m_pSpawnGroup); // <-- Here call.
+			//     else
+			//       v38 = "???";
+			//     src = (char *)v38;
+			//   }
+			// Near strings:
+			//  ...
+			//   "???" // The most.
+			//   "forward"
+			//   "backward"
+			//   "%u"
+			//   "CO-%u"
+			//   "CO-%u"
+			//   "%s(%s):  Found %s connection to %s:  %s at %f %f %f\n" // To find.
+			//  ...
+			"ISpawnGroup::GetName"
+			{
+				"windows64"     "0"
+				"linux64"       "0"
+			}
 		}
 	}
 }

@@ -11,7 +11,7 @@
 
 #include "provider_agent.h"
 
-#define ENTITY_MANAGER_MAP_CONFIG_DIR "configs/maps"
+#define ENTITY_MANAGER_MAP_CONFIG_DIR "configs/spawngroups"
 #define ENTITY_MANAGER_MAP_CONFIG_WORLD_FILE "world.vdf"
 
 extern IFileSystem *filesystem;
@@ -25,7 +25,7 @@ bool EntityManagerSpace::Settings::Init(char *psError, size_t nMaxLength)
 	return true;
 }
 
-bool EntityManagerSpace::Settings::Load(const char *pszBasePath, const char *pszMapName, char *psError, size_t nMaxLength)
+bool EntityManagerSpace::Settings::Load(SpawnGroupHandle_t hSpawnGroup, const char *pszBasePath, const char *pszSpawnGroupName, char *psError, size_t nMaxLength)
 {
 	char sBaseConfigsDir[MAX_PATH];
 
@@ -35,9 +35,9 @@ bool EntityManagerSpace::Settings::Load(const char *pszBasePath, const char *psz
 #else
 		"%s/%s/%s",
 #endif
-		pszBasePath, ENTITY_MANAGER_MAP_CONFIG_DIR, pszMapName);
+		pszBasePath, ENTITY_MANAGER_MAP_CONFIG_DIR, pszSpawnGroupName);
 
-	bool bResult = this->LoadWorld((const char *)sBaseConfigsDir, psError, nMaxLength);
+	bool bResult = this->LoadWorld(hSpawnGroup, (const char *)sBaseConfigsDir, psError, nMaxLength);
 
 	if(bResult)
 	{
@@ -58,7 +58,7 @@ void EntityManagerSpace::Settings::Destroy()
 	this->m_pWorld = nullptr;
 }
 
-bool EntityManagerSpace::Settings::LoadWorld(const char *pszBaseConfigsDir, char *psError, size_t nMaxLength)
+bool EntityManagerSpace::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const char *pszBaseConfigsDir, char *psError, size_t nMaxLength)
 {
 	char sConfigFile[MAX_PATH];
 
@@ -78,7 +78,7 @@ bool EntityManagerSpace::Settings::LoadWorld(const char *pszBaseConfigsDir, char
 	{
 		FOR_EACH_SUBKEY(pWorldValues, pEntityValues)
 		{
-			g_pEntityManagerProviderAgent->PushSpawnQueueOld(pEntityValues);
+			g_pEntityManagerProviderAgent->PushSpawnQueueOld(pEntityValues, hSpawnGroup);
 		}
 	}
 	else if(psError)

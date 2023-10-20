@@ -34,7 +34,7 @@ def CopyFiles(src, dest, list_objs):
 
 # Package Configs files.
 CopyFiles('configs', os.path.join('addons', EntityManager.plugin_name, 'configs'),
- [ 'maps', ]
+ [ 'spawngroups', ]
 )
 
 # Package GameData files.

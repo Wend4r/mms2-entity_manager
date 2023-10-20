@@ -16,6 +16,7 @@ namespace EntityManagerSpace
 	public:
 		friend class CEntityKeyValuesProvider;
 		friend class CEntitySystemProvider;
+		friend class CSpawnGroupMgrGameSystemProvider;
 
 		bool Init(char *psError, size_t nMaxLength);
 		bool Load(char *psError = NULL, size_t nMaxLength = 0);
@@ -25,6 +26,7 @@ namespace EntityManagerSpace
 		bool LoadGameData(char *psError = NULL, size_t nMaxLength = 0);
 		bool LoadEntityKeyValuesGameData(char *psError = NULL, size_t nMaxLength = 0);
 		bool LoadEntitySystemGameData(char *psError = NULL, size_t nMaxLength = 0);
+		bool LoadSpawnGroupGameData(char *psError = NULL, size_t nMaxLength = 0);
 
 	private:
 		class GameData
@@ -61,6 +63,14 @@ namespace EntityManagerSpace
 			};
 
 			EntitySystem m_aEntitySystem;
+
+			class SpawnGroup
+			{
+			public:
+				ptrdiff_t m_nMgrGameSystemSpawnGroupsOffset;
+			};
+
+			SpawnGroup m_aSpawnGroup;
 		};
 
 		GameData m_aData;

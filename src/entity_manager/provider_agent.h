@@ -26,8 +26,15 @@ namespace EntityManagerSpace
 		void Destroy();
 
 	public:
-		void PushSpawnQueueOld(KeyValues *pOldKeyValues);
-		void PushSpawnQueue(CEntityKeyValues *pOldKeyValues);
+		void PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
+		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
+
+		int AddSpawnQueuedToTail(CUtlVector<const CEntityKeyValues *> *vecTarget);
+		int AddSpawnQueuedToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup);
+		void ReleaseSpawnQueued();
+		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup);
+
+		int SpawnQueued();
 		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup);
 
 	protected:
@@ -40,9 +47,24 @@ namespace EntityManagerSpace
 		CacheMapOIndexType CacheOrGetEntityKey(const char *pszName);
 
 	private:
-		struct EntityData
+		class EntityData
 		{
+			typedef EntityData ThisClass;
+
+		public:
+			EntityData(CEntityKeyValues *pKeyValues);
+			EntityData(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup);
+
+			CEntityKeyValues *GetKeyValues() const;
+			CEntityKeyValuesProvider *GetKeyValuesProvider() const;
+
+			SpawnGroupHandle_t GetSpawnGroup() const;
+			static SpawnGroupHandle_t GetAnySpawnGroup();
+			bool IsAnySpawnGroup() const;
+
+		private:
 			CEntityKeyValues *m_pKeyValues;
+			SpawnGroupHandle_t m_hSpawnGroup;
 		};
 
 		CUtlVector<EntityData> m_vecEntitySpawnQueue; // To spawn.

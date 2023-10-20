@@ -12,22 +12,25 @@
 
 #include <stdio.h>
 #include <string>
+#include <functional>
 
 // Game SDK.
+#include <eiface.h>
+#include <iserver.h>
 #include <entity2/entitysystem.h>
 #include <game_systems/spawngroup_manager.h>
 #include <tier0/dbg.h>
 #include <tier1/convar.h>
-#include <eiface.h>
-#include <iserver.h>
 
 #include "entity_manager.h"
+#include "entity_manager/provider/spawngroup.h"
 
 class GameSessionConfiguration_t { };
 
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 SH_DECL_HOOK3_void(INetworkServerService, StartupServer, SH_NOATTRIB, 0, const GameSessionConfiguration_t &, ISource2WorldSession *, const char *);
-SH_DECL_HOOK1_void(CSpawnGroupMgrGameSystem, SpawnGroupSpawnEntities, SH_NOATTRIB, 0, SpawnGroupHandle_t);
+SH_DECL_HOOK2_void(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, SH_NOATTRIB, 0, SpawnGroupHandle_t, ISpawnGroup *);
+SH_DECL_HOOK4(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, SH_NOATTRIB, 0, ILoadingSpawnGroup *, SpawnGroupHandle_t, bool, bool, const CUtlVector<const CEntityKeyValues *> *);
 
 static EntityManager s_aEntityManager;
 EntityManager *g_pEntityManager = &s_aEntityManager;  // To extern usage.
@@ -162,7 +165,22 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 		{
 			this->InitEntitySystem();
 			this->InitSpawnGroup();
-			s_aEntityManager.OnLevelInit(pNewServer->GetMapName(), nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
+
+			// Load by spawn groups now.
+			{
+				auto pSpawnGroupMgr = (EntityManagerSpace::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+
+				pSpawnGroupMgr->WhileBySpawnGroups([this](SpawnGroupHandle_t h, CMapSpawnGroup *pSpawnGroup) -> void {
+					char sSettingsError[256];
+
+					if(!this->LoadSettings(h, pSpawnGroup->GetSpawnGroupName(), (char *)sSettingsError, sizeof(sSettingsError)))
+					{
+						Warning("Failed to load a settings: %s\n", sSettingsError);
+					}
+				});
+
+				s_aEntityManagerProviderAgent.SpawnQueued();
+			}
 		}
 	}
 
@@ -204,12 +222,14 @@ void EntityManager::InitSpawnGroup()
 {
 	g_pSpawnGroupMgr = *this->m_ppSpawnGroupMgrAddress;
 
-	SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, SpawnGroupSpawnEntities, g_pSpawnGroupMgr, this, &EntityManager::OnSpawnGroupSpawnEntitiesHook, true);
+	SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, g_pSpawnGroupMgr, this, &EntityManager::OnAllocateSpawnGroupHook, true);
+	SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, g_pSpawnGroupMgr, this, &EntityManager::OnCreateLoadingSpawnGroupHook, false);
 }
 
 void EntityManager::DestroySpawnGroup()
 {
-	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, SpawnGroupSpawnEntities, g_pSpawnGroupMgr, this, &EntityManager::OnSpawnGroupSpawnEntitiesHook, true);
+	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, g_pSpawnGroupMgr, this, &EntityManager::OnAllocateSpawnGroupHook, true);
+	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, g_pSpawnGroupMgr, this, &EntityManager::OnCreateLoadingSpawnGroupHook, false);
 }
 
 bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
@@ -273,14 +293,14 @@ bool EntityManager::LoadProvider(char *psError, size_t nMaxLength)
 	return bResult;
 }
 
-bool EntityManager::LoadSettings(char *psError, size_t nMaxLength)
+bool EntityManager::LoadSettings(SpawnGroupHandle_t hSpawnGroup, const char *pszSpawnGroupName, char *psError, size_t nMaxLength)
 {
-	return this->m_aSettings.Load(this->m_sBasePath.c_str(), this->m_sCurrentMap.c_str(), psError, nMaxLength);
+	return this->m_aSettings.Load(hSpawnGroup, this->m_sBasePath.c_str(), pszSpawnGroupName, psError, nMaxLength);
 }
 
 void EntityManager::OnBasePathChanged(const char *pszNewOne)
 {
-	this->m_sBasePath = std::string(pszNewOne);
+	this->m_sBasePath = pszNewOne;
 
 	// Load a gamedata.
 	{
@@ -304,12 +324,12 @@ void EntityManager::OnBasePathChanged(const char *pszNewOne)
 
 	// Load a settings.
 	{
-		char sSettingsError[256];
+		// char sSettingsError[256];
 
-		if(!this->LoadSettings((char *)sSettingsError, sizeof(sSettingsError)))
-		{
-			Warning("Failed to load a settings: %s\n", sSettingsError);
-		}
+		// if(!this->LoadSettings(this->m_sCurrentMap.c_str(), (char *)sSettingsError, sizeof(sSettingsError)))
+		// {
+		// 	Warning("Failed to load a settings: %s\n", sSettingsError);
+		// }
 	}
 }
 
@@ -324,27 +344,6 @@ void EntityManager::OnSetBasePathCommand(const CCommandContext &context, const C
 
 	this->OnBasePathChanged(args[1]);
 	Msg("Base path is \"%s\"\n", this->m_sBasePath.c_str());
-}
-
-// Potentially might not work
-void EntityManager::OnLevelInit(char const *pszMapName,
-                                char const *pszMapEntities,
-                                char const *pszOldLevel,
-                                char const *pszLandmarkName,
-                                bool bIsLoadGame,
-                                bool bIsBackground)
-{
-	this->m_sCurrentMap = pszMapName;
-	this->m_aSettings.Clear();
-
-	{
-		char sSettingsError[256];
-
-		if(!this->LoadSettings((char *)sSettingsError, sizeof(sSettingsError)))
-		{
-			Warning("Failed to load a settings: %s\n", sSettingsError);
-		}
-	}
 }
 
 void EntityManager::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLastTick )
@@ -365,8 +364,18 @@ void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config
 	{
 		const char *pszMapName = pNetServer->GetMapName();
 
+		if(g_pGameEntitySystem)
+		{
+			this->DestroyEntitySystem();
+		}
+
+		if(g_pSpawnGroupMgr)
+		{
+			this->DestroySpawnGroup();
+		}
+
 		this->InitEntitySystem();
-		s_aEntityManager.OnLevelInit(pszMapName, nullptr, this->m_sCurrentMap.c_str(), nullptr, false, false);
+		this->InitSpawnGroup();
 	}
 	else
 	{
@@ -374,11 +383,29 @@ void EntityManager::OnStartupServerHook(const GameSessionConfiguration_t &config
 	}
 }
 
-void EntityManager::OnSpawnGroupSpawnEntitiesHook(SpawnGroupHandle_t handle)
+void EntityManager::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
 {
-	Msg("EntityManager::OnSpawnGroupSpawnEntitiesHook(%d)\n", handle);
+	Msg("EntityManager::OnAllocateSpawnGroupHook(%d, %s)\n", handle, pSpawnGroup->GetName());
 
-	s_aEntityManagerProviderAgent.SpawnQueued(handle);
+	// Load settings by spawn group name
+	{
+		char sSettingsError[256];
+
+		if(!this->LoadSettings(handle, pSpawnGroup->GetName(), (char *)sSettingsError, sizeof(sSettingsError)))
+		{
+			Warning("Failed to load a settings: %s\n", sSettingsError);
+		}
+	}
+}
+
+ILoadingSpawnGroup *EntityManager::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
+{
+	Msg("EntityManager::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
+
+	s_aEntityManagerProviderAgent.AddSpawnQueuedToTail(const_cast<CUtlVector<const CEntityKeyValues *> *>(pKeyValues), handle);
+	s_aEntityManagerProviderAgent.ReleaseSpawnQueued(handle);
+
+	return META_RESULT_ORIG_RET(ILoadingSpawnGroup *);
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)

@@ -1,12 +1,15 @@
 #ifndef SPAWNGROUP_MANAGER_H
 #define SPAWNGROUP_MANAGER_H
 
+#include "eiface.h"
+#include "entity2/entitysystem.h"
 #include "entity2/entityidentity.h"
 #include "tier1/utlstring.h"
 #include "tier1/utlvector.h"
 
+class matrix3x4a_t; // "mathlib/mathlib.h"
+
 class CEntityKeyValues;
-class ISpawnGroup;
 class ISpawnGroupPrerequisiteRegistry;
 
 struct SaveRestoreDataHandle_t__
@@ -28,6 +31,68 @@ struct EventServerPostEntityThink_t
 {
 	bool m_bFirstTick;
 	bool m_bLastTick;
+};
+
+class ISpawnGroup
+{
+public:
+	virtual const char *GetName() const = 0;
+	virtual const char *GetEntityLumpName() const = 0;
+	virtual const char *GetEntityFilterName() const = 0;
+	virtual SpawnGroupHandle_t GetSpawnGroupHandle() const = 0;
+	virtual const matrix3x4a_t &GetWorldOffset() const = 0;
+	virtual bool UnkIsValid() const = 0;
+	virtual const char *UnkGetName() const = 0;
+	virtual const char *GetLocalNameFixup() const = 0;
+	virtual SpawnGroupHandle_t GetOwner() const = 0;
+
+	// And more at next one.
+};
+
+class CMapSpawnGroup
+{
+public:
+	const char *GetSpawnGroupName() const
+	{
+		return this->m_pSpawnGroup->GetName();
+	}
+
+	const char *GetEntityLumpName() const
+	{
+		return this->m_pSpawnGroup->GetEntityLumpName();
+	}
+
+	const char *GetEntityFilterName() const
+	{
+		return this->m_pSpawnGroup->GetEntityFilterName();
+	}
+
+	SpawnGroupHandle_t GetSpawnGroupHandle() const
+	{
+		return this->m_pSpawnGroup->GetSpawnGroupHandle();
+	}
+
+	const matrix3x4a_t &GetWorldOffset() const
+	{
+		return this->m_pSpawnGroup->GetWorldOffset();
+	}
+
+	const char *GetLocalNameFixup() const
+	{
+		return this->m_pSpawnGroup->GetLocalNameFixup();
+	}
+
+	SpawnGroupHandle_t GetOwnerSpawnGroup() const
+	{
+		return this->m_pSpawnGroup->GetOwner();
+	}
+
+private:
+	ISpawnGroup *m_pSpawnGroup;
+	bool m_bSpawnGroupPrecacheDispatched;
+	bool m_bSpawnGroupLoadDispatched;
+	IPVS *m_pPVS;
+	// CUtlVector<SpawnGroupConnectionInfo_t> m_Connections;
 };
 
 class IGameSpawnGroupMgr
@@ -59,13 +124,13 @@ public:
 	virtual void GameShutdown(const EventGameInit_t &msg) = 0;
 	virtual void FrameBoundary(const EventGameInit_t &msg) = 0;
 	virtual void PreSpawnGroupLoad(const EventPreSpawnGroupLoad_t &msg) = 0;
+	virtual ~IGameSpawnGroupMgr() = 0;
 
 	// IGameSystem is at next one.
 };
 
 class CSpawnGroupMgrGameSystem : public IGameSpawnGroupMgr //, public IGameSystem
 {
-	virtual ~CSpawnGroupMgrGameSystem() = 0;
 };
 
-#endif // SPAWNGROUP_MANAGER_H
+#endif // SPAWNGROUP_MANAGER_H	

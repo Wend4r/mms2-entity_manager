@@ -46,17 +46,17 @@ protected:
 protected:
 	bool LoadGameData(char *psError = NULL, size_t nMaxLength = 0);
 	bool LoadProvider(char *psError = NULL, size_t nMaxLength = 0);
-	bool LoadSettings(char *psError = NULL, size_t nMaxLength = 0);
+	bool LoadSettings(SpawnGroupHandle_t hSpawnGroup, const char *pszSpawnGroupName, char *psError = NULL, size_t nMaxLength = 0);
 	virtual void OnBasePathChanged(const char *pszNewOne);
 
 private: // Commands.
 	CON_COMMAND_MEMBER_F(EntityManager, "mm_" PREFIX_ENTITY_MANAGER "_set_basepath", OnSetBasePathCommand, "Set base path for Entity Manager", FCVAR_LINKED_CONCOMMAND);
 
 public: // SourceHooks.
-	void OnLevelInit(char const *pszMapName, char const *pszMapEntities, char const *pszOldLevel, char const *pszLandmarkName, bool bIsLoadGame, bool bIsBackground);
 	void OnGameFrameHook(bool simulating, bool bFirstTick, bool bLastTick);
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *);
-	void OnSpawnGroupSpawnEntitiesHook(SpawnGroupHandle_t handle);
+	void OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
+	ILoadingSpawnGroup *OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues);
 
 public:
 	const char *GetAuthor();
