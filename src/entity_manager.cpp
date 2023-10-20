@@ -30,7 +30,7 @@ class GameSessionConfiguration_t { };
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 SH_DECL_HOOK3_void(INetworkServerService, StartupServer, SH_NOATTRIB, 0, const GameSessionConfiguration_t &, ISource2WorldSession *, const char *);
 SH_DECL_HOOK2_void(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, SH_NOATTRIB, 0, SpawnGroupHandle_t, ISpawnGroup *);
-SH_DECL_HOOK1_void(CSpawnGroupMgrGameSystem, SpawnGroupSpawnEntities, SH_NOATTRIB, 0, SpawnGroupHandle_t);
+SH_DECL_HOOK4(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, SH_NOATTRIB, 0, ILoadingSpawnGroup *, SpawnGroupHandle_t, bool, bool, const CUtlVector<const CEntityKeyValues *> *);
 
 static EntityManager s_aEntityManager;
 EntityManager *g_pEntityManager = &s_aEntityManager;  // To extern usage.
@@ -223,13 +223,13 @@ void EntityManager::InitSpawnGroup()
 	g_pSpawnGroupMgr = *this->m_ppSpawnGroupMgrAddress;
 
 	SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, g_pSpawnGroupMgr, this, &EntityManager::OnAllocateSpawnGroupHook, true);
-	SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, SpawnGroupSpawnEntities, g_pSpawnGroupMgr, this, &EntityManager::OnSpawnGroupSpawnEntitiesHook, true);
+	SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, g_pSpawnGroupMgr, this, &EntityManager::OnCreateLoadingSpawnGroupHook, false);
 }
 
 void EntityManager::DestroySpawnGroup()
 {
 	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, g_pSpawnGroupMgr, this, &EntityManager::OnAllocateSpawnGroupHook, true);
-	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, SpawnGroupSpawnEntities, g_pSpawnGroupMgr, this, &EntityManager::OnSpawnGroupSpawnEntitiesHook, true);
+	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, g_pSpawnGroupMgr, this, &EntityManager::OnCreateLoadingSpawnGroupHook, false);
 }
 
 bool EntityManager::LoadGameData(char *psError, size_t nMaxLength)
@@ -398,11 +398,14 @@ void EntityManager::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGr
 	}
 }
 
-void EntityManager::OnSpawnGroupSpawnEntitiesHook(SpawnGroupHandle_t handle)
+ILoadingSpawnGroup *EntityManager::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
 {
-	Msg("EntityManager::OnSpawnGroupSpawnEntitiesHook(%d)\n", handle);
+	Msg("EntityManager::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
 
-	s_aEntityManagerProviderAgent.SpawnQueued(handle);
+	s_aEntityManagerProviderAgent.AddSpawnQueuedToTail(const_cast<CUtlVector<const CEntityKeyValues *> *>(pKeyValues), handle);
+	s_aEntityManagerProviderAgent.ReleaseSpawnQueued(handle);
+
+	return META_RESULT_ORIG_RET(ILoadingSpawnGroup *);
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)
