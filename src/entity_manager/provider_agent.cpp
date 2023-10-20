@@ -202,7 +202,7 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued()
 
 			if(pszClassname && pszClassname[0])
 			{
-				CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(iForceEdictIndex, pszClassname, ENTITY_NETWORKING_MODE_DEFAULT, aSpawnEntity.GetSpawnGroup(), -1, false);
+				CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(aSpawnEntity.GetSpawnGroup(), pszClassname, ENTITY_NETWORKING_MODE_DEFAULT, iForceEdictIndex, -1, false);
 
 				if(pEntity)
 				{
@@ -277,7 +277,7 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGrou
 
 				if(pszClassname && pszClassname[0])
 				{
-					CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(iForceEdictIndex, (const char *)pszClassname, ENTITY_NETWORKING_MODE_DEFAULT, hSpawnGroup, -1, false);
+					CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(hSpawnGroup, pszClassname, ENTITY_NETWORKING_MODE_DEFAULT, iForceEdictIndex, -1, false);
 
 					if(pEntity)
 					{

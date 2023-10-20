@@ -10,10 +10,10 @@
 			// Declaration: 
 			// CEntityInstance *CEntitySystem::CreateEntity(
 			//         CEntitySystem *const this,
-			//         CEntityIndex iForcedIndex,
+			//         SpawnGroupHandle_t hSpawnGroup,
 			//         const char *pszNameOrDesignName,
 			//         EntityNetworkingMode_t networkMode,
-			//         SpawnGroupHandle_t hSpawnGroup,
+			//         CEntityIndex iForcedIndex,
 			//         int iForcedSerial,
 			//         bool bCreateInIsolatedPrecacheList)
 			// 
@@ -26,7 +26,7 @@
 			// };
 			// 
 			// Basic usage:
-			// (CBaseEntity *)CEntitySystem::CreateEntity(g_pEntitySystem, iForceEdictIndex, pClassName, ENTITY_NETWORKING_MODE_DEFAULT, (SpawnGroupHandle_t)-1, -1, false);
+			// (CBaseEntity *)CEntitySystem::CreateEntity(g_pEntitySystem, (SpawnGroupHandle_t)-1, pClassName, ENTITY_NETWORKING_MODE_DEFAULT, -1, -1, false);
 			"CEntitySystem::CreateEntity"
 			{
 				"library"       "server"

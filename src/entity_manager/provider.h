@@ -56,7 +56,7 @@ namespace EntityManagerSpace
 			class EntitySystem
 			{
 			public:
-				typedef CEntityInstance *(*CreateEntityFuncType)(CEntitySystem * const pThis, CEntityIndex iForcedIndex, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, SpawnGroupHandle_t hSpawnGroup, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
+				typedef CEntityInstance *(*CreateEntityFuncType)(CEntitySystem * const pThis, SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
 				CreateEntityFuncType m_pfnCreateEntity;
 
 				typedef void (*QueueSpawnEntityFuncType)(CEntitySystem * const pThis, CEntityIdentity *pEntity, const CEntityKeyValues *pInitializationData);
