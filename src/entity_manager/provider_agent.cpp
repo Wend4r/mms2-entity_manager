@@ -13,6 +13,11 @@ inline EntityKey CalcEntityKey(const char *pszName, const char *pszSafeName, int
 	return {MurmurHash2LowerCase(pszName, nLength, ENTITY_KEY_MAGIC_MEOW), pszSafeName};
 }
 
+inline EntityKey CalcEntityKey(const char *pszName, int nLength)
+{
+	return CalcEntityKey(pszName, pszName, nLength);
+}
+
 inline EntityKey CalcEntityKey(const char *pszName)
 {
 	return CalcEntityKey(pszName, pszName, strlen(pszName));
@@ -34,11 +39,7 @@ EntityManagerSpace::ProviderAgent::ProviderAgent()
 	{
 		static const char szClassname[] = "classname";
 
-		const int iClassnameLength = sizeof(szClassname);
-
-		const CUtlString sClassname((const char *)szClassname, iClassnameLength);
-
-		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert(sClassname, CalcEntityKey((const char *)szClassname, sClassname.Get(), iClassnameLength));
+		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert((const char *)szClassname, CalcEntityKey((const char *)szClassname, sizeof(szClassname) - 1));
 	}
 }
 
