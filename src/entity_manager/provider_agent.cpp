@@ -120,27 +120,23 @@ int EntityManagerSpace::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEn
 {
 	const auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
 
-	int iQueueLength = vecEntitySpawnQueue.Count();
+	const int iQueueLength = vecEntitySpawnQueue.Count();
 
 	CEntityKeyValues **ppKeyValuesArr = new CEntityKeyValues *[iQueueLength];
+	CEntityKeyValues **ppKeyValuesCur = ppKeyValuesArr;
 
-	// Fill ppKeyValuesArr from .
+	for(int i = 0; i < iQueueLength; i++)
 	{
-		CEntityKeyValues **ppKeyValuesCur = ppKeyValuesArr;
+		const EntityData &aSpawnEntity = vecEntitySpawnQueue[i];
 
-		for(int i = 0; i < iQueueLength; i++)
+		if(hSpawnGroup == aSpawnEntity.GetSpawnGroup())
 		{
-			const EntityData &aSpawnEntity = vecEntitySpawnQueue[i];
-
-			if(hSpawnGroup == aSpawnEntity.GetSpawnGroup())
-			{
-				*ppKeyValuesCur = aSpawnEntity.GetKeyValues();
-				ppKeyValuesCur++;
-			}
+			*ppKeyValuesCur = aSpawnEntity.GetKeyValues();
+			ppKeyValuesCur++;
 		}
 	}
 
-	int iResult = vecTarget->AddMultipleToTail(iQueueLength, ppKeyValuesArr);
+	int iResult = vecTarget->AddMultipleToTail((ppKeyValuesCur - ppKeyValuesArr) / sizeof(decltype(ppKeyValuesArr)), ppKeyValuesArr);
 
 	delete[] ppKeyValuesArr;
 
