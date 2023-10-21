@@ -56,7 +56,7 @@
 			"CEntityKeyValuesAttribute::GetValueString"
 			{
 				"library"       "server"
-				"windows64"     "48 89 5C 24 ? 57 48 83 EC 30 48 8B DA 48 8B F9 E8 ? ? ? ? 48 8D 05 ? ? ? ? C7"
+				"windows64"     "44 8B 01 49 C1 E8 02 41 8D 40 FA"
 				"linux64"       "0F B7 17 66 C1 EA 02 89 D0 83 E0 DF"
 			}
 
