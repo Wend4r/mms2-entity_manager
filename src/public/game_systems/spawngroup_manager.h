@@ -5,6 +5,7 @@
 #include "entity2/entitysystem.h"
 #include "entity2/entityidentity.h"
 #include "tier1/utlstring.h"
+#include "tier1/utlscratchmemory.h"
 #include "tier1/utlvector.h"
 
 class matrix3x4a_t; // "mathlib/mathlib.h"
@@ -95,6 +96,23 @@ private:
 	// CUtlVector<SpawnGroupConnectionInfo_t> m_Connections;
 };
 
+class ILoadingSpawnGroup
+{
+public:
+	virtual int EntityCount() const = 0;
+	virtual const EntitySpawnInfo_t *GetEntities() const = 0;
+	virtual bool ShouldLoadEntitiesFromSave() const = 0;
+	virtual const CUtlBuffer *GetSaveRestoreFileData() const = 0;
+	virtual void SetLevelTransitionPreviousMap(const char *pLevelTransitionMap, const char *pLandmarkName) = 0;
+	virtual bool IsLevelTransition() const = 0;
+	virtual const char *GetLevelTransitionPreviousMap() const = 0;
+	virtual const char *GetLevelTransitionLandmarkName() const = 0;
+	virtual CUtlScratchMemoryPool *GetEntityKeyValuesAllocator() = 0;
+	virtual CEntityInstance *CreateEntityToSpawn(SpawnGroupHandle_t hSpawnGroup, const matrix3x4a_t *const vecSpawnOffset, int createType, const CEntityKeyValues *pEntityKeyValues) = 0;
+	virtual void SpawnEntities() = 0;
+	virtual void Release() = 0;
+};
+
 class IGameSpawnGroupMgr
 {
 public:
@@ -130,6 +148,10 @@ public:
 };
 
 class CSpawnGroupMgrGameSystem : public IGameSpawnGroupMgr //, public IGameSystem
+{
+};
+
+class CLoadingSpawnGroup : public ILoadingSpawnGroup
 {
 };
 

@@ -170,16 +170,24 @@ bool EntityManager::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 			{
 				auto pSpawnGroupMgr = (EntityManagerSpace::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
 
+
 				pSpawnGroupMgr->WhileBySpawnGroups([this](SpawnGroupHandle_t h, CMapSpawnGroup *pSpawnGroup) -> void {
 					char sSettingsError[256];
 
-					if(!this->LoadSettings(h, pSpawnGroup->GetSpawnGroupName(), (char *)sSettingsError, sizeof(sSettingsError)))
+					if(this->LoadSettings(h, pSpawnGroup->GetSpawnGroupName(), (char *)sSettingsError, sizeof(sSettingsError)))
+					{
+						CUtlVector<const CEntityKeyValues *> vecKeyValues;
+
+						ILoadingSpawnGroup *pLoadingSpawnGroup = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, &vecKeyValues);
+
+						pLoadingSpawnGroup->SpawnEntities();
+						pLoadingSpawnGroup->Release();
+					}
+					else
 					{
 						Warning("Failed to load a settings: %s\n", sSettingsError);
 					}
 				});
-
-				s_aEntityManagerProviderAgent.SpawnQueued();
 			}
 		}
 	}
