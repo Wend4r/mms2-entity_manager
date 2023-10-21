@@ -137,7 +137,7 @@ public:
 	virtual void UnkRelease1() = 0;
 	virtual void UnkRelease2() = 0;
 	virtual void YouForgot_DECLARE_GAME_SYSTEM_InYourClassDefinition() = 0;
-	virtual void UnkSpawnGroupManagerGameSystemMember1();
+	virtual void UnkSpawnGroupManagerGameSystemMember1() = 0;
 	virtual void GameInit(const EventGameInit_t &msg) = 0;
 	virtual void GameShutdown(const EventGameInit_t &msg) = 0;
 	virtual void FrameBoundary(const EventGameInit_t &msg) = 0;
