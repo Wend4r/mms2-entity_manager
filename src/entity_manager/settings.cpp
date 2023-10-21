@@ -11,7 +11,8 @@
 
 #include "provider_agent.h"
 
-#define ENTITY_MANAGER_MAP_CONFIG_DIR "configs/spawngroups"
+#define ENTITY_MANAGER_MAP_CONFIG_DIR "configs"
+#define ENTITY_MANAGER_MAP_CONFIG_SPAWNGROUPS_DIR "spawngroups"
 #define ENTITY_MANAGER_MAP_CONFIG_WORLD_FILE "world.vdf"
 
 extern IFileSystem *filesystem;
@@ -31,11 +32,11 @@ bool EntityManagerSpace::Settings::Load(SpawnGroupHandle_t hSpawnGroup, const ch
 
 	snprintf((char *)sBaseConfigsDir, sizeof(sBaseConfigsDir), 
 #ifdef PLATFORM_WINDOWS
-		"%s\\%s\\%s",
+		"%s\\%s\\%s\\%s",
 #else
-		"%s/%s/%s",
+		"%s/%s/%s/%s",
 #endif
-		pszBasePath, ENTITY_MANAGER_MAP_CONFIG_DIR, pszSpawnGroupName);
+		pszBasePath, ENTITY_MANAGER_MAP_CONFIG_DIR, ENTITY_MANAGER_MAP_CONFIG_SPAWNGROUPS_DIR, pszSpawnGroupName);
 
 	bool bResult = this->LoadWorld(hSpawnGroup, (const char *)sBaseConfigsDir, psError, nMaxLength);
 
