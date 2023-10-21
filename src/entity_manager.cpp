@@ -405,7 +405,7 @@ ILoadingSpawnGroup *EntityManager::OnCreateLoadingSpawnGroupHook(SpawnGroupHandl
 	s_aEntityManagerProviderAgent.AddSpawnQueuedToTail(const_cast<CUtlVector<const CEntityKeyValues *> *>(pKeyValues), handle);
 	s_aEntityManagerProviderAgent.ReleaseSpawnQueued(handle);
 
-	return META_RESULT_ORIG_RET(ILoadingSpawnGroup *);
+	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, nullptr, &CSpawnGroupMgrGameSystem::CreateLoadingSpawnGroup, (handle, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, pKeyValues));
 }
 
 bool EntityManager::Pause(char *error, size_t maxlen)
