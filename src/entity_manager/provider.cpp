@@ -46,48 +46,71 @@ bool EntityManagerSpace::Provider::LoadGameData(char *psError, size_t nMaxLength
 
 bool EntityManagerSpace::Provider::LoadEntityKeyValuesGameData(char *psError, size_t nMaxLength)
 {
-	const char *pszSignatureName = "CEntityKeyValues::CEntityKeyValues";
-
-	CMemory pResult = g_pEntityManagerGameData->GetEntityKeyValuesAddress(pszSignatureName);
-
-	bool bResult = pResult;
-
-	if(bResult)
+	bool bResult = true;
+	
 	{
-		this->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues = pResult.RCast<GameData::EntityKeyValues::EntityKeyValuesFuncType>();
+		const char *pszSignatureName = "CEntityKeyValues::CEntityKeyValues";
 
-		pszSignatureName = "CEntityKeyValues::GetAttribute";
-		pResult = g_pEntityManagerGameData->GetEntityKeyValuesAddress(pszSignatureName);
+		CMemory pResult = g_pEntityManagerGameData->GetEntityKeyValuesAddress(pszSignatureName);
+
 		bResult = pResult;
 
 		if(bResult)
 		{
-			this->m_aData.m_aEntityKeyValues.m_pfnGetAttribute = pResult.RCast<GameData::EntityKeyValues::GetAttributeFuncType>();
+			this->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues = pResult.RCast<GameData::EntityKeyValues::EntityKeyValuesFuncType>();
 
-			pszSignatureName = "CEntityKeyValuesAttribute::GetValueString";
+			pszSignatureName = "CEntityKeyValues::GetAttribute";
 			pResult = g_pEntityManagerGameData->GetEntityKeyValuesAddress(pszSignatureName);
 			bResult = pResult;
 
 			if(bResult)
 			{
-				this->m_aData.m_aEntityKeyValues.m_pfnGetValueString = pResult.RCast<GameData::EntityKeyValues::GetValueStringFuncType>();
+				this->m_aData.m_aEntityKeyValues.m_pfnGetAttribute = pResult.RCast<GameData::EntityKeyValues::GetAttributeFuncType>();
 
-				pszSignatureName = "CEntityKeyValues::SetAttributeValue";
+				pszSignatureName = "CEntityKeyValuesAttribute::GetValueString";
 				pResult = g_pEntityManagerGameData->GetEntityKeyValuesAddress(pszSignatureName);
 				bResult = pResult;
 
 				if(bResult)
 				{
-					this->m_aData.m_aEntityKeyValues.m_pfnSetAttributeValue = pResult.RCast<GameData::EntityKeyValues::SetAttributeValueFuncType>();
+					this->m_aData.m_aEntityKeyValues.m_pfnGetValueString = pResult.RCast<GameData::EntityKeyValues::GetValueStringFuncType>();
+
+					pszSignatureName = "CEntityKeyValues::SetAttributeValue";
+					pResult = g_pEntityManagerGameData->GetEntityKeyValuesAddress(pszSignatureName);
+					bResult = pResult;
+
+					if(bResult)
+					{
+						this->m_aData.m_aEntityKeyValues.m_pfnSetAttributeValue = pResult.RCast<GameData::EntityKeyValues::SetAttributeValueFuncType>();
+					}
 				}
 			}
 		}
+
+		if(!bResult && psError)
+		{
+			snprintf(psError, nMaxLength, "Failed to get \"%s\" signature", pszSignatureName);
+		}
 	}
 
-	if(!bResult && psError)
+	if(bResult)
 	{
-		snprintf(psError, nMaxLength, "Failed to get \"%s\" signature", pszSignatureName);
+		const char *pszOffsetName = "sizeof(CEntityKeyValues)";
+
+		ptrdiff_t nResult = g_pEntityManagerGameData->GetEntityKeyValuesOffset(pszOffsetName);
+
+		bResult = nResult != -1;
+
+		if(bResult)
+		{
+			this->m_aData.m_aEntityKeyValues.m_nSizeof = nResult;
+		}
+		else if(psError)
+		{
+			snprintf(psError, nMaxLength, "Failed to get \"%s\" offset", pszOffsetName);
+		}
 	}
+
 
 	return bResult;
 }
