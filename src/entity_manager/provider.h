@@ -37,18 +37,18 @@ namespace EntityManagerSpace
 			{
 			public:
 				typedef void (*EntityKeyValuesFuncType)(CEntityKeyValues * const pThis, void *pEntitySystemSubobject, char eSubobjectType);
-				EntityKeyValuesFuncType m_pfnEntityKeyValues;
+				EntityKeyValuesFuncType m_pfnEntityKeyValues = nullptr;
 
 				typedef CEntityKeyValuesAttribute *(*GetAttributeFuncType)(CEntityKeyValues * const pThis, const EntityKey &key, char *psValue);
-				GetAttributeFuncType m_pfnGetAttribute;
+				GetAttributeFuncType m_pfnGetAttribute = nullptr;
 
 				typedef const char *(*GetValueStringFuncType)(CEntityKeyValuesAttribute * const pThis, const char *pszDefaultValue);
-				GetValueStringFuncType m_pfnGetValueString;
+				GetValueStringFuncType m_pfnGetValueString = nullptr;
 
 				typedef void (*SetAttributeValueFuncType)(CEntityKeyValues * const pThis, CEntityKeyValuesAttribute *pAttribute, const char *pString);
-				SetAttributeValueFuncType m_pfnSetAttributeValue;
+				SetAttributeValueFuncType m_pfnSetAttributeValue = nullptr;
 
-				size_t m_nSizeof;
+				size_t m_nSizeof = -1;
 			};
 
 			EntityKeyValues m_aEntityKeyValues;
@@ -57,13 +57,13 @@ namespace EntityManagerSpace
 			{
 			public:
 				typedef CEntityInstance *(*CreateEntityFuncType)(CEntitySystem * const pThis, SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
-				CreateEntityFuncType m_pfnCreateEntity;
+				CreateEntityFuncType m_pfnCreateEntity = nullptr;
 
 				typedef void (*QueueSpawnEntityFuncType)(CEntitySystem * const pThis, CEntityIdentity *pEntity, const CEntityKeyValues *pInitializationData);
-				QueueSpawnEntityFuncType m_pfnQueueSpawnEntity;
+				QueueSpawnEntityFuncType m_pfnQueueSpawnEntity = nullptr;
 
 				typedef void (*ExecuteQueuedCreationFuncType)(CEntitySystem * const pThis);
-				ExecuteQueuedCreationFuncType m_pfnExecuteQueuedCreation;
+				ExecuteQueuedCreationFuncType m_pfnExecuteQueuedCreation = nullptr;
 			};
 
 			EntitySystem m_aEntitySystem;
@@ -71,7 +71,7 @@ namespace EntityManagerSpace
 			class SpawnGroup
 			{
 			public:
-				ptrdiff_t m_nMgrGameSystemSpawnGroupsOffset;
+				ptrdiff_t m_nMgrGameSystemSpawnGroupsOffset = -1;
 			};
 
 			SpawnGroup m_aSpawnGroup;

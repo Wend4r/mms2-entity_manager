@@ -78,7 +78,7 @@ private:
 
 	EntityManagerSpace::Settings m_aSettings;
 	ptrdiff_t m_nGameResourceServiceEntitySystemOffset = -1;
-	CSpawnGroupMgrGameSystem **m_ppSpawnGroupMgrAddress = NULL;
+	CSpawnGroupMgrGameSystem **m_ppSpawnGroupMgrAddress = nullptr;
 
 	std::string m_sCurrentMap = "\0";
 };
