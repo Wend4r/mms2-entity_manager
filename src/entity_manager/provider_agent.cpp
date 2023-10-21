@@ -3,24 +3,53 @@
 #include "provider/entitysystem.h"
 
 #include <tier0/dbg.h>
+#include <tier0/platform.h>
 #include <tier1/generichash.h>
 #include <tier1/KeyValues.h>
 
 extern CGameEntitySystem *g_pGameEntitySystem;
 
-inline EntityKey CalcEntityKey(const char *pszName, const char *pszSafeName, int nLength)
+// tier0 module.
+PLATFORM_INTERFACE bool g_bUpdateStringTokenDatabase;
+PLATFORM_INTERFACE void RegisterStringToken(uint32 nHashCode, const char *pszName, uint64 nUnk1 = 0LL, bool bUnk2 = true);
+
+// Entity key caclulation.
+FORCEINLINE const EntityKey CalcEntityKey(const char *pszName, const char *pszSafeName, int nLength)
 {
 	return {MurmurHash2LowerCase(pszName, nLength, ENTITY_KEY_MAGIC_MEOW), pszSafeName};
 }
 
-inline EntityKey CalcEntityKey(const char *pszName, int nLength)
+FORCEINLINE const EntityKey CalcEntityKey(const char *pszName, int nLength)
 {
 	return CalcEntityKey(pszName, pszName, nLength);
 }
 
-inline EntityKey CalcEntityKey(const char *pszName)
+FORCEINLINE const EntityKey CalcEntityKey(const char *pszName)
 {
 	return CalcEntityKey(pszName, pszName, strlen(pszName));
+}
+
+// Make an entity key.
+FORCEINLINE const EntityKey MakeEntityKey(const char *pszName, const char *pszSafeName, int nLength)
+{
+	const EntityKey aKey = CalcEntityKey(pszName, pszSafeName, nLength);
+
+	if(g_bUpdateStringTokenDatabase)
+	{
+		RegisterStringToken(aKey.m_nHashCode, aKey.m_pszName);
+	}
+
+	return aKey;
+}
+
+FORCEINLINE const EntityKey MakeEntityKey(const char *pszName, int nLength)
+{
+	return MakeEntityKey(pszName, pszName, nLength);
+}
+
+FORCEINLINE const EntityKey MakeEntityKey(const char *pszName)
+{
+	return MakeEntityKey(pszName, pszName, strlen(pszName));
 }
 
 class CDefOpsString
@@ -39,7 +68,7 @@ EntityManagerSpace::ProviderAgent::ProviderAgent()
 	{
 		static const char szClassname[] = "classname";
 
-		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert((const char *)szClassname, CalcEntityKey((const char *)szClassname, sizeof(szClassname) - 1));
+		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert((const char *)szClassname, MakeEntityKey((const char *)szClassname, sizeof(szClassname) - 1));
 	}
 }
 
@@ -61,7 +90,7 @@ void EntityManagerSpace::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValu
 {
 	int iNewIndex = this->m_vecEntitySpawnQueue.Count();
 
-	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create();
+	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(/* (void *)((uintptr_t)g_pGameEntitySystem + 3280), 3 */);
 
 	FOR_EACH_VALUE(pOldKeyValues, pKeyValue)
 	{
@@ -337,7 +366,7 @@ EntityManagerSpace::ProviderAgent::CacheMapOIndexType EntityManagerSpace::Provid
 
 	CacheMapOIndexType nFindElm = this->m_mapCachedKeys.Find(sName);
 
-	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, CalcEntityKey(pszName, sName.Get(), sName.Length())) : nFindElm;
+	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, MakeEntityKey(pszName, sName.Get(), sName.Length())) : nFindElm;
 }
 
 EntityManagerSpace::ProviderAgent::EntityData::EntityData(CEntityKeyValues *pKeyValues)

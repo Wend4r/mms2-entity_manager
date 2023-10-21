@@ -16,8 +16,9 @@ class CEntityKeyValuesAttribute
 {
 };
 
-struct EntityKey
+class EntityKey
 {
+public:
 	uint32 m_nHashCode;
 	const char *m_pszName;
 };
