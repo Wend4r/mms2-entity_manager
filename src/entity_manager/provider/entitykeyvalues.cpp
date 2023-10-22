@@ -7,13 +7,17 @@ extern EntityManager::Provider *g_pEntityManagerProvider;
 EntityManager::CEntityKeyValuesProvider::CEntityKeyValuesProvider(void *pEntitySystemSubobject, char eSubobjectType)
 {
 	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues(this, pEntitySystemSubobject, eSubobjectType);
+	++*(uint16_t *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset);
 }
 
 CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(void *pEntitySystemSubobject, char eSubobjectType)
 {
-	CEntityKeyValues *pNewKeyValues = (CEntityKeyValues *)malloc(g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nSizeof);
+	void *pKeyValuesSpace = malloc(g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nSizeof);
+
+	CEntityKeyValues *pNewKeyValues = (CEntityKeyValues *)pKeyValuesSpace;
 
 	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues(pNewKeyValues, pEntitySystemSubobject, eSubobjectType);
+	++*(uint16_t *)((uintptr_t)pKeyValuesSpace + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset); // @Wend4r: This is necessary, I've been looking for a long time why a server glitched crashes (with broken stack).
 
 	return pNewKeyValues;
 }

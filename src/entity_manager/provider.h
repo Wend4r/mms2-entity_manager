@@ -48,7 +48,9 @@ namespace EntityManager
 				typedef void (*SetAttributeValueFuncType)(CEntityKeyValues * const pThis, CEntityKeyValuesAttribute *pAttribute, const char *pString);
 				SetAttributeValueFuncType m_pfnSetAttributeValue = nullptr;
 
-				size_t m_nSizeof = -1;
+				ptrdiff_t m_nSizeof = -1;
+
+				ptrdiff_t m_nRefCountOffset = -1;
 			};
 
 			EntityKeyValues m_aEntityKeyValues;

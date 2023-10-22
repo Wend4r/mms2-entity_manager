@@ -85,6 +85,13 @@
 				"windows64"     "0x38"
 				"linux64"       "0x38"
 			}
+
+			// Near ctor: see CEntityKeyValues::CEntityKeyValues()
+			"CEntityKeyValues::m_nRefCount"
+			{
+				"windows64"     "32"
+				"linux64"       "32"
+			}
 		}
 	}
 }

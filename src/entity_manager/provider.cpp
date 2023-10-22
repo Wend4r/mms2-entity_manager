@@ -104,8 +104,18 @@ bool EntityManager::Provider::LoadEntityKeyValuesGameData(char *psError, size_t 
 		if(bResult)
 		{
 			this->m_aData.m_aEntityKeyValues.m_nSizeof = nResult;
+
+			pszOffsetName = "CEntityKeyValues::m_nRefCount";
+			nResult = g_pEntityManagerGameData->GetEntityKeyValuesOffset(pszOffsetName);
+			bResult = nResult != -1;
+
+			if(bResult)
+			{
+				this->m_aData.m_aEntityKeyValues.m_nRefCountOffset = nResult;
+			}
 		}
-		else if(psError)
+
+		if(!bResult && psError)
 		{
 			snprintf(psError, nMaxLength, "Failed to get \"%s\" offset", pszOffsetName);
 		}
