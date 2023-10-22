@@ -180,8 +180,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 						ILoadingSpawnGroup *pLoadingSpawnGroup = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, &vecKeyValues);
 
-						pLoadingSpawnGroup->SpawnEntities();
-						pLoadingSpawnGroup->Release();
+						pSpawnGroup->SetSpawnGroupLoading(pLoadingSpawnGroup);
 					}
 					else
 					{

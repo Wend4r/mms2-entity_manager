@@ -46,6 +46,8 @@ public:
 	virtual const char *UnkGetName() const = 0;
 	virtual const char *GetLocalNameFixup() const = 0;
 	virtual SpawnGroupHandle_t GetOwner() const = 0;
+	virtual ILoadingSpawnGroup *GetLoading() const = 0;
+	virtual void SetLoading(ILoadingSpawnGroup *pLoading) = 0;
 
 	// And more at next one.
 };
@@ -86,6 +88,16 @@ public:
 	SpawnGroupHandle_t GetOwnerSpawnGroup() const
 	{
 		return this->m_pSpawnGroup->GetOwner();
+	}
+
+	ILoadingSpawnGroup *GetSpawnGroupLoading() const
+	{
+		return this->m_pSpawnGroup->GetLoading();
+	}
+
+	void SetSpawnGroupLoading(ILoadingSpawnGroup *pLoading)
+	{
+		this->m_pSpawnGroup->SetLoading(pLoading);
 	}
 
 private:
