@@ -18,12 +18,12 @@ extern IVEngineServer *engine;
 extern IFileSystem *filesystem;
 extern IServerGameDLL *server;
 
-extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
+extern EntityManager::GameData *g_pEntityManagerGameData;
 
 CModule g_aLibEngine, 
         g_aLibServer;
 
-bool EntityManagerSpace::GameData::Init(char *psError, size_t nMaxLength)
+bool EntityManager::GameData::Init(char *psError, size_t nMaxLength)
 {
 	bool bResult = g_aLibEngine.InitFromMemory(engine);
 
@@ -50,7 +50,7 @@ bool EntityManagerSpace::GameData::Init(char *psError, size_t nMaxLength)
 	return true;
 }
 
-bool EntityManagerSpace::GameData::Load(const char *pszBasePath, char *psError, size_t nMaxLength)
+bool EntityManager::GameData::Load(const char *pszBasePath, char *psError, size_t nMaxLength)
 {
 	char sBaseGameConfigDir[MAX_PATH];
 
@@ -77,24 +77,24 @@ bool EntityManagerSpace::GameData::Load(const char *pszBasePath, char *psError, 
 	return bResult;
 }
 
-void EntityManagerSpace::GameData::Clear()
+void EntityManager::GameData::Clear()
 {
 	this->m_aEntitySystemConfig.Clear();
 }
 
-void EntityManagerSpace::GameData::Destroy()
+void EntityManager::GameData::Destroy()
 {
 	// ...
 }
 
-const CModule *EntityManagerSpace::GameData::FindLibrary(const char *pszName)
+const CModule *EntityManager::GameData::FindLibrary(const char *pszName)
 {
 	auto itResult = this->m_aLibraryMap.find(pszName);
 
 	return itResult == this->m_aLibraryMap.cend() ? nullptr : itResult->second;
 }
 
-bool EntityManagerSpace::GameData::LoadEntityKeyValues(const char *pszBaseGameConfigDir, char *psError, size_t nMaxLength)
+bool EntityManager::GameData::LoadEntityKeyValues(const char *pszBaseGameConfigDir, char *psError, size_t nMaxLength)
 {
 	char sConfigFile[MAX_PATH];
 
@@ -131,7 +131,7 @@ bool EntityManagerSpace::GameData::LoadEntityKeyValues(const char *pszBaseGameCo
 	return bResult;
 }
 
-bool EntityManagerSpace::GameData::LoadEntitySystem(const char *pszBaseGameConfigDir, char *psError, size_t nMaxLength)
+bool EntityManager::GameData::LoadEntitySystem(const char *pszBaseGameConfigDir, char *psError, size_t nMaxLength)
 {
 	char sConfigFile[MAX_PATH];
 
@@ -168,7 +168,7 @@ bool EntityManagerSpace::GameData::LoadEntitySystem(const char *pszBaseGameConfi
 	return bResult;
 }
 
-bool EntityManagerSpace::GameData::LoadSpawnGroup(const char *pszBaseGameConfigDir, char *psError, size_t nMaxLength)
+bool EntityManager::GameData::LoadSpawnGroup(const char *pszBaseGameConfigDir, char *psError, size_t nMaxLength)
 {
 	char sConfigFile[MAX_PATH];
 
@@ -205,37 +205,37 @@ bool EntityManagerSpace::GameData::LoadSpawnGroup(const char *pszBaseGameConfigD
 	return bResult;
 }
 
-CMemory EntityManagerSpace::GameData::GetEntityKeyValuesAddress(const std::string &sName)
+CMemory EntityManager::GameData::GetEntityKeyValuesAddress(const std::string &sName)
 {
 	return this->m_aEntityKeyValuesConfig.GetAddress(sName);
 }
 
-ptrdiff_t EntityManagerSpace::GameData::GetEntityKeyValuesOffset(const std::string &sName)
+ptrdiff_t EntityManager::GameData::GetEntityKeyValuesOffset(const std::string &sName)
 {
 	return this->m_aEntityKeyValuesConfig.GetOffset(sName);
 }
 
-CMemory EntityManagerSpace::GameData::GetEntitySystemAddress(const std::string &sName)
+CMemory EntityManager::GameData::GetEntitySystemAddress(const std::string &sName)
 {
 	return this->m_aEntitySystemConfig.GetAddress(sName);
 }
 
-ptrdiff_t EntityManagerSpace::GameData::GetEntitySystemOffset(const std::string &sName)
+ptrdiff_t EntityManager::GameData::GetEntitySystemOffset(const std::string &sName)
 {
 	return this->m_aEntitySystemConfig.GetOffset(sName);
 }
 
-CMemory EntityManagerSpace::GameData::GetSpawnGroupAddress(const std::string &sName)
+CMemory EntityManager::GameData::GetSpawnGroupAddress(const std::string &sName)
 {
 	return this->m_aSpawnGroupConfig.GetAddress(sName);
 }
 
-ptrdiff_t EntityManagerSpace::GameData::GetSpawnGroupOffset(const std::string &sName)
+ptrdiff_t EntityManager::GameData::GetSpawnGroupOffset(const std::string &sName)
 {
 	return this->m_aSpawnGroupConfig.GetOffset(sName);
 }
 
-const char *EntityManagerSpace::GameData::GetSourceEngineName()
+const char *EntityManager::GameData::GetSourceEngineName()
 {
 #if SOURCE_ENGINE == SE_CS2
 	return "cs2";
@@ -247,7 +247,7 @@ const char *EntityManagerSpace::GameData::GetSourceEngineName()
 #endif
 }
 
-EntityManagerSpace::GameData::Platform EntityManagerSpace::GameData::GetCurrentPlatform()
+EntityManager::GameData::Platform EntityManager::GameData::GetCurrentPlatform()
 {
 #if defined(_WINDOWS)
 #	if defined(X64BITS)
@@ -267,12 +267,12 @@ EntityManagerSpace::GameData::Platform EntityManagerSpace::GameData::GetCurrentP
 #endif
 }
 
-const char *EntityManagerSpace::GameData::GetCurrentPlatformName()
+const char *EntityManager::GameData::GetCurrentPlatformName()
 {
 	return ThisClass::GetPlatformName(ThisClass::GetCurrentPlatform());
 }
 
-const char *EntityManagerSpace::GameData::GetPlatformName(Platform eElm)
+const char *EntityManager::GameData::GetPlatformName(Platform eElm)
 {
 	const char *sPlatformNames[Platform::PLATFORM_MAX] =
 	{
@@ -289,14 +289,14 @@ const char *EntityManagerSpace::GameData::GetPlatformName(Platform eElm)
 	return sPlatformNames[eElm];
 }
 
-ptrdiff_t EntityManagerSpace::GameData::ReadOffset(const char *pszValue)
+ptrdiff_t EntityManager::GameData::ReadOffset(const char *pszValue)
 {
 	return static_cast<ptrdiff_t>(strtol(pszValue, NULL, 0));
 }
 
-bool EntityManagerSpace::GameData::Config::Load(KeyValues *pGamesValues, char *psError, size_t nMaxLength)
+bool EntityManager::GameData::Config::Load(KeyValues *pGamesValues, char *psError, size_t nMaxLength)
 {
-	const char *pszEngineName = EntityManagerSpace::GameData::GetSourceEngineName();
+	const char *pszEngineName = EntityManager::GameData::GetSourceEngineName();
 
 	KeyValues *pEngineValues = pGamesValues->FindKey(pszEngineName, false);
 
@@ -314,7 +314,7 @@ bool EntityManagerSpace::GameData::Config::Load(KeyValues *pGamesValues, char *p
 	return bResult;
 }
 
-bool EntityManagerSpace::GameData::Config::LoadEngine(KeyValues *pEngineValues, char *psError, size_t nMaxLength)
+bool EntityManager::GameData::Config::LoadEngine(KeyValues *pEngineValues, char *psError, size_t nMaxLength)
 {
 	KeyValues *pSectionValues = pEngineValues->FindKey("Signatures", false);
 
@@ -348,7 +348,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngine(KeyValues *pEngineValues, 
 	return bResult;
 }
 
-bool EntityManagerSpace::GameData::Config::LoadEngineSignatures(KeyValues *pSignaturesValues, char *psError, size_t nMaxLength)
+bool EntityManager::GameData::Config::LoadEngineSignatures(KeyValues *pSignaturesValues, char *psError, size_t nMaxLength)
 {
 	KeyValues *pSigSection = pSignaturesValues->GetFirstSubKey();
 
@@ -357,7 +357,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineSignatures(KeyValues *pSign
 	if(bResult)
 	{
 		const char *pszLibraryKey = "library", 
-		           *pszPlatformKey = EntityManagerSpace::GameData::GetCurrentPlatformName();
+		           *pszPlatformKey = EntityManager::GameData::GetCurrentPlatformName();
 
 		do
 		{
@@ -425,7 +425,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineSignatures(KeyValues *pSign
 	return bResult;
 }
 
-bool EntityManagerSpace::GameData::Config::LoadEngineOffsets(KeyValues *pOffsetsValues, char *psError, size_t nMaxLength)
+bool EntityManager::GameData::Config::LoadEngineOffsets(KeyValues *pOffsetsValues, char *psError, size_t nMaxLength)
 {
 	KeyValues *pOffsetSection = pOffsetsValues->GetFirstSubKey();
 
@@ -433,7 +433,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineOffsets(KeyValues *pOffsets
 
 	if(bResult)
 	{
-		const char *pszPlatformKey = EntityManagerSpace::GameData::GetCurrentPlatformName();
+		const char *pszPlatformKey = EntityManager::GameData::GetCurrentPlatformName();
 
 		do
 		{
@@ -445,7 +445,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineOffsets(KeyValues *pOffsets
 
 			if(pPlatformValues)
 			{
-				this->SetOffset(pszOffsetName, EntityManagerSpace::GameData::ReadOffset(pPlatformValues->GetString(NULL)));
+				this->SetOffset(pszOffsetName, EntityManager::GameData::ReadOffset(pPlatformValues->GetString(NULL)));
 			}
 			else if(psError)
 			{
@@ -464,7 +464,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineOffsets(KeyValues *pOffsets
 	return bResult;
 }
 
-bool EntityManagerSpace::GameData::Config::LoadEngineAddresses(KeyValues *pAddressesValues, char *psError, size_t nMaxLength)
+bool EntityManager::GameData::Config::LoadEngineAddresses(KeyValues *pAddressesValues, char *psError, size_t nMaxLength)
 {
 	KeyValues *pAddrSection = pAddressesValues->GetFirstSubKey();
 
@@ -540,7 +540,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineAddresses(KeyValues *pAddre
 	return bResult;
 }
 
-bool EntityManagerSpace::GameData::Config::LoadEngineAddressActions(uintptr_t &pAddrCur, KeyValues *pActionSection, char *psError, size_t nMaxLength)
+bool EntityManager::GameData::Config::LoadEngineAddressActions(uintptr_t &pAddrCur, KeyValues *pActionSection, char *psError, size_t nMaxLength)
 {
 	KeyValues *pAction = pActionSection->GetFirstSubKey();
 
@@ -552,7 +552,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineAddressActions(uintptr_t &p
 		{
 			const char *pszName = pAction->GetName();
 
-			ptrdiff_t nActionValue = EntityManagerSpace::GameData::ReadOffset(pAction->GetString(NULL));
+			ptrdiff_t nActionValue = EntityManager::GameData::ReadOffset(pAction->GetString(NULL));
 
 			if(!strcmp(pszName, "offset"))
 			{
@@ -574,7 +574,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineAddressActions(uintptr_t &p
 					snprintf(psError, nMaxLength, "Unknown \"%s\" read action", pszName);
 				}
 			}
-			else if(!strcmp(pszName, EntityManagerSpace::GameData::GetCurrentPlatformName()))
+			else if(!strcmp(pszName, EntityManager::GameData::GetCurrentPlatformName()))
 			{
 				bResult = this->LoadEngineAddressActions(pAddrCur, pAction, psError, nMaxLength); // Recursive by platform.
 			}
@@ -592,7 +592,7 @@ bool EntityManagerSpace::GameData::Config::LoadEngineAddressActions(uintptr_t &p
 	return bResult;
 }
 
-CMemory EntityManagerSpace::GameData::Config::GetAddress(const std::string &sName) const
+CMemory EntityManager::GameData::Config::GetAddress(const std::string &sName) const
 {
 	auto itResult = this->m_aAddressMap.find(sName);
 
@@ -611,7 +611,7 @@ CMemory EntityManagerSpace::GameData::Config::GetAddress(const std::string &sNam
 }
 
 
-ptrdiff_t EntityManagerSpace::GameData::Config::GetOffset(const std::string &sName) const
+ptrdiff_t EntityManager::GameData::Config::GetOffset(const std::string &sName) const
 {
 	auto itResult = this->m_aOffsetMap.find(sName);
 
@@ -629,17 +629,17 @@ ptrdiff_t EntityManagerSpace::GameData::Config::GetOffset(const std::string &sNa
 	return -1;
 }
 
-void EntityManagerSpace::GameData::Config::SetAddress(const std::string &sName, const CMemory &aMemory)
+void EntityManager::GameData::Config::SetAddress(const std::string &sName, const CMemory &aMemory)
 {
 	this->m_aAddressMap[sName] = aMemory;
 }
 
-void EntityManagerSpace::GameData::Config::SetOffset(const std::string &sName, const ptrdiff_t nValue)
+void EntityManager::GameData::Config::SetOffset(const std::string &sName, const ptrdiff_t nValue)
 {
 	this->m_aOffsetMap[sName] = nValue;
 }
 
-void EntityManagerSpace::GameData::Config::Clear()
+void EntityManager::GameData::Config::Clear()
 {
 	this->m_aAddressMap.clear();
 	this->m_aOffsetMap.clear();

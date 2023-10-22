@@ -10,7 +10,7 @@
 
 class KeyValues;
 
-namespace EntityManagerSpace
+namespace EntityManager
 {
 	class GameData
 	{

@@ -17,16 +17,16 @@
 
 extern IFileSystem *filesystem;
 
-extern EntityManagerSpace::ProviderAgent *g_pEntityManagerProviderAgent;
+extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
-bool EntityManagerSpace::Settings::Init(char *psError, size_t nMaxLength)
+bool EntityManager::Settings::Init(char *psError, size_t nMaxLength)
 {
 	this->m_pWorld = new KeyValues("World");
 
 	return true;
 }
 
-bool EntityManagerSpace::Settings::Load(SpawnGroupHandle_t hSpawnGroup, const char *pszBasePath, const char *pszSpawnGroupName, char *psError, size_t nMaxLength)
+bool EntityManager::Settings::Load(SpawnGroupHandle_t hSpawnGroup, const char *pszBasePath, const char *pszSpawnGroupName, char *psError, size_t nMaxLength)
 {
 	char sBaseConfigsDir[MAX_PATH];
 
@@ -48,18 +48,18 @@ bool EntityManagerSpace::Settings::Load(SpawnGroupHandle_t hSpawnGroup, const ch
 	return bResult;
 }
 
-void EntityManagerSpace::Settings::Clear()
+void EntityManager::Settings::Clear()
 {
 	this->m_pWorld->Clear();
 }
 
-void EntityManagerSpace::Settings::Destroy()
+void EntityManager::Settings::Destroy()
 {
 	delete this->m_pWorld;
 	this->m_pWorld = nullptr;
 }
 
-bool EntityManagerSpace::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const char *pszBaseConfigsDir, char *psError, size_t nMaxLength)
+bool EntityManager::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const char *pszBaseConfigsDir, char *psError, size_t nMaxLength)
 {
 	char sConfigFile[MAX_PATH];
 

@@ -4,7 +4,7 @@
 #include <functional>
 #include <game_systems/spawngroup_manager.h>
 
-namespace EntityManagerSpace
+namespace EntityManager
 {
 	class CSpawnGroupMgrGameSystemProvider : public CSpawnGroupMgrGameSystem
 	{

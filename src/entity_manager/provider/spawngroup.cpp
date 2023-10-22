@@ -3,9 +3,9 @@
 #include <tier1/utlmap.h>
 #include <entity_manager/provider.h>
 
-extern EntityManagerSpace::Provider *g_pEntityManagerProvider;
+extern EntityManager::Provider *g_pEntityManagerProvider;
 
-CMapSpawnGroup *EntityManagerSpace::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupHandle_t h)
+CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupHandle_t h)
 {
 	auto pMgrSpawnGroupMap = (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aSpawnGroup.m_nMgrGameSystemSpawnGroupsOffset);
 
@@ -14,7 +14,7 @@ CMapSpawnGroup *EntityManagerSpace::CSpawnGroupMgrGameSystemProvider::Get(SpawnG
 	return iFoundIndex == pMgrSpawnGroupMap->InvalidIndex() ? nullptr : pMgrSpawnGroupMap->Element(iFoundIndex);
 }
 
-void EntityManagerSpace::CSpawnGroupMgrGameSystemProvider::WhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
+void EntityManager::CSpawnGroupMgrGameSystemProvider::WhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
 {
 	auto pMgrSpawnGroupMap = (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aSpawnGroup.m_nMgrGameSystemSpawnGroupsOffset);
 
@@ -28,7 +28,7 @@ void EntityManagerSpace::CSpawnGroupMgrGameSystemProvider::WhileBySpawnGroups(st
 	}
 }
 
-void EntityManagerSpace::CSpawnGroupMgrGameSystemProvider::FastWhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
+void EntityManager::CSpawnGroupMgrGameSystemProvider::FastWhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
 {
 	auto pMgrSpawnGroupMap = (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aSpawnGroup.m_nMgrGameSystemSpawnGroupsOffset);
 

@@ -27,7 +27,7 @@
 
 class CGameResourceService;
 
-class EntityManager final : public ISmmPlugin, public IMetamodListener
+class EntityManagerPlugin final : public ISmmPlugin, public IMetamodListener
 {
 public:
 	bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late);
@@ -50,7 +50,7 @@ protected:
 	virtual void OnBasePathChanged(const char *pszNewOne);
 
 private: // Commands.
-	CON_COMMAND_MEMBER_F(EntityManager, "mm_" PREFIX_ENTITY_MANAGER "_set_basepath", OnSetBasePathCommand, "Set base path for Entity Manager", FCVAR_LINKED_CONCOMMAND);
+	CON_COMMAND_MEMBER_F(EntityManagerPlugin, "mm_" PREFIX_ENTITY_MANAGER "_set_basepath", OnSetBasePathCommand, "Set base path for Entity Manager", FCVAR_LINKED_CONCOMMAND);
 
 public: // SourceHooks.
 	void OnGameFrameHook(bool simulating, bool bFirstTick, bool bLastTick);
@@ -76,17 +76,17 @@ private:
 	std::string m_sBasePath = "addons/" META_PLUGIN_NAME;
 #endif
 
-	EntityManagerSpace::Settings m_aSettings;
+	EntityManager::Settings m_aSettings;
 	ptrdiff_t m_nGameResourceServiceEntitySystemOffset = -1;
 	CSpawnGroupMgrGameSystem **m_ppSpawnGroupMgrAddress = nullptr;
 
 	std::string m_sCurrentMap = "\0";
 };
 
-extern EntityManager *g_pEntityManager;
-extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
-extern EntityManagerSpace::Provider *g_pEntityManagerProvider;
-extern EntityManagerSpace::ProviderAgent *g_pEntityManagerProviderAgent;
+extern EntityManagerPlugin *g_pEntityManager;
+extern EntityManager::GameData *g_pEntityManagerGameData;
+extern EntityManager::Provider *g_pEntityManagerProvider;
+extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 PLUGIN_GLOBALVARS();
 

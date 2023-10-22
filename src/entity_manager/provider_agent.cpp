@@ -61,7 +61,7 @@ public:
 	}
 };
 
-EntityManagerSpace::ProviderAgent::ProviderAgent()
+EntityManager::ProviderAgent::ProviderAgent()
  :   m_mapCachedKeys(CDefOpsString::LessFunc)
 {
 	// Cache the classname.
@@ -72,21 +72,21 @@ EntityManagerSpace::ProviderAgent::ProviderAgent()
 	}
 }
 
-bool EntityManagerSpace::ProviderAgent::Init(char *psError, size_t nMaxLength)
+bool EntityManager::ProviderAgent::Init(char *psError, size_t nMaxLength)
 {
 	return true;
 }
 
-void EntityManagerSpace::ProviderAgent::Clear()
+void EntityManager::ProviderAgent::Clear()
 {
 	this->ReleaseSpawnQueued();
 }
 
-void EntityManagerSpace::ProviderAgent::Destroy()
+void EntityManager::ProviderAgent::Destroy()
 {
 }
 
-void EntityManagerSpace::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup)
+void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup)
 {
 	int iNewIndex = this->m_vecEntitySpawnQueue.Count();
 
@@ -115,12 +115,12 @@ void EntityManagerSpace::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValu
 	this->PushSpawnQueue(pNewKeyValues, hSpawnGroup);
 }
 
-void EntityManagerSpace::ProviderAgent::PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup)
+void EntityManager::ProviderAgent::PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup)
 {
 	this->m_vecEntitySpawnQueue.AddToTail({pKeyValues, hSpawnGroup});
 }
 
-int EntityManagerSpace::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEntityKeyValues *> *vecTarget)
+int EntityManager::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEntityKeyValues *> *vecTarget)
 {
 	const auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
 
@@ -146,7 +146,7 @@ int EntityManagerSpace::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEn
 	return iResult;
 }
 
-int EntityManagerSpace::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup)
+int EntityManager::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup)
 {
 	const auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
 
@@ -173,12 +173,12 @@ int EntityManagerSpace::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEn
 	return iResult;
 }
 
-void EntityManagerSpace::ProviderAgent::ReleaseSpawnQueued()
+void EntityManager::ProviderAgent::ReleaseSpawnQueued()
 {
 	this->m_vecEntitySpawnQueue.Purge();
 }
 
-int EntityManagerSpace::ProviderAgent::ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup)
+int EntityManager::ProviderAgent::ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup)
 {
 	auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
 
@@ -197,7 +197,7 @@ int EntityManagerSpace::ProviderAgent::ReleaseSpawnQueued(SpawnGroupHandle_t hSp
 	return iQueueLengthBefore - vecEntitySpawnQueue.Count();
 }
 
-int EntityManagerSpace::ProviderAgent::SpawnQueued()
+int EntityManager::ProviderAgent::SpawnQueued()
 {
 	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
 
@@ -271,7 +271,7 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued()
 	return iQueueLength;
 }
 
-int EntityManagerSpace::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup)
+int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup)
 {
 	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
 
@@ -350,17 +350,17 @@ int EntityManagerSpace::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGrou
 	return iQueueLength - iCompliteQueueLength;
 }
 
-const EntityKey &EntityManagerSpace::ProviderAgent::GetCachedEntityKey(CacheMapOIndexType nElm)
+const EntityKey &EntityManager::ProviderAgent::GetCachedEntityKey(CacheMapOIndexType nElm)
 {
 	return this->m_mapCachedKeys[nElm];
 }
 
-const EntityKey &EntityManagerSpace::ProviderAgent::GetCachedClassnameKey()
+const EntityKey &EntityManager::ProviderAgent::GetCachedClassnameKey()
 {
 	return this->m_mapCachedKeys[this->m_nElmCachedClassnameKey];
 }
 
-EntityManagerSpace::ProviderAgent::CacheMapOIndexType EntityManagerSpace::ProviderAgent::CacheOrGetEntityKey(const char *pszName)
+EntityManager::ProviderAgent::CacheMapOIndexType EntityManager::ProviderAgent::CacheOrGetEntityKey(const char *pszName)
 {
 	const CUtlString sName = pszName;
 
@@ -369,39 +369,39 @@ EntityManagerSpace::ProviderAgent::CacheMapOIndexType EntityManagerSpace::Provid
 	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, MakeEntityKey(pszName, sName.Get(), sName.Length())) : nFindElm;
 }
 
-EntityManagerSpace::ProviderAgent::EntityData::EntityData(CEntityKeyValues *pKeyValues)
+EntityManager::ProviderAgent::EntityData::EntityData(CEntityKeyValues *pKeyValues)
 {
 	this->m_pKeyValues = pKeyValues;
 	this->m_hSpawnGroup = ThisClass::GetAnySpawnGroup();
 }
 
-EntityManagerSpace::ProviderAgent::EntityData::EntityData(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup)
+EntityManager::ProviderAgent::EntityData::EntityData(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup)
 {
 	this->m_pKeyValues = pKeyValues;
 	this->m_hSpawnGroup = hSpawnGroup;
 }
 
-CEntityKeyValues *EntityManagerSpace::ProviderAgent::EntityData::GetKeyValues() const
+CEntityKeyValues *EntityManager::ProviderAgent::EntityData::GetKeyValues() const
 {
 	return this->m_pKeyValues;
 }
 
-EntityManagerSpace::CEntityKeyValuesProvider *EntityManagerSpace::ProviderAgent::EntityData::GetKeyValuesProvider() const
+EntityManager::CEntityKeyValuesProvider *EntityManager::ProviderAgent::EntityData::GetKeyValuesProvider() const
 {
 	return (CEntityKeyValuesProvider *)this->m_pKeyValues;
 }
 
-SpawnGroupHandle_t EntityManagerSpace::ProviderAgent::EntityData::GetSpawnGroup() const
+SpawnGroupHandle_t EntityManager::ProviderAgent::EntityData::GetSpawnGroup() const
 {
 	return this->m_hSpawnGroup;
 }
 
-SpawnGroupHandle_t EntityManagerSpace::ProviderAgent::EntityData::GetAnySpawnGroup()
+SpawnGroupHandle_t EntityManager::ProviderAgent::EntityData::GetAnySpawnGroup()
 {
 	return (SpawnGroupHandle_t)-1;
 }
 
-bool EntityManagerSpace::ProviderAgent::EntityData::IsAnySpawnGroup() const
+bool EntityManager::ProviderAgent::EntityData::IsAnySpawnGroup() const
 {
 	return this->GetSpawnGroup() == ThisClass::GetAnySpawnGroup();
 }

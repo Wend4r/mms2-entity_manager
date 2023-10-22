@@ -9,7 +9,7 @@
 #include "provider/entitykeyvalues.h"
 #include "provider/entitysystem.h"
 
-namespace EntityManagerSpace
+namespace EntityManager
 {
 	class Provider
 	{

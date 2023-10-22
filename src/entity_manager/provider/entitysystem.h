@@ -12,7 +12,7 @@ enum EntityNetworkingMode_t
 	ENTITY_NETWORKING_MODE_NOT_NETWORKED,
 };
 
-namespace EntityManagerSpace
+namespace EntityManager
 {
 	class CEntitySystemProvider : public CEntitySystem
 	{

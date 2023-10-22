@@ -3,14 +3,14 @@
 
 #include <entity2/entitysystem.h>
 
-extern EntityManagerSpace::GameData *g_pEntityManagerGameData;
+extern EntityManager::GameData *g_pEntityManagerGameData;
 
-bool EntityManagerSpace::Provider::Init(char *psError, size_t nMaxLength)
+bool EntityManager::Provider::Init(char *psError, size_t nMaxLength)
 {
 	return true;
 }
 
-bool EntityManagerSpace::Provider::Load(char *psError, size_t nMaxLength)
+bool EntityManager::Provider::Load(char *psError, size_t nMaxLength)
 {
 	bool bResult = this->LoadGameData(psError, nMaxLength);
 
@@ -22,12 +22,12 @@ bool EntityManagerSpace::Provider::Load(char *psError, size_t nMaxLength)
 	return bResult;
 }
 
-void EntityManagerSpace::Provider::Destroy()
+void EntityManager::Provider::Destroy()
 {
 	// ...
 }
 
-bool EntityManagerSpace::Provider::LoadGameData(char *psError, size_t nMaxLength)
+bool EntityManager::Provider::LoadGameData(char *psError, size_t nMaxLength)
 {
 	bool bResult = this->LoadEntitySystemGameData(psError, nMaxLength);
 
@@ -44,7 +44,7 @@ bool EntityManagerSpace::Provider::LoadGameData(char *psError, size_t nMaxLength
 	return bResult;
 }
 
-bool EntityManagerSpace::Provider::LoadEntityKeyValuesGameData(char *psError, size_t nMaxLength)
+bool EntityManager::Provider::LoadEntityKeyValuesGameData(char *psError, size_t nMaxLength)
 {
 	bool bResult = true;
 	
@@ -116,7 +116,7 @@ bool EntityManagerSpace::Provider::LoadEntityKeyValuesGameData(char *psError, si
 }
 
 
-bool EntityManagerSpace::Provider::LoadEntitySystemGameData(char *psError, size_t nMaxLength)
+bool EntityManager::Provider::LoadEntitySystemGameData(char *psError, size_t nMaxLength)
 {
 	const char *pszSignatureName = "CEntitySystem::CreateEntity";
 
@@ -155,7 +155,7 @@ bool EntityManagerSpace::Provider::LoadEntitySystemGameData(char *psError, size_
 	return bResult;
 }
 
-bool EntityManagerSpace::Provider::LoadSpawnGroupGameData(char *psError, size_t nMaxLength)
+bool EntityManager::Provider::LoadSpawnGroupGameData(char *psError, size_t nMaxLength)
 {
 	const char *pszOffsetName = "CSpawnGroupMgrGameSystem::m_SpawnGroups";
 

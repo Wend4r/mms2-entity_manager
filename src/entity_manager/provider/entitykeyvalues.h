@@ -23,7 +23,7 @@ public:
 	const char *m_pszName;
 };
 
-namespace EntityManagerSpace
+namespace EntityManager
 {
 	class CEntityKeyValuesProvider : public CEntityKeyValues
 	{

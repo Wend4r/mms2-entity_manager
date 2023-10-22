@@ -14,7 +14,7 @@
 class KeyValues;
 class CEntityKeyValues;
 
-namespace EntityManagerSpace
+namespace EntityManager
 {
 	class ProviderAgent
 	{

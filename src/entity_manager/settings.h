@@ -10,7 +10,7 @@ class KeyValues;
 class CBaseEntity;
 class CEntityKeyValues;
 
-namespace EntityManagerSpace
+namespace EntityManager
 {
 	class Settings
 	{
