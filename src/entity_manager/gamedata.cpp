@@ -125,7 +125,7 @@ bool EntityManager::GameData::LoadEntityKeyValues(const char *pszBaseGameConfigD
 	}
 	else if(psError)
 	{
-		snprintf(psError, nMaxLength, "Can't to load KeyValue from \"%s\" file", sConfigFile);
+		snprintf(psError, nMaxLength, "Can't to load KeyValues from \"%s\" file", sConfigFile);
 	}
 
 	delete pGamesValues;
@@ -162,7 +162,7 @@ bool EntityManager::GameData::LoadEntitySystem(const char *pszBaseGameConfigDir,
 	}
 	else if(psError)
 	{
-		snprintf(psError, nMaxLength, "Can't to load KeyValue from \"%s\" file", sConfigFile);
+		snprintf(psError, nMaxLength, "Can't to load KeyValues from \"%s\" file", sConfigFile);
 	}
 
 	delete pGamesValues;
@@ -199,7 +199,7 @@ bool EntityManager::GameData::LoadSpawnGroup(const char *pszBaseGameConfigDir, c
 	}
 	else if(psError)
 	{
-		snprintf(psError, nMaxLength, "Can't to load KeyValue from \"%s\" file", sConfigFile);
+		snprintf(psError, nMaxLength, "Can't to load KeyValues from \"%s\" file", sConfigFile);
 	}
 
 	delete pGamesValues;

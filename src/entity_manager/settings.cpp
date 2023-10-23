@@ -84,7 +84,7 @@ bool EntityManager::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const ch
 	}
 	else if(psError)
 	{
-		snprintf(psError, nMaxLength, "Can't to load KeyValue from \"%s\" file", sConfigFile);
+		snprintf(psError, nMaxLength, "Can't to load KeyValues from \"%s\" file", sConfigFile);
 	}
 
 	return bResult;
