@@ -163,6 +163,8 @@ int EntityManager::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEntityK
 		{
 			*ppKeyValuesCur = aSpawnEntity.GetKeyValues();
 			ppKeyValuesCur++;
+
+			aSpawnEntity.GetKeyValuesProvider()->AddRef(); // @Wend4r: fixes external crash when map changing to next one.
 		}
 	}
 
