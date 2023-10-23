@@ -17,9 +17,24 @@ CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(void *pEntityS
 	CEntityKeyValues *pNewKeyValues = (CEntityKeyValues *)pKeyValuesSpace;
 
 	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues(pNewKeyValues, pEntitySystemSubobject, eSubobjectType);
-	++*(uint16_t *)((uintptr_t)pKeyValuesSpace + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset); // @Wend4r: This is necessary, I've been looking for a long time why a server glitched crashes (with broken stack).
+	((CEntityKeyValuesProvider *)pNewKeyValues)->AddRef();
 
 	return pNewKeyValues;
+}
+
+uint16 EntityManager::CEntityKeyValuesProvider::GetRefCount()
+{
+	return *(uint16 *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset);
+}
+
+uint16 EntityManager::CEntityKeyValuesProvider::AddRef()
+{
+	return ++*(uint16 *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset); // @Wend4r: This is necessary, I've been looking for a long time why a server glitched crashes (with broken stack).
+}
+
+uint16 EntityManager::CEntityKeyValuesProvider::SubRef()
+{
+	return --*(uint16 *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset);
 }
 
 CEntityKeyValuesAttribute *EntityManager::CEntityKeyValuesProvider::GetAttribute(const EntityKey &key, char *psValue)

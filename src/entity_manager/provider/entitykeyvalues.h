@@ -31,6 +31,10 @@ namespace EntityManager
 		CEntityKeyValuesProvider(void *pUnkEntitySystemSubobject = nullptr, char eUnknownType = 0);
 		static CEntityKeyValues *Create(void *pUnkEntitySystemSubobject = nullptr, char eUnknownType = 0);
 
+		uint16 GetRefCount();
+		uint16 AddRef();
+		uint16 SubRef();
+
 		CEntityKeyValuesAttribute *GetAttribute(const EntityKey &key, char *psValue = nullptr);
 		void SetAttributeValue(CEntityKeyValuesAttribute *pAttr, const char *pString);
 	};
