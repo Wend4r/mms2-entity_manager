@@ -23,7 +23,6 @@
 #include <tier1/convar.h>
 
 #include "entity_manager.h"
-#include "entity_manager/provider/spawngroup.h"
 
 class GameSessionConfiguration_t { };
 
@@ -37,6 +36,9 @@ EntityManagerPlugin *g_pEntityManager = &s_aEntityManager;  // To extern usage.
 
 static EntityManager::GameData s_aEntityManagerGameData;
 EntityManager::GameData *g_pEntityManagerGameData = &s_aEntityManagerGameData;
+
+static EntityManager::Logger s_aEntityManagerLogger;
+EntityManager::Logger *g_pEntityManagerLogger = &s_aEntityManagerLogger;
 
 static EntityManager::Provider s_aEntityManagerProvider;
 EntityManager::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
@@ -184,7 +186,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 					}
 					else
 					{
-						Warning("Failed to load a settings: %s\n", sSettingsError);
+						s_aEntityManagerLogger.WarningFormat("Failed to load a settings: %s", sSettingsError);
 					}
 				});
 			}
@@ -315,7 +317,7 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 
 		if(!this->LoadGameData((char *)sGameDataError, sizeof(sGameDataError)))
 		{
-			Error("FATAL: Failed to load a gamedata: %s\n", sGameDataError);
+			s_aEntityManagerLogger.ErrorFormat("Failed to load a gamedata: %s", sGameDataError);
 		}
 	}
 
@@ -325,7 +327,7 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 
 		if(!this->LoadProvider((char *)sProviderError, sizeof(sProviderError)))
 		{
-			Warning("Failed to load a provider: %s\n", sProviderError);
+			s_aEntityManagerLogger.WarningFormat("Failed to load a provider: %s", sProviderError);
 		}
 	}
 
@@ -386,13 +388,13 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 	}
 	else
 	{
-		Warning("Failed to get a net server\n");
+		s_aEntityManagerLogger.Warning("Failed to get a net server");
 	}
 }
 
 void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
 {
-	Msg("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %s)\n", handle, pSpawnGroup->GetName());
+	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %s)", handle, pSpawnGroup->GetName());
 
 	// Load settings by spawn group name
 	{
@@ -400,14 +402,14 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 
 		if(!this->LoadSettings(handle, pSpawnGroup->GetName(), (char *)sSettingsError, sizeof(sSettingsError)))
 		{
-			Warning("Failed to load a settings: %s\n", sSettingsError);
+			s_aEntityManagerLogger.WarningFormat("Failed to load a settings: %s", sSettingsError);
 		}
 	}
 }
 
 ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
 {
-	Msg("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
+	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
 
 	s_aEntityManagerProviderAgent.AddSpawnQueuedToTail(const_cast<CUtlVector<const CEntityKeyValues *> *>(pKeyValues), handle);
 	s_aEntityManagerProviderAgent.ReleaseSpawnQueued(handle);

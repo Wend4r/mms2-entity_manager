@@ -1,4 +1,5 @@
 #include "gamedata.h"
+#include "logger.h"
 
 #include <stdlib.h>
 
@@ -19,6 +20,7 @@ extern IFileSystem *filesystem;
 extern IServerGameDLL *server;
 
 extern EntityManager::GameData *g_pEntityManagerGameData;
+extern EntityManager::Logger *g_pEntityManagerLogger;
 
 CModule g_aLibEngine, 
         g_aLibServer;
@@ -600,12 +602,12 @@ CMemory EntityManager::GameData::Config::GetAddress(const std::string &sName) co
 	{
 		CMemory pResult = itResult->second;
 
-		DebugMsg("Address (or signature) \"%s\" is %p\n", sName.c_str(), (void *)pResult);
+		g_pEntityManagerLogger->DevMessageFormat(1, "Address (or signature) \"%s\" is %p", sName.c_str(), (void *)pResult);
 
 		return pResult;
 	}
 
-	DevWarning("Address (or signature) \"%s\" is not found\n", sName.c_str());
+	g_pEntityManagerLogger->DevWarningFormat(1, "Address (or signature) \"%s\" is not found", sName.c_str());
 
 	return nullptr;
 }
@@ -619,12 +621,12 @@ ptrdiff_t EntityManager::GameData::Config::GetOffset(const std::string &sName) c
 	{
 		ptrdiff_t nResult = itResult->second;
 
-		DebugMsg("Offset \"%s\" is 0x%zX (%zd)\n", sName.c_str(), nResult, nResult);
+		g_pEntityManagerLogger->DevMessageFormat(1, "Offset \"%s\" is 0x%zX (%zd)", sName.c_str(), nResult, nResult);
 
 		return nResult;
 	}
 
-	DevWarning("Offset \"%s\" is not found\n", sName.c_str());
+	g_pEntityManagerLogger->DevWarningFormat(1, "Offset \"%s\" is not found", sName.c_str());
 
 	return -1;
 }

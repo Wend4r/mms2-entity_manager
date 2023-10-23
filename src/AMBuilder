@@ -17,6 +17,7 @@ for sdk_name in EntityManager.sdks:
 
     binary.sources += [
       'entity_manager/gamedata.cpp',
+      'entity_manager/logger.cpp',
       'entity_manager/provider/entitykeyvalues.cpp',
       'entity_manager/provider/entitysystem.cpp',
       'entity_manager/provider/spawngroup.cpp',

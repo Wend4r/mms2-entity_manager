@@ -19,6 +19,8 @@
 #include <sh_vector.h>
 
 #include "entity_manager/gamedata.h"
+#include "entity_manager/logger.h"
+#include "entity_manager/provider/spawngroup.h"
 #include "entity_manager/provider.h"
 #include "entity_manager/provider_agent.h"
 #include "entity_manager/settings.h"
@@ -85,6 +87,7 @@ private:
 
 extern EntityManagerPlugin *g_pEntityManager;
 extern EntityManager::GameData *g_pEntityManagerGameData;
+extern EntityManager::Logger *g_pEntityManagerLogger;
 extern EntityManager::Provider *g_pEntityManagerProvider;
 extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
