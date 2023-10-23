@@ -90,7 +90,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 {
 	int iNewIndex = this->m_vecEntitySpawnQueue.Count();
 
-	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(/* (void *)((uintptr_t)g_pGameEntitySystem + 3280), 3 */);
+	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetSubobjectForKeyValues(), 3);
 
 	FOR_EACH_VALUE(pOldKeyValues, pKeyValue)
 	{
@@ -134,7 +134,11 @@ int EntityManager::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEntityK
 
 		for(int i = 0; i < iQueueLength; i++)
 		{
-			*ppKeyValuesCur = vecEntitySpawnQueue[i].GetKeyValues();
+			CEntityKeyValues *pKeyValues = vecEntitySpawnQueue[i].GetKeyValues();
+
+			g_pGameEntitySystem->AddRefKeyValues(pKeyValues);
+
+			*ppKeyValuesCur = pKeyValues;
 			ppKeyValuesCur++;
 		}
 	}
@@ -161,10 +165,12 @@ int EntityManager::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEntityK
 
 		if(hSpawnGroup == aSpawnEntity.GetSpawnGroup())
 		{
-			*ppKeyValuesCur = aSpawnEntity.GetKeyValues();
-			ppKeyValuesCur++;
+			CEntityKeyValues *pKeyValues = aSpawnEntity.GetKeyValues();
 
-			aSpawnEntity.GetKeyValuesProvider()->AddRef(); // @Wend4r: fixes external crash when map changing to next one.
+			g_pGameEntitySystem->AddRefKeyValues(pKeyValues); // @Wend4r: fixes external crash when map changing to next one.
+
+			*ppKeyValuesCur = pKeyValues;
+			ppKeyValuesCur++;
 		}
 	}
 

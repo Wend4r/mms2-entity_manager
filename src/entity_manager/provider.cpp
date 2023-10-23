@@ -121,45 +121,67 @@ bool EntityManager::Provider::LoadEntityKeyValuesGameData(char *psError, size_t 
 		}
 	}
 
-
 	return bResult;
 }
 
 
 bool EntityManager::Provider::LoadEntitySystemGameData(char *psError, size_t nMaxLength)
 {
-	const char *pszSignatureName = "CEntitySystem::CreateEntity";
+	bool bResult = true;
 
-	CMemory pResult = g_pEntityManagerGameData->GetEntitySystemAddress(pszSignatureName);
-
-	bool bResult = pResult;
-
-	if(bResult)
 	{
-		this->m_aData.m_aEntitySystem.m_pfnCreateEntity = pResult.RCast<GameData::EntitySystem::CreateEntityFuncType>();
+		const char *pszSignatureName = "CEntitySystem::CreateEntity";
 
-		pszSignatureName = "CEntitySystem::QueueSpawnEntity";
-		pResult = g_pEntityManagerGameData->GetEntitySystemAddress(pszSignatureName);
-		bResult = pResult;
+		CMemory pResult = g_pEntityManagerGameData->GetEntitySystemAddress(pszSignatureName);
+
+		bool bResult = pResult;
 
 		if(bResult)
 		{
-			this->m_aData.m_aEntitySystem.m_pfnQueueSpawnEntity = pResult.RCast<GameData::EntitySystem::QueueSpawnEntityFuncType>();
+			this->m_aData.m_aEntitySystem.m_pfnCreateEntity = pResult.RCast<GameData::EntitySystem::CreateEntityFuncType>();
 
-			pszSignatureName = "CEntitySystem::ExecuteQueuedCreation";
+			pszSignatureName = "CEntitySystem::QueueSpawnEntity";
 			pResult = g_pEntityManagerGameData->GetEntitySystemAddress(pszSignatureName);
 			bResult = pResult;
 
 			if(bResult)
 			{
-				this->m_aData.m_aEntitySystem.m_pfnExecuteQueuedCreation = pResult.RCast<GameData::EntitySystem::ExecuteQueuedCreationFuncType>();
+				this->m_aData.m_aEntitySystem.m_pfnQueueSpawnEntity = pResult.RCast<GameData::EntitySystem::QueueSpawnEntityFuncType>();
+
+				pszSignatureName = "CEntitySystem::ExecuteQueuedCreation";
+				pResult = g_pEntityManagerGameData->GetEntitySystemAddress(pszSignatureName);
+				bResult = pResult;
+
+				if(bResult)
+				{
+					this->m_aData.m_aEntitySystem.m_pfnExecuteQueuedCreation = pResult.RCast<GameData::EntitySystem::ExecuteQueuedCreationFuncType>();
+				}
 			}
+		}
+
+		if(!bResult && psError)
+		{
+			snprintf(psError, nMaxLength, "Failed to get \"%s\" signature", pszSignatureName);
 		}
 	}
 
-	if(!bResult && psError)
+	if(bResult)
 	{
-		snprintf(psError, nMaxLength, "Failed to get \"%s\" signature", pszSignatureName);
+		const char *pszOffsetName = "CEntitySystem::m_aSubobjectForKeyValues";
+
+		ptrdiff_t nResult = g_pEntityManagerGameData->GetEntitySystemOffset(pszOffsetName);
+
+		bResult = nResult != -1;
+
+		if(bResult)
+		{
+			this->m_aData.m_aEntitySystem.m_nSubobjectForKeyValuesOffset = nResult;
+		}
+
+		if(!bResult && psError)
+		{
+			snprintf(psError, nMaxLength, "Failed to get \"%s\" offset", pszOffsetName);
+		}
 	}
 
 	return bResult;

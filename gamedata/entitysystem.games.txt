@@ -86,6 +86,13 @@
 				"windows64"     "0x13B8"
 				"linux64"       "0x13E0"
 			}
+
+			// Passes to CEntityKeyValues::CEntityKeyValues() as argument.
+			"CEntitySystem::m_aSubobjectForKeyValues"
+			{
+				"windows64"     "3280"
+				"linux64"       "3304"
+			}
 		}
 	}
 }

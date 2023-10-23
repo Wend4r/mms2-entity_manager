@@ -66,6 +66,8 @@ namespace EntityManager
 
 				typedef void (*ExecuteQueuedCreationFuncType)(CEntitySystem * const pThis);
 				ExecuteQueuedCreationFuncType m_pfnExecuteQueuedCreation = nullptr;
+
+				ptrdiff_t m_nSubobjectForKeyValuesOffset = -1;
 			};
 
 			EntitySystem m_aEntitySystem;

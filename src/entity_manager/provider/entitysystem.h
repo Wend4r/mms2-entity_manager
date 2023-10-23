@@ -18,6 +18,7 @@ namespace EntityManager
 	{
 	public:
 		CEntityInstance *CreateEntity(SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
+		void *GetSubobjectForKeyValues();
 		void QueueSpawnEntity(CEntityIdentity *pEntity, const CEntityKeyValues *pInitializationData);
 		void ExecuteQueuedCreation();
 	};
