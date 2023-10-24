@@ -28,6 +28,22 @@ EntityManager::Logger::Logger()
 	}, 0, LV_DEFAULT, ENTITY_MANAGER_LOGGINING_COLOR);
 }
 
+void EntityManager::Logger::Detailed(const char *pszContent)
+{
+	LoggingSystem_LogDirect(this->m_nChannelID, LS_DETAILED, pszContent);
+}
+
+void EntityManager::Logger::DetailedFormat(const char *pszFormat, ...)
+{
+	va_list aParams;
+
+	va_start(aParams, pszFormat);
+	V_vsnprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), pszFormat, aParams);
+	va_end(aParams);
+
+	this->Detailed((const char *)this->m_sFormatBuffer);
+}
+
 void EntityManager::Logger::Message(const char *pszContent)
 {
 	LoggingSystem_LogDirect(this->m_nChannelID, LS_MESSAGE, pszContent);
@@ -163,6 +179,11 @@ size_t EntityManager::Logger::Scope::Message::SetWithCopy(const char *pszContent
 	this->m_sContent = pszContent;
 
 	return this->m_sContent.size();
+}
+
+EntityManager::Logger::Scope EntityManager::Logger::CreateDetailsScope()
+{
+	return {};
 }
 
 EntityManager::Logger::Scope EntityManager::Logger::CreateMessagesScope()

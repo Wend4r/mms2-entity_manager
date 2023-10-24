@@ -95,8 +95,10 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 
 	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetSubobjectForKeyValues(), 3);
 
-	auto aMessages = g_pEntityManagerLogger->CreateMessagesScope(), 
+	auto aDetails = g_pEntityManagerLogger->CreateDetailsScope(), 
 	     aWarnings = g_pEntityManagerLogger->CreateWarningsScope();
+
+	aDetails.PushFormat("- Queue entity #%d -", iNewIndex);
 
 	FOR_EACH_VALUE(pOldKeyValues, pKeyValue)
 	{
@@ -108,7 +110,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 		{
 			const char *pszValue = pKeyValue->GetString(NULL);
 
-			aMessages.PushFormat("Queue entity #%d: \"%s\" has \"%s\" value", iNewIndex, pszKey, pszValue);
+			aDetails.PushFormat("  \"%s\" has \"%s\" value", pszKey, pszValue);
 
 			pNewKeyValues->SetAttributeValue(pAttr, pszValue);
 		}
@@ -118,8 +120,8 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 		}
 	}
 
-	aMessages.Send([](const char *pszContent) {
-		g_pEntityManagerLogger->Message(pszContent);
+	aDetails.Send([](const char *pszContent) {
+		g_pEntityManagerLogger->Detailed(pszContent);
 	});
 
 	aWarnings.Send([](const char *pszContent) {
@@ -230,7 +232,7 @@ int EntityManager::ProviderAgent::SpawnQueued()
 
 	const int iQueueLength = vecEntitySpawnQueue.Count();
 
-	auto aMessages = g_pEntityManagerLogger->CreateMessagesScope(), 
+	auto aDetails = g_pEntityManagerLogger->CreateMessagesScope(), 
 	     aWarnings = g_pEntityManagerLogger->CreateWarningsScope();
 
 	const CEntityIndex iForceEdictIndex = CEntityIndex(-1);
@@ -255,7 +257,7 @@ int EntityManager::ProviderAgent::SpawnQueued()
 
 				if(pEntity)
 				{
-					aMessages.PushFormat("Created \"%s\" (force edict index is %d, result index is %d) entity", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+					aDetails.PushFormat("Created \"%s\" (force edict index is %d, result index is %d) entity", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
 
 					pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pKeyValues);
 				}
@@ -275,7 +277,7 @@ int EntityManager::ProviderAgent::SpawnQueued()
 		}
 	}
 
-	aMessages.Send([](const char *pszContent){
+	aDetails.Send([](const char *pszContent){
 		g_pEntityManagerLogger->Message(pszContent);
 	});
 
@@ -303,7 +305,7 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup)
 
 	const int iQueueLength = vecEntitySpawnQueue.Count();
 
-	auto aMessages = g_pEntityManagerLogger->CreateMessagesScope(), 
+	auto aDetails = g_pEntityManagerLogger->CreateDetailsScope(), 
 	     aWarnings = g_pEntityManagerLogger->CreateWarningsScope();
 
 	const CEntityIndex iForceEdictIndex = CEntityIndex(-1);
@@ -330,7 +332,7 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup)
 
 					if(pEntity)
 					{
-						aMessages.PushFormat("Created \"%s\" (force edict index is %d, result index is %d) entity", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+						aDetails.PushFormat("Created \"%s\" (force edict index is %d, result index is %d) entity", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
 
 						pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pKeyValues);
 					}
@@ -354,8 +356,8 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup)
 		}
 	}
 
-	aMessages.Send([](const char *pszContent){
-		g_pEntityManagerLogger->Message(pszContent);
+	aDetails.Send([](const char *pszContent){
+		g_pEntityManagerLogger->Detailed(pszContent);
 	});
 
 	aWarnings.Send([](const char *pszContent){

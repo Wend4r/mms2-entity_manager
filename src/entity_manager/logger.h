@@ -15,6 +15,9 @@ namespace EntityManager
 	public:
 		Logger();
 
+		void Detailed(const char *pszContent);
+		void DetailedFormat(const char *pszFormat, ...) FMTFUNCTION(2, 3);
+
 		void Message(const char *pszContent);
 		void MessageFormat(const char *pszFormat, ...) FMTFUNCTION(2, 3);
 
@@ -60,6 +63,7 @@ namespace EntityManager
 			std::string m_aEnd;
 		};
 
+		Scope CreateDetailsScope();
 		Scope CreateMessagesScope();
 		Scope CreateWarningsScope();
 		Scope CreateAssertScope();

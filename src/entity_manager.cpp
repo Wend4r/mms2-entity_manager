@@ -172,9 +172,9 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 			{
 				auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
 
-				auto aErrors = s_aEntityManagerLogger.CreateErrorsScope();
+				auto aWarnings = s_aEntityManagerLogger.CreateWarningsScope();
 
-				pSpawnGroupMgr->WhileBySpawnGroups([this, &aErrors](SpawnGroupHandle_t h, CMapSpawnGroup *pSpawnGroup) -> void {
+				pSpawnGroupMgr->WhileBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pSpawnGroup) -> void {
 					char sSettingsError[256];
 
 					if(this->LoadSettings(h, pSpawnGroup->GetSpawnGroupName(), (char *)sSettingsError, sizeof(sSettingsError)))
@@ -187,12 +187,12 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 					}
 					else
 					{
-						aErrors.PushFormat("Failed to load a settings: %s", sSettingsError);
+						aWarnings.PushFormat("Failed to load a settings: %s", sSettingsError);
 					}
 				});
 
-				aErrors.Send([](const char *pszContent){
-					s_aEntityManagerLogger.Error(pszContent);
+				aWarnings.Send([](const char *pszContent) {
+					s_aEntityManagerLogger.Warning(pszContent);
 				});
 
 				// s_aEntityManagerProviderAgent.SpawnQueued();
@@ -409,7 +409,7 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 
 		if(!this->LoadSettings(handle, pSpawnGroup->GetName(), (char *)sSettingsError, sizeof(sSettingsError)))
 		{
-			s_aEntityManagerLogger.ErrorFormat("Failed to load a settings: %s\n", sSettingsError);
+			s_aEntityManagerLogger.WarningFormat("Failed to load a settings: %s\n", sSettingsError);
 		}
 	}
 }
