@@ -3,7 +3,6 @@
 #include "entity_manager.h"
 
 #include <stdarg.h>
-#include <tier0/logging.h>
 
 #define FORMAT_ENTITY_MANAGER_MESSAGE_STARTWITH "[%s]: "
 #define FORMAT_ENTITY_MANAGER_MESSAGE FORMAT_ENTITY_MANAGER_MESSAGE_STARTWITH "%s\n"
@@ -20,15 +19,18 @@
 #define FORMAT_ENTITY_MANAGER_DEV_WARNING_STARTWITH "[%s] DEV WARNING L%d: "
 #define FORMAT_ENTITY_MANAGER_DEV_WARNING FORMAT_ENTITY_MANAGER_DEV_WARNING_STARTWITH "%s\n"
 
-constexpr auto DBG_Msg = Msg;
-constexpr auto DBG_Warning = Warning;
-constexpr auto DBG_Error = Error;
-constexpr void (*DBG_DevMsg)(int, const tchar *, ...) = DevMsg;
-constexpr void (*DBG_DevWarning)(int, const tchar *, ...) = DevWarning;
+const Color ENTITY_MANAGER_LOGGINING_COLOR = {255, 125, 0, 255};
+
+EntityManager::Logger::Logger()
+{
+	this->m_nChannelID = LoggingSystem_RegisterLoggingChannel(g_pEntityManager->GetName(), [](LoggingChannelID_t nTagChannelID) {
+		LoggingSystem_AddTagToChannel(nTagChannelID, g_pEntityManager->GetLogTag());
+	}, 0, LV_DEFAULT, ENTITY_MANAGER_LOGGINING_COLOR);
+}
 
 void EntityManager::Logger::Message(const char *pszContent)
 {
-	DBG_Msg(FORMAT_ENTITY_MANAGER_MESSAGE, g_pEntityManager->GetLogTag(), pszContent);
+	LoggingSystem_LogDirect(this->m_nChannelID, LS_MESSAGE, pszContent);
 }
 
 void EntityManager::Logger::MessageFormat(const char *pszFormat, ...)
@@ -44,7 +46,7 @@ void EntityManager::Logger::MessageFormat(const char *pszFormat, ...)
 
 void EntityManager::Logger::Warning(const char *pszContent)
 {
-	DBG_Warning(FORMAT_ENTITY_MANAGER_WARNING, g_pEntityManager->GetLogTag(), pszContent);
+	LoggingSystem_LogDirect(this->m_nChannelID, LS_WARNING, pszContent);
 }
 
 void EntityManager::Logger::WarningFormat(const char *pszFormat, ...)
@@ -58,9 +60,25 @@ void EntityManager::Logger::WarningFormat(const char *pszFormat, ...)
 	this->Warning((const char *)this->m_sFormatBuffer);
 }
 
+void EntityManager::Logger::ThrowAssert(const char *pszFilename, int iLine, const char *pszContent)
+{
+	LoggingSystem_Log(this->m_nChannelID, LS_ASSERT, "%s (%d) : %s", pszFilename, iLine, pszContent);
+}
+
+void EntityManager::Logger::ThrowAssertFormat(const char *pszFilename, int iLine, const char *pszFormat, ...)
+{
+	va_list aParams;
+
+	va_start(aParams, pszFormat);
+	V_vsnprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), pszFormat, aParams);
+	va_end(aParams);
+
+	this->ThrowAssert(pszFilename, iLine, (const char *)this->m_sFormatBuffer);
+}
+
 void EntityManager::Logger::Error(const char *pszContent)
 {
-	DBG_Error(FORMAT_ENTITY_MANAGER_ERROR, g_pEntityManager->GetLogTag(), pszContent);
+	LoggingSystem_LogDirect(this->m_nChannelID, LS_ERROR, pszContent);
 }
 
 void EntityManager::Logger::ErrorFormat(const char *pszFormat, ...)
@@ -72,38 +90,6 @@ void EntityManager::Logger::ErrorFormat(const char *pszFormat, ...)
 	va_end(aParams);
 
 	this->Error((const char *)this->m_sFormatBuffer);
-}
-
-void EntityManager::Logger::DevMessage(int iLevel, const char *pszContent)
-{
-	DBG_DevMsg(iLevel, FORMAT_ENTITY_MANAGER_DEV_MESSAGE, g_pEntityManager->GetLogTag(), iLevel, pszContent);
-}
-
-void EntityManager::Logger::DevMessageFormat(int iLevel, const char *pszFormat, ...)
-{
-	va_list aParams;
-
-	va_start(aParams, pszFormat);
-	V_vsnprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), pszFormat, aParams);
-	va_end(aParams);
-
-	this->DevMessage(iLevel, (const char *)this->m_sFormatBuffer);
-}
-
-void EntityManager::Logger::DevWarning(int iLevel, const char *pszContent)
-{
-	DBG_DevWarning(iLevel, FORMAT_ENTITY_MANAGER_DEV_WARNING, g_pEntityManager->GetLogTag(), iLevel, pszContent);
-}
-
-void EntityManager::Logger::DevWarningFormat(int iLevel, const char *pszFormat, ...)
-{
-	va_list aParams;
-
-	va_start(aParams, pszFormat);
-	V_vsnprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), pszFormat, aParams);
-	va_end(aParams);
-
-	this->DevWarning(iLevel, (const char *)this->m_sFormatBuffer);
 }
 
 EntityManager::Logger::Scope::Scope(const char *pszStartWith)
@@ -181,35 +167,20 @@ size_t EntityManager::Logger::Scope::Message::SetWithCopy(const char *pszContent
 
 EntityManager::Logger::Scope EntityManager::Logger::CreateMessagesScope()
 {
-	snprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), FORMAT_ENTITY_MANAGER_MESSAGE_STARTWITH, g_pEntityManager->GetLogTag());
-
-	return {(const char *)this->m_sFormatBuffer};
+	return {};
 }
 
 EntityManager::Logger::Scope EntityManager::Logger::CreateWarningsScope()
 {
-	snprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), FORMAT_ENTITY_MANAGER_WARNING_STARTWITH, g_pEntityManager->GetLogTag());
+	return {};
+}
 
-	return {(const char *)this->m_sFormatBuffer};
+EntityManager::Logger::Scope EntityManager::Logger::CreateAssertScope()
+{
+	return {};
 }
 
 EntityManager::Logger::Scope EntityManager::Logger::CreateErrorsScope()
 {
-	snprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), FORMAT_ENTITY_MANAGER_ERROR_STARTWITH, g_pEntityManager->GetLogTag());
-
-	return {(const char *)this->m_sFormatBuffer};
-}
-
-EntityManager::Logger::Scope EntityManager::Logger::CreateDevMessagesScope(int iLevel)
-{
-	snprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), FORMAT_ENTITY_MANAGER_DEV_MESSAGE_STARTWITH, g_pEntityManager->GetLogTag(), iLevel);
-
-	return {(const char *)this->m_sFormatBuffer};
-}
-
-EntityManager::Logger::Scope EntityManager::Logger::CreateDevWarningsScope(int iLevel)
-{
-	snprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), FORMAT_ENTITY_MANAGER_DEV_WARNING_STARTWITH, g_pEntityManager->GetLogTag(), iLevel);
-
-	return {(const char *)this->m_sFormatBuffer};
+	return {};
 }

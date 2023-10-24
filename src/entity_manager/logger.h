@@ -6,27 +6,26 @@
 #include <string>
 
 #include <tier0/dbg.h>
+#include <tier0/logging.h>
 
 namespace EntityManager
 {
 	class Logger
 	{
 	public:
+		Logger();
+
 		void Message(const char *pszContent);
 		void MessageFormat(const char *pszFormat, ...) FMTFUNCTION(2, 3);
 
 		void Warning(const char *pszContent);
 		void WarningFormat(const char *pszFormat, ...) FMTFUNCTION(2, 3);
 
+		void ThrowAssert(const char *pszFilename, int iLine, const char *pszContent);
+		void ThrowAssertFormat(const char *pszFilename, int iLine, const char *pszFormat, ...) FMTFUNCTION(4, 5);
+
 		void Error(const char *pszContent);
 		void ErrorFormat(const char *pszFormat, ...) FMTFUNCTION(2, 3);
-
-	public:
-		void DevMessage(int iLevel, const char *pszContent);
-		void DevMessageFormat(int iLevel, const char *pszFormat, ...) FMTFUNCTION(3, 4);
-
-		void DevWarning(int iLevel, const char *pszContent);
-		void DevWarningFormat(int iLevel, const char *pszFormat, ...) FMTFUNCTION(3, 4);
 
 	public:
 		class Scope
@@ -63,13 +62,13 @@ namespace EntityManager
 
 		Scope CreateMessagesScope();
 		Scope CreateWarningsScope();
+		Scope CreateAssertScope();
 		Scope CreateErrorsScope();
-
-		Scope CreateDevMessagesScope(int iLevel);
-		Scope CreateDevWarningsScope(int iLevel);
 
 	private:
 		char m_sFormatBuffer[MAX_LOGGING_MESSAGE_LENGTH];
+
+		LoggingChannelID_t m_nChannelID;
 	};
 };
 

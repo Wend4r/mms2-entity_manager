@@ -1,6 +1,7 @@
 #include "provider_agent.h"
 
 #include "provider/entitysystem.h"
+#include "logger.h"
 
 #include <tier0/dbg.h>
 #include <tier0/platform.h>
@@ -94,8 +95,8 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 
 	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetSubobjectForKeyValues(), 3);
 
-	auto aWarnings = g_pEntityManagerLogger->CreateWarningsScope(), 
-	     aDevMessages = g_pEntityManagerLogger->CreateDevMessagesScope(3);
+	auto aMessages = g_pEntityManagerLogger->CreateMessagesScope(), 
+	     aWarnings = g_pEntityManagerLogger->CreateWarningsScope();
 
 	FOR_EACH_VALUE(pOldKeyValues, pKeyValue)
 	{
@@ -107,7 +108,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 		{
 			const char *pszValue = pKeyValue->GetString(NULL);
 
-			aDevMessages.PushFormat("Queue entity #%d: \"%s\" has \"%s\" value", iNewIndex, pszKey, pszValue);
+			aMessages.PushFormat("Queue entity #%d: \"%s\" has \"%s\" value", iNewIndex, pszKey, pszValue);
 
 			pNewKeyValues->SetAttributeValue(pAttr, pszValue);
 		}
@@ -117,12 +118,12 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 		}
 	}
 
-	aDevMessages.Send([](const char *pszContent) {
-		DevMsg(3, "%s", pszContent);
+	aMessages.Send([](const char *pszContent) {
+		g_pEntityManagerLogger->Message(pszContent);
 	});
 
 	aWarnings.Send([](const char *pszContent) {
-		Warning("%s", pszContent);
+		g_pEntityManagerLogger->Warning(pszContent);
 	});
 
 	this->PushSpawnQueue(pNewKeyValues, hSpawnGroup);
@@ -229,8 +230,8 @@ int EntityManager::ProviderAgent::SpawnQueued()
 
 	const int iQueueLength = vecEntitySpawnQueue.Count();
 
-	auto aWarningMessages = g_pEntityManagerLogger->CreateWarningsScope(), 
-	     aDevMessages = g_pEntityManagerLogger->CreateDevMessagesScope(3);
+	auto aMessages = g_pEntityManagerLogger->CreateMessagesScope(), 
+	     aWarnings = g_pEntityManagerLogger->CreateWarningsScope();
 
 	const CEntityIndex iForceEdictIndex = CEntityIndex(-1);
 
@@ -254,35 +255,35 @@ int EntityManager::ProviderAgent::SpawnQueued()
 
 				if(pEntity)
 				{
-					aDevMessages.PushFormat("Created \"%s\" (force edict index is %d, result index is %d) entity", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+					aMessages.PushFormat("Created \"%s\" (force edict index is %d, result index is %d) entity", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
 
 					pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pKeyValues);
 				}
 				else
 				{
-					aWarningMessages.PushFormat("Failed to create \"%s\" entity (queue number is %d)", pszClassname, i);
+					aWarnings.PushFormat("Failed to create \"%s\" entity (queue number is %d)", pszClassname, i);
 				}
 			}
 			else
 			{
-				aWarningMessages.PushFormat("Empty entity \"%s\" key (queue number is %d)", aClassnameKey.m_pszName, i);
+				aWarnings.PushFormat("Empty entity \"%s\" key (queue number is %d)", aClassnameKey.m_pszName, i);
 			}
 		}
 		else
 		{
-			aWarningMessages.PushFormat("Failed to get \"%s\" entity key (queue number is %d)", aClassnameKey.m_pszName, i);
+			aWarnings.PushFormat("Failed to get \"%s\" entity key (queue number is %d)", aClassnameKey.m_pszName, i);
 		}
 	}
 
-	aDevMessages.Send([](const char *pszContent){
-		DevMsg(3, "%s", pszContent);
+	aMessages.Send([](const char *pszContent){
+		g_pEntityManagerLogger->Message(pszContent);
 	});
 
-	aWarningMessages.Send([](const char *pszContent){
-		Warning("%s", pszContent);
+	aWarnings.Send([](const char *pszContent){
+		g_pEntityManagerLogger->Warning(pszContent);
 	});
 
-	if(aWarningMessages.Count() < this->m_vecEntitySpawnQueue.Count())
+	if(aWarnings.Count() < this->m_vecEntitySpawnQueue.Count())
 	{
 		pEntitySystem->ExecuteQueuedCreation();
 	}
@@ -302,8 +303,8 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup)
 
 	const int iQueueLength = vecEntitySpawnQueue.Count();
 
-	auto aWarningMessages = g_pEntityManagerLogger->CreateWarningsScope(), 
-	     aDevMessages = g_pEntityManagerLogger->CreateDevMessagesScope(3);
+	auto aMessages = g_pEntityManagerLogger->CreateMessagesScope(), 
+	     aWarnings = g_pEntityManagerLogger->CreateWarningsScope();
 
 	const CEntityIndex iForceEdictIndex = CEntityIndex(-1);
 
@@ -329,23 +330,23 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup)
 
 					if(pEntity)
 					{
-						aDevMessages.PushFormat("Created \"%s\" (force edict index is %d, result index is %d) entity", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+						aMessages.PushFormat("Created \"%s\" (force edict index is %d, result index is %d) entity", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
 
 						pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pKeyValues);
 					}
 					else
 					{
-						aWarningMessages.PushFormat("Failed to create \"%s\" entity (queue number is %d)", pszClassname, i);
+						aWarnings.PushFormat("Failed to create \"%s\" entity (queue number is %d)", pszClassname, i);
 					}
 				}
 				else
 				{
-					aWarningMessages.PushFormat("Empty entity \"%s\" key (queue number is %d)", aClassnameKey.m_pszName, i);
+					aWarnings.PushFormat("Empty entity \"%s\" key (queue number is %d)", aClassnameKey.m_pszName, i);
 				}
 			}
 			else
 			{
-				aWarningMessages.PushFormat("Failed to get \"%s\" entity key (queue number is %d)", aClassnameKey.m_pszName, i);
+				aWarnings.PushFormat("Failed to get \"%s\" entity key (queue number is %d)", aClassnameKey.m_pszName, i);
 			}
 
 			vecEntitySpawnQueue.FastRemove(i);
@@ -353,17 +354,17 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup)
 		}
 	}
 
-	aDevMessages.Send([](const char *pszContent){
-		DevMsg(3, "%s", pszContent);
+	aMessages.Send([](const char *pszContent){
+		g_pEntityManagerLogger->Message(pszContent);
 	});
 
-	aWarningMessages.Send([](const char *pszContent){
-		Warning("%s", pszContent);
+	aWarnings.Send([](const char *pszContent){
+		g_pEntityManagerLogger->Warning(pszContent);
 	});
 
 	const int iCompliteQueueLength = this->m_vecEntitySpawnQueue.Count();
 
-	if(aWarningMessages.Count() < iCompliteQueueLength)
+	if(aWarnings.Count() < iCompliteQueueLength)
 	{
 		pEntitySystem->ExecuteQueuedCreation();
 	}
