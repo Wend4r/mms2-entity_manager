@@ -40,6 +40,8 @@ namespace EntityManager
 		void ErrorFormat(const char *pszFormat, ...) FMTFUNCTION(2, 3);
 		void ErrorFormat(Color aColor, const char *pszFormat, ...) FMTFUNCTION(3, 4);
 
+		void DoTest();
+
 	public:
 		class Scope
 		{

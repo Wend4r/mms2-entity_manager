@@ -188,6 +188,15 @@ void EntityManager::Logger::ErrorFormat(Color aColor, const char *pszFormat, ...
 	this->Error(aColor, (const char *)this->m_sFormatBuffer);
 }
 
+void EntityManager::Logger::DoTest()
+{ 
+	this->DetailedFormat("LS_DETAILED = %d\n", LS_DETAILED);
+	this->MessageFormat("LS_MESSAGE = %d\n", LS_MESSAGE);
+	this->WarningFormat("LS_WARNING = %d\n", LS_WARNING);
+	this->ThrowAssertFormat(__FILE__, __LINE__, "LS_ASSERT = %d\n", LS_ASSERT);
+	this->ErrorFormat("LS_ERROR = %d\n", LS_ERROR);
+}
+
 EntityManager::Logger::Scope::Scope(const char *pszStartWith)
 {
 	this->m_aStartWith = pszStartWith;
