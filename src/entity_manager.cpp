@@ -192,7 +192,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 				});
 
 				aWarnings.Send([](const char *pszContent) {
-					s_aEntityManagerLogger.Warning(pszContent);
+					s_aEntityManagerLogger.Warning({255, 0, 0, 255}, pszContent);
 				});
 
 				// s_aEntityManagerProviderAgent.SpawnQueued();
@@ -395,7 +395,7 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 	}
 	else
 	{
-		s_aEntityManagerLogger.Warning("Failed to get a net server\n");
+		s_aEntityManagerLogger.Warning({255, 255, 0, 255}, "Failed to get a net server\n");
 	}
 }
 
@@ -409,7 +409,7 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 
 		if(!this->LoadSettings(handle, pSpawnGroup->GetName(), (char *)sSettingsError, sizeof(sSettingsError)))
 		{
-			s_aEntityManagerLogger.WarningFormat("Failed to load a settings: %s\n", sSettingsError);
+			s_aEntityManagerLogger.WarningFormat({255, 0, 0, 255}, "Failed to load a settings: %s\n", sSettingsError);
 		}
 	}
 }

@@ -120,12 +120,14 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 		}
 	}
 
-	aDetails.Send([](const char *pszContent) {
-		g_pEntityManagerLogger->Detailed(pszContent);
+	Color aMsgColor = pOldKeyValues->GetColor("color", {200, 200, 200, 255});
+
+	aDetails.Send([&aMsgColor](const char *pszContent) {
+		g_pEntityManagerLogger->Detailed(aMsgColor, pszContent);
 	});
 
-	aWarnings.Send([](const char *pszContent) {
-		g_pEntityManagerLogger->Warning(pszContent);
+	aWarnings.Send([&aMsgColor](const char *pszContent) {
+		g_pEntityManagerLogger->Warning(aMsgColor, pszContent);
 	});
 
 	this->PushSpawnQueue(pNewKeyValues, hSpawnGroup);
@@ -278,11 +280,11 @@ int EntityManager::ProviderAgent::SpawnQueued()
 	}
 
 	aDetails.Send([](const char *pszContent){
-		g_pEntityManagerLogger->Message(pszContent);
+		g_pEntityManagerLogger->Message({255, 200, 200, 255}, pszContent);
 	});
 
 	aWarnings.Send([](const char *pszContent){
-		g_pEntityManagerLogger->Warning(pszContent);
+		g_pEntityManagerLogger->Warning({255, 255, 0, 255}, pszContent);
 	});
 
 	if(aWarnings.Count() < this->m_vecEntitySpawnQueue.Count())

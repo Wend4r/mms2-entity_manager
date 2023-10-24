@@ -602,12 +602,12 @@ CMemory EntityManager::GameData::Config::GetAddress(const std::string &sName) co
 	{
 		CMemory pResult = itResult->second;
 
-		g_pEntityManagerLogger->MessageFormat("Address (or signature) \"%s\" is %p\n", sName.c_str(), (void *)pResult);
+		g_pEntityManagerLogger->DetailedFormat({255, 127, 255, 255}, "Address (or signature) \"%s\" is %p\n", sName.c_str(), (void *)pResult);
 
 		return pResult;
 	}
 
-	g_pEntityManagerLogger->MessageFormat("Address (or signature) \"%s\" is not found\n", sName.c_str());
+	g_pEntityManagerLogger->DetailedFormat({255, 127, 255, 255}, "Address (or signature) \"%s\" is not found\n", sName.c_str());
 
 	return nullptr;
 }
@@ -621,12 +621,12 @@ ptrdiff_t EntityManager::GameData::Config::GetOffset(const std::string &sName) c
 	{
 		ptrdiff_t nResult = itResult->second;
 
-		g_pEntityManagerLogger->MessageFormat("Offset \"%s\" is 0x%zX (%zd)\n", sName.c_str(), nResult, nResult);
+		g_pEntityManagerLogger->DetailedFormat({255, 127, 255, 255}, "Offset \"%s\" is 0x%zX (%zd)\n", sName.c_str(), nResult, nResult);
 
 		return nResult;
 	}
 
-	g_pEntityManagerLogger->MessageFormat("Offset \"%s\" is not found\n", sName.c_str());
+	g_pEntityManagerLogger->DetailedFormat({255, 127, 255, 255}, "Offset \"%s\" is not found\n", sName.c_str());
 
 	return -1;
 }

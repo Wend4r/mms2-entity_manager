@@ -16,19 +16,29 @@ namespace EntityManager
 		Logger();
 
 		void Detailed(const char *pszContent);
+		void Detailed(Color aColor, const char *pszContent);
 		void DetailedFormat(const char *pszFormat, ...) FMTFUNCTION(2, 3);
+		void DetailedFormat(Color aColor, const char *pszFormat, ...) FMTFUNCTION(3, 4);
 
 		void Message(const char *pszContent);
+		void Message(Color aColor, const char *pszContent);
 		void MessageFormat(const char *pszFormat, ...) FMTFUNCTION(2, 3);
+		void MessageFormat(Color aColor, const char *pszFormat, ...) FMTFUNCTION(3, 4);
 
 		void Warning(const char *pszContent);
+		void Warning(Color aColor, const char *pszContent);
 		void WarningFormat(const char *pszFormat, ...) FMTFUNCTION(2, 3);
+		void WarningFormat(Color aColor, const char *pszFormat, ...) FMTFUNCTION(3, 4);
 
 		void ThrowAssert(const char *pszFilename, int iLine, const char *pszContent);
+		void ThrowAssert(const char *pszFilename, int iLine, Color aColor, const char *pszContent);
 		void ThrowAssertFormat(const char *pszFilename, int iLine, const char *pszFormat, ...) FMTFUNCTION(4, 5);
+		void ThrowAssertFormat(const char *pszFilename, int iLine, Color aColor, const char *pszFormat, ...) FMTFUNCTION(5, 6);
 
 		void Error(const char *pszContent);
+		void Error(Color aColor, const char *pszContent);
 		void ErrorFormat(const char *pszFormat, ...) FMTFUNCTION(2, 3);
+		void ErrorFormat(Color aColor, const char *pszFormat, ...) FMTFUNCTION(3, 4);
 
 	public:
 		class Scope
