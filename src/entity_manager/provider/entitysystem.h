@@ -17,8 +17,11 @@ namespace EntityManager
 	class CEntitySystemProvider : public CEntitySystem
 	{
 	public:
-		CEntityInstance *CreateEntity(SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
+		IEntityResourceManifest *GetCurrentManifest();
 		void *GetSubobjectForKeyValues();
+
+	public: // Action methods.
+		CEntityInstance *CreateEntity(SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
 		void QueueSpawnEntity(CEntityIdentity *pEntity, const CEntityKeyValues *pInitializationData);
 		void ExecuteQueuedCreation();
 	};

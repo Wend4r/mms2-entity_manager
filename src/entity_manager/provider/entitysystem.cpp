@@ -9,6 +9,11 @@ CEntityInstance *EntityManager::CEntitySystemProvider::CreateEntity(SpawnGroupHa
 	return g_pEntityManagerProvider->m_aData.m_aEntitySystem.m_pfnCreateEntity(this, hSpawnGroup, pszNameOrDesignName, eNetworkMode, iForcedIndex, iForcedSerial, bCreateInIsolatedPrecacheList);
 }
 
+IEntityResourceManifest *EntityManager::CEntitySystemProvider::GetCurrentManifest()
+{
+	return *(IEntityResourceManifest **)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntitySystem.m_nCurrentManifestOffset);
+}
+
 void *EntityManager::CEntitySystemProvider::GetSubobjectForKeyValues()
 {
 	return (void *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntitySystem.m_nSubobjectForKeyValuesOffset);

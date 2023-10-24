@@ -71,10 +71,21 @@
 
 		"Offsets"
 		{
+			// Near strings (engine):
+			//  "CGameResourceService::BuildResourceManifest(start)"
+			//  "CGameResourceService::BuildResourceManifest(finish)"
 			"CGameResourceService::m_pEntitySystem"
 			{
 				"windows64"     "0x58"
 				"linux64"       "0x50"
+			}
+
+			// Used in CEntitySystem::BuildResourceManifest().
+			// Field type is IEntityResourceManifest * .
+			"CEntitySystem::m_pCurrentManifest"
+			{
+				"windows64"     "8"
+				"linux64"       "8"
 			}
 
 			// Used in CSpawnGroupMgrGameSystem::SetActiveSpawnGroup()

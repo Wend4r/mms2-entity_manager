@@ -174,16 +174,21 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 				auto aWarnings = s_aEntityManagerLogger.CreateWarningsScope();
 
-				pSpawnGroupMgr->WhileBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pSpawnGroup) -> void {
+				pSpawnGroupMgr->WhileBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void {
 					char sSettingsError[256];
 
-					if(this->LoadSettings(h, pSpawnGroup->GetSpawnGroupName(), (char *)sSettingsError, sizeof(sSettingsError)))
+					if(this->LoadSettings(h, pMap->GetSpawnGroupName(), (char *)sSettingsError, sizeof(sSettingsError)))
 					{
 						CUtlVector<const CEntityKeyValues *> vecKeyValues;
 
 						ILoadingSpawnGroup *pLoadingSpawnGroup = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, &vecKeyValues);
 
-						pSpawnGroup->SetSpawnGroupLoading(pLoadingSpawnGroup);
+						pMap->SetSpawnGroupLoading(pLoadingSpawnGroup); // To respawn in next rounds.
+						// g_pSpawnGroupMgr->SpawnGroupInit(h, ((EntityManager::CEntitySystemProvider *)g_pGameEntitySystem)->GetCurrentManifest(), NULL, NULL /* Require CNetworkClientSpawnGroup_WaitForAssetLoadPrerequisit (from engine2, *(uintptr_t *)this + 11 is ISpawnGroupPrerequisiteRegistry) now (@Wend4r: needs to restore lifecycle of CSequentialPrerequisite progenitor and CNetworkClientSpawnGroup slaves )*/);
+						// g_pSpawnGroupMgr->SpawnGroupSpawnEntities(h);
+						g_pGameEntitySystem->BuildResourceManifest(h, &vecKeyValues, pMap->GetEntityFilterName(), NULL, ((EntityManager::CEntitySystemProvider *)g_pGameEntitySystem)->GetCurrentManifest()); // Precache entities now.
+						pLoadingSpawnGroup->SpawnEntities(); // Spawn created now.
+						// pLoadingSpawnGroup->Release(); // Free CLoadingSpawnGroup.
 					}
 					else
 					{
@@ -194,8 +199,6 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 				aWarnings.Send([](const char *pszContent) {
 					s_aEntityManagerLogger.Warning({255, 0, 0, 255}, pszContent);
 				});
-
-				// s_aEntityManagerProviderAgent.SpawnQueued();
 			}
 		}
 	}
