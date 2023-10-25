@@ -177,13 +177,13 @@ bool EntityManager::Provider::LoadEntitySystemGameData(char *psError, size_t nMa
 		{
 			this->m_aData.m_aEntitySystem.m_nCurrentManifestOffset = nResult;
 
-			pszOffsetName = "CEntitySystem::m_aSubobjectForKeyValues";
+			pszOffsetName = "CEntitySystem::m_aKeyValuesMemoryPool";
 			nResult = g_pEntityManagerGameData->GetEntitySystemOffset(pszOffsetName);
 			bResult = nResult != -1;
 
 			if(bResult)
 			{
-				this->m_aData.m_aEntitySystem.m_nSubobjectForKeyValuesOffset = nResult;
+				this->m_aData.m_aEntitySystem.m_nKeyValuesMemoryPoolOffset = nResult;
 			}
 		}
 

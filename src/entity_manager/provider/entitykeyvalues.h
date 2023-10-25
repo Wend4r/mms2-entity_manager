@@ -2,9 +2,10 @@
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_ENTITYKEYVALUES_PROVIDER_H_
 
 #include <eiface.h>
+#include <tier1/utlstring.h>
+#include <tier1/utlscratchmemory.h>
 #include <entity2/entityidentity.h>
 #include <entity2/entitysystem.h>
-#include <tier1/utlstring.h>
 
 #define ENTITY_KEY_MAGIC_MEOW 0x31415926u
 
@@ -28,8 +29,8 @@ namespace EntityManager
 	class CEntityKeyValuesProvider : public CEntityKeyValues
 	{
 	public:
-		CEntityKeyValuesProvider(void *pUnkEntitySystemSubobject = nullptr, char eUnknownType = 0);
-		static CEntityKeyValues *Create(void *pUnkEntitySystemSubobject = nullptr, char eUnknownType = 0);
+		CEntityKeyValuesProvider(CUtlScratchMemoryPool *pMemoryPool = nullptr, char eContainerType = 0);
+		static CEntityKeyValues *Create(CUtlScratchMemoryPool *pMemoryPool = nullptr, char eContainerType = 0);
 
 		uint16 GetRefCount();
 		uint16 AddRef();

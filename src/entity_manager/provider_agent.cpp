@@ -93,7 +93,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 {
 	int iNewIndex = this->m_vecEntitySpawnQueue.Count();
 
-	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetSubobjectForKeyValues(), 3);
+	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesMemoryPool(), 3);
 
 	auto aDetails = g_pEntityManagerLogger->CreateDetailsScope(), 
 	     aWarnings = g_pEntityManagerLogger->CreateWarningsScope();

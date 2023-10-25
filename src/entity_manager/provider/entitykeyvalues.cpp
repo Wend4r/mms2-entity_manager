@@ -4,19 +4,19 @@
 
 extern EntityManager::Provider *g_pEntityManagerProvider;
 
-EntityManager::CEntityKeyValuesProvider::CEntityKeyValuesProvider(void *pEntitySystemSubobject, char eSubobjectType)
+EntityManager::CEntityKeyValuesProvider::CEntityKeyValuesProvider(CUtlScratchMemoryPool *pMemoryPool, char eContainerType)
 {
-	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues(this, pEntitySystemSubobject, eSubobjectType);
+	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues(this, pMemoryPool, eContainerType);
 	++*(uint16_t *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset);
 }
 
-CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(void *pEntitySystemSubobject, char eSubobjectType)
+CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(CUtlScratchMemoryPool *pMemoryPool, char eContainerType)
 {
 	void *pKeyValuesSpace = malloc(g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nSizeof);
 
 	CEntityKeyValues *pNewKeyValues = (CEntityKeyValues *)pKeyValuesSpace;
 
-	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues(pNewKeyValues, pEntitySystemSubobject, eSubobjectType);
+	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues(pNewKeyValues, pMemoryPool, eContainerType);
 	((CEntityKeyValuesProvider *)pNewKeyValues)->AddRef();
 
 	return pNewKeyValues;

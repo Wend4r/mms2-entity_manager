@@ -4,7 +4,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <tier0/dbg.h>
 #include <tier0/platform.h>
+#include <tier1/utlscratchmemory.h>
 
 #include "provider/entitykeyvalues.h"
 #include "provider/entitysystem.h"
@@ -36,7 +38,7 @@ namespace EntityManager
 			class EntityKeyValues
 			{
 			public:
-				typedef void (*EntityKeyValuesFuncType)(CEntityKeyValues * const pThis, void *pEntitySystemSubobject, char eSubobjectType);
+				typedef void (*EntityKeyValuesFuncType)(CEntityKeyValues * const pThis, CUtlScratchMemoryPool *pMemoryPool, char eContainerType);
 				EntityKeyValuesFuncType m_pfnEntityKeyValues = nullptr;
 
 				typedef CEntityKeyValuesAttribute *(*GetAttributeFuncType)(CEntityKeyValues * const pThis, const EntityKey &key, char *psValue);
@@ -69,7 +71,7 @@ namespace EntityManager
 
 				ptrdiff_t m_nCurrentManifestOffset = -1;
 
-				ptrdiff_t m_nSubobjectForKeyValuesOffset = -1;
+				ptrdiff_t m_nKeyValuesMemoryPoolOffset = -1;
 			};
 
 			EntitySystem m_aEntitySystem;
