@@ -141,8 +141,6 @@ public:
 
 					auto it = map.find(aKey);
 
-					Msg("aKey = %s\n", aKey.c_str());
-
 					if(it != map.cend())
 					{
 						(it->second)(aKey, aValue);

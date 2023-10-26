@@ -2,12 +2,11 @@
 
 #include <stdlib.h>
 
-#include <tier1/utlstring.h>
-
-#include <entity2/entitysystem.h>
-#include <tier0/dbg.h>
-#include <tier0/platform.h>
 #include <tier1/KeyValues.h>
+
+class IVEngineServer;
+class IFileSystem;
+class IServerGameDLL;
 
 extern IVEngineServer *engine;
 extern IFileSystem *filesystem;
@@ -451,14 +450,10 @@ const ptrdiff_t &GameData::Config::GetOffset(std::string sName) const
 
 void GameData::Config::SetAddress(std::string sName, CMemory aMemory)
 {
-	Msg("Address: sName = %s\n", sName.c_str());
-
 	this->m_aAddressStorage.Set(sName, aMemory);
 }
 
 void GameData::Config::SetOffset(std::string sName, ptrdiff_t nValue)
 {
-	Msg("Offset: sName = %s\n", sName.c_str());
-
 	this->m_aOffsetStorage.Set(sName, nValue);
 }

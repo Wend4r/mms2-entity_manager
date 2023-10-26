@@ -111,11 +111,7 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 
 		if(bResult)
 		{
-			Msg("aConfigs[n].pszFilename = %s\n", aConfigs[n].pszFilename);
-
 			bResult = (this->*(aConfigs[n].pfnLoad))(pRoot, pGameConfig, psError, nMaxLength);
-
-			Msg("bResult = %s\n", bResult ? "true" : "false");
 
 			if(bResult)
 			{
