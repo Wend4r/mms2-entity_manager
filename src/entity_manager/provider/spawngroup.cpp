@@ -7,7 +7,7 @@ extern EntityManager::Provider *g_pEntityManagerProvider;
 
 CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupHandle_t h)
 {
-	auto pMgrSpawnGroupMap = (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aSpawnGroup.m_nMgrGameSystemSpawnGroupsOffset);
+	auto pMgrSpawnGroupMap = this->GetSpawnGroups();
 
 	auto iFoundIndex = pMgrSpawnGroupMap->Find(h);
 
@@ -16,7 +16,7 @@ CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupH
 
 void EntityManager::CSpawnGroupMgrGameSystemProvider::WhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
 {
-	auto pMgrSpawnGroupMap = (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aSpawnGroup.m_nMgrGameSystemSpawnGroupsOffset);
+	auto pMgrSpawnGroupMap = this->GetSpawnGroups();
 
 	{
 		const int iInvalidIndex = pMgrSpawnGroupMap->InvalidIndex();
@@ -30,7 +30,7 @@ void EntityManager::CSpawnGroupMgrGameSystemProvider::WhileBySpawnGroups(std::fu
 
 void EntityManager::CSpawnGroupMgrGameSystemProvider::FastWhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
 {
-	auto pMgrSpawnGroupMap = (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aSpawnGroup.m_nMgrGameSystemSpawnGroupsOffset);
+	auto pMgrSpawnGroupMap = this->GetSpawnGroups();
 
 	{
 		const int iMaxElement = pMgrSpawnGroupMap->MaxElement();
@@ -43,4 +43,9 @@ void EntityManager::CSpawnGroupMgrGameSystemProvider::FastWhileBySpawnGroups(std
 			}
 		}
 	}
+}
+
+CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *EntityManager::CSpawnGroupMgrGameSystemProvider::GetSpawnGroups()
+{
+	return (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetMgrGameSystemSpawnGroupsOffset());
 }

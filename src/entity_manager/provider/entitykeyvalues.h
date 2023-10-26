@@ -29,13 +29,14 @@ namespace EntityManager
 	class CEntityKeyValuesProvider : public CEntityKeyValues
 	{
 	public:
-		CEntityKeyValuesProvider(CUtlScratchMemoryPool *pMemoryPool = nullptr, char eContainerType = 0);
 		static CEntityKeyValues *Create(CUtlScratchMemoryPool *pMemoryPool = nullptr, char eContainerType = 0);
 
+	public: // Reference.
+		void AddRef();
 		uint16 GetRefCount();
-		uint16 AddRef();
-		uint16 SubRef();
+		void Release();
 
+	public: // Attributes.
 		CEntityKeyValuesAttribute *GetAttribute(const EntityKey &key, char *psValue = nullptr);
 		void SetAttributeValue(CEntityKeyValuesAttribute *pAttr, const char *pString);
 	};

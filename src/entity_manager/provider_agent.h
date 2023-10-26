@@ -26,6 +26,10 @@ namespace EntityManager
 		void Destroy();
 
 	public:
+		bool NotifyEntitySystemUpdated();
+		bool NotifySpawnGroupMgrUpdated();
+
+	public:
 		void PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
 		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
 

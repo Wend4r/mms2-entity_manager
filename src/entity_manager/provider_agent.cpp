@@ -1,5 +1,6 @@
 #include "provider_agent.h"
 
+#include "provider.h"
 #include "provider/entitysystem.h"
 #include "logger.h"
 
@@ -9,8 +10,11 @@
 #include <tier1/KeyValues.h>
 
 extern EntityManager::Logger *g_pEntityManagerLogger;
+extern EntityManager::Provider *g_pEntityManagerProvider;
 
-extern CGameEntitySystem *g_pGameEntitySystem;
+extern IGameResourceServiceServer *g_pGameResourceServiceServer;
+CGameEntitySystem *g_pGameEntitySystem = NULL;
+CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
 // tier0 module.
 PLATFORM_INTERFACE bool g_bUpdateStringTokenDatabase;
@@ -87,6 +91,16 @@ void EntityManager::ProviderAgent::Clear()
 
 void EntityManager::ProviderAgent::Destroy()
 {
+}
+
+bool EntityManager::ProviderAgent::NotifyEntitySystemUpdated()
+{
+	return (g_pGameEntitySystem = *(CGameEntitySystem **)((uintptr_t)g_pGameResourceServiceServer + g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().GetGameResourceServiceEntitySystemOffset())) != NULL;
+}
+
+bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()
+{
+	return (g_pSpawnGroupMgr = *g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetSpawnGroupMgrAddress()) != NULL;
 }
 
 void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup)

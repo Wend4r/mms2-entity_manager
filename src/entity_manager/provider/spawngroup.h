@@ -16,6 +16,9 @@ namespace EntityManager
 		typedef EachSpawnGroupFunc *EachSpawnGroupFuncPtr;
 		void WhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc); // In order.
 		void FastWhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc);
+
+	private:
+		CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups();
 	};
 };
 

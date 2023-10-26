@@ -18,7 +18,6 @@
 #include <iplayerinfo.h>
 #include <sh_vector.h>
 
-#include "entity_manager/gamedata.h"
 #include "entity_manager/logger.h"
 #include "entity_manager/provider/spawngroup.h"
 #include "entity_manager/provider.h"
@@ -39,14 +38,13 @@ public:
 	void AllPluginsLoaded();
 
 protected:
-	void InitEntitySystem();
+	bool InitEntitySystem();
 	void DestroyEntitySystem();
 
-	void InitSpawnGroup();
+	bool InitSpawnGroup();
 	void DestroySpawnGroup();
 
 protected:
-	bool LoadGameData(char *psError = NULL, size_t nMaxLength = 0);
 	bool LoadProvider(char *psError = NULL, size_t nMaxLength = 0);
 	bool LoadSettings(SpawnGroupHandle_t hSpawnGroup, const char *pszSpawnGroupName, char *psError = NULL, size_t nMaxLength = 0);
 	virtual void OnBasePathChanged(const char *pszNewOne);
@@ -71,7 +69,6 @@ public:
 	const char *GetLogTag();
 
 private:
-
 #ifdef PLATFORM_WINDOWS
 	std::string m_sBasePath = "addons\\" META_PLUGIN_NAME;
 #else
@@ -79,14 +76,11 @@ private:
 #endif
 
 	EntityManager::Settings m_aSettings;
-	ptrdiff_t m_nGameResourceServiceEntitySystemOffset = -1;
-	CSpawnGroupMgrGameSystem **m_ppSpawnGroupMgrAddress = nullptr;
 
 	std::string m_sCurrentMap = "\0";
 };
 
 extern EntityManagerPlugin *g_pEntityManager;
-extern EntityManager::GameData *g_pEntityManagerGameData;
 extern EntityManager::Logger *g_pEntityManagerLogger;
 extern EntityManager::Provider *g_pEntityManagerProvider;
 extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;

@@ -1,53 +1,53 @@
 #include "entitykeyvalues.h"
 
+#include <entity2/entitysystem.h>
 #include <entity_manager/provider.h>
 
 extern EntityManager::Provider *g_pEntityManagerProvider;
 
-EntityManager::CEntityKeyValuesProvider::CEntityKeyValuesProvider(CUtlScratchMemoryPool *pMemoryPool, char eContainerType)
-{
-	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues(this, pMemoryPool, eContainerType);
-	++*(uint16_t *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset);
-}
+extern CGameEntitySystem *g_pGameEntitySystem;
 
 CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(CUtlScratchMemoryPool *pMemoryPool, char eContainerType)
 {
-	void *pKeyValuesSpace = malloc(g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nSizeof);
+	const auto &aGameData = g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues();
 
-	CEntityKeyValues *pNewKeyValues = (CEntityKeyValues *)pKeyValuesSpace;
+	CEntityKeyValues *pNewKeyValues = (CEntityKeyValues *)malloc(aGameData.GetSizeof());
 
-	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnEntityKeyValues(pNewKeyValues, pMemoryPool, eContainerType);
-	((CEntityKeyValuesProvider *)pNewKeyValues)->AddRef();
+	if(pNewKeyValues)
+	{
+		(aGameData.EntityKeyValuesFunction())(pNewKeyValues, pMemoryPool, eContainerType);
+		++*(uint16 *)((uintptr_t)pNewKeyValues + aGameData.GetRefCountOffset());
+	}
 
 	return pNewKeyValues;
 }
 
+void EntityManager::CEntityKeyValuesProvider::AddRef()
+{
+	g_pGameEntitySystem->AddRefKeyValues(this);
+}
+
 uint16 EntityManager::CEntityKeyValuesProvider::GetRefCount()
 {
-	return *(uint16 *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset);
+	return *(uint16 *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().GetRefCountOffset());
 }
 
-uint16 EntityManager::CEntityKeyValuesProvider::AddRef()
+void EntityManager::CEntityKeyValuesProvider::Release()
 {
-	return ++*(uint16 *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset); // @Wend4r: This is necessary, I've been looking for a long time why a server glitched crashes (with broken stack).
-}
-
-uint16 EntityManager::CEntityKeyValuesProvider::SubRef()
-{
-	return --*(uint16 *)((uintptr_t)this + g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_nRefCountOffset);
+	g_pGameEntitySystem->ReleaseKeyValues(this);
 }
 
 CEntityKeyValuesAttribute *EntityManager::CEntityKeyValuesProvider::GetAttribute(const EntityKey &key, char *psValue)
 {
-	return g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnGetAttribute(this, key, psValue);
+	return (g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().GetAttributeFunction())(this, key, psValue);
 }
 
 const char *EntityManager::CEntityKeyValuesAttributeProvider::GetValueString(const char *pszDefaultValue)
 {
-	return g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnGetValueString(this, pszDefaultValue);
+	return (g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().AttributeGetValueStringFunction())(this, pszDefaultValue);
 }
 
 void EntityManager::CEntityKeyValuesProvider::SetAttributeValue(CEntityKeyValuesAttribute *pAttr, const char *pString)
 {
-	g_pEntityManagerProvider->m_aData.m_aEntityKeyValues.m_pfnSetAttributeValue(this, pAttr, pString);
+	(g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().SetAttributeValueFunction())(this, pAttr, pString);
 }
