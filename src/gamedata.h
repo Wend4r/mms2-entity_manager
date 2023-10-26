@@ -1,5 +1,5 @@
-#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_GAMEDATA_H_
-#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_GAMEDATA_H_
+#ifndef _INCLUDE_GAMEDATA_H_
+#define _INCLUDE_GAMEDATA_H_
 
 #include "memory_utils/module.h"
 #include "memory_utils/memaddr.h"
@@ -350,4 +350,4 @@ private:
 	std::map<std::string, const CModule *> m_aLibraryMap;
 };
 
-#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_GAMEDATA_H_
+#endif //_INCLUDE_GAMEDATA_H_
