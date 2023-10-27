@@ -165,8 +165,8 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 						pMap->SetSpawnGroupLoading(pLoading); // To respawn in next rounds.
 						// g_pSpawnGroupMgr->SpawnGroupInit(h, ((EntityManager::CEntitySystemProvider *)g_pGameEntitySystem)->GetCurrentManifest(), NULL, NULL /* Require CNetworkClientSpawnGroup_WaitForAssetLoadPrerequisit (from engine2, *(uintptr_t *)this + 11 is ISpawnGroupPrerequisiteRegistry) now (@Wend4r: needs to restore lifecycle of CSequentialPrerequisite progenitor and CNetworkClientSpawnGroup slaves )*/);
 						// g_pSpawnGroupMgr->SpawnGroupSpawnEntities(h);
-						((EntityManager::CGameResourceServiceProvider *)g_pGameResourceServiceServer)->PrecacheEntitiesAndConfirmResourcesAreLoaded(h, pLoading->EntityCount(), pLoading->GetEntities(), pMap->GetWorldOffset()); // Precache entities now.
-						pLoading->SpawnEntities(); // Spawn created now.
+						((EntityManager::CGameResourceServiceProvider *)g_pGameResourceServiceServer)->PrecacheEntitiesAndConfirmResourcesAreLoaded(h, pLoading->EntityCount(), pLoading->GetEntities(), &pMap->GetWorldOffset()); // Precache entities now.
+						// pLoading->SpawnEntities(); // Spawn created now.
 						// pLoading->Release(); // Free CLoadingSpawnGroup.
 					}
 					else

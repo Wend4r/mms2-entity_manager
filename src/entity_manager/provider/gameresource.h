@@ -20,7 +20,7 @@ namespace EntityManager
 	class CGameResourceServiceProvider : public CGameResourceService
 	{
 	public:
-		void PrecacheEntitiesAndConfirmResourcesAreLoaded(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t &vWorldOffset);
+		void PrecacheEntitiesAndConfirmResourcesAreLoaded(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
 	};
 };
 
