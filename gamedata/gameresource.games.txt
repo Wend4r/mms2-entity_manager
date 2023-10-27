@@ -1,0 +1,37 @@
+"Games"
+{
+	"cs2"
+	{
+		"Offsets"
+		{
+			// Virtual method index.
+			// 
+			// Used strings:
+			//   "PrecacheEntitiesAndConfirmResourcesAreLoaded"
+			// 
+			// Declaration: 
+			// void CGameResourceService::PrecacheEntitiesAndConfirmResourcesAreLoaded(
+			//   CGameResourceService *const this,
+			//   SpawnGroupHandle_t hSpawnGroup,
+			//   int nCount,
+			//   const EntitySpawnInfo_t *pEntities,
+			//   const matrix3x4a_t &vWorldOffset)
+			"CGameResourceService::PrecacheEntitiesAndConfirmResourcesAreLoaded"
+			{
+				"windows64"     "35"
+				"linux64"       "35"
+			}
+
+			// Field in class.
+			// 
+			// Near strings (engine):
+			//  "CGameResourceService::BuildResourceManifest(start)"
+			//  "CGameResourceService::BuildResourceManifest(finish)"
+			"CGameResourceService::m_pEntitySystem"
+			{
+				"windows64"     "88"
+				"linux64"       "80"
+			}
+		}
+	}
+}

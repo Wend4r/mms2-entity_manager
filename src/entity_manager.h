@@ -19,14 +19,13 @@
 #include <sh_vector.h>
 
 #include "entity_manager/logger.h"
-#include "entity_manager/provider/spawngroup.h"
 #include "entity_manager/provider.h"
 #include "entity_manager/provider_agent.h"
 #include "entity_manager/settings.h"
 
 #define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
 
-class CGameResourceService;
+class ISpawnGroup;
 
 class EntityManagerPlugin final : public ISmmPlugin, public IMetamodListener
 {

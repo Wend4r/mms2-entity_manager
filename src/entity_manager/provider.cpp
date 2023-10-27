@@ -8,6 +8,7 @@
 #define GAMECONFIG_FOLDER_DIR "gamedata"
 #define GAMECONFIG_ENTITYKEYVALUES_FILENAME "entitykeyvalues.games.txt"
 #define GAMECONFIG_ENTITYSYSTEM_FILENAME "entitysystem.games.txt"
+#define GAMECONFIG_GAMERESOURCE_FILENAME "gameresource.games.txt"
 #define GAMECONFIG_SPAWNGROUP_FILENAME "spawngroup.games.txt"
 
 extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
@@ -92,6 +93,10 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 			&GameDataStorage::LoadEntitySystem
 		},
 		{
+			GAMECONFIG_GAMERESOURCE_FILENAME,
+			&GameDataStorage::LoadGameResource
+		},
+		{
 			GAMECONFIG_SPAWNGROUP_FILENAME,
 			&GameDataStorage::LoadEntitySpawnGroup
 		}
@@ -143,6 +148,11 @@ bool EntityManager::Provider::GameDataStorage::LoadEntityKeyValues(IGameData *pR
 bool EntityManager::Provider::GameDataStorage::LoadEntitySystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
 {
 	return this->m_aEntitySystem.Load(pRoot, pGameConfig, psError, nMaxLength);
+}
+
+bool EntityManager::Provider::GameDataStorage::LoadGameResource(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+{
+	return this->m_aGameResource.Load(pRoot, pGameConfig, psError, nMaxLength);
 }
 
 bool EntityManager::Provider::GameDataStorage::LoadEntitySpawnGroup(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
@@ -265,11 +275,6 @@ EntityManager::Provider::GameDataStorage::EntitySystem::EntitySystem()
 	{
 		auto &aCallbacks = this->m_aOffsetCallbacks;
 
-		aCallbacks.Insert("CGameResourceService::m_pEntitySystem", [this](const std::string &, const ptrdiff_t &nOffset)
-		{
-			this->m_nGameResourceServiceEntitySystemOffset = nOffset;
-			g_pEntityManagerProviderAgent->NotifyEntitySystemUpdated();
-		});
 		aCallbacks.Insert("CEntitySystem::m_pCurrentManifest", [this](const std::string &, const ptrdiff_t &nOffset)
 		{
 			this->m_nCurrentManifestOffset = nOffset;
@@ -315,11 +320,6 @@ EntityManager::Provider::GameDataStorage::EntitySystem::OnExecuteQueuedCreationP
 	return this->m_pfnExecuteQueuedCreation;
 }
 
-ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetGameResourceServiceEntitySystemOffset() const
-{
-	return this->m_nGameResourceServiceEntitySystemOffset;
-}
-
 ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetCurrentManifestOffset() const
 {
 	return this->m_nCurrentManifestOffset;
@@ -328,6 +328,46 @@ ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetCurrentMani
 ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetKeyValuesMemoryPoolOffset() const
 {
 	return this->m_nKeyValuesMemoryPoolOffset;
+}
+
+EntityManager::Provider::GameDataStorage::GameResource::GameResource()
+{
+	{
+		auto &aCallbacks = this->m_aOffsetCallbacks;
+
+		aCallbacks.Insert("CGameResourceService::PrecacheEntitiesAndConfirmResourcesAreLoaded", [this](const std::string &, const ptrdiff_t &nOffset)
+		{
+			this->m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset = nOffset;
+		});
+		aCallbacks.Insert("CGameResourceService::m_pEntitySystem", [this](const std::string &, const ptrdiff_t &nOffset)
+		{
+			this->m_nEntitySystemOffset = nOffset;
+			g_pEntityManagerProviderAgent->NotifyEntitySystemUpdated();
+		});
+
+		this->m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
+	}
+}
+
+bool EntityManager::Provider::GameDataStorage::GameResource::Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+{
+	return this->m_aGameConfig.Load(pRoot, pGameConfig, psError, nMaxLength);
+}
+
+void EntityManager::Provider::GameDataStorage::GameResource::Reset()
+{
+	this->m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset = -1;
+	this->m_nEntitySystemOffset = -1;
+}
+
+ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetPrecacheEntitiesAndConfirmResourcesAreLoadedOffset() const
+{
+	return this->m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset;
+}
+
+ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetEntitySystemOffset() const
+{
+	return this->m_nEntitySystemOffset;
 }
 
 EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
@@ -390,6 +430,11 @@ const EntityManager::Provider::GameDataStorage::EntityKeyValues &EntityManager::
 const EntityManager::Provider::GameDataStorage::EntitySystem &EntityManager::Provider::GameDataStorage::GetEntitySystem() const
 {
 	return this->m_aEntitySystem;
+}
+
+const EntityManager::Provider::GameDataStorage::GameResource &EntityManager::Provider::GameDataStorage::GetGameResource() const
+{
+	return this->m_aGameResource;
 }
 
 const EntityManager::Provider::GameDataStorage::SpawnGroup &EntityManager::Provider::GameDataStorage::GetSpawnGroup() const

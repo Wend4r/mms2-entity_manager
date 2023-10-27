@@ -95,7 +95,7 @@ void EntityManager::ProviderAgent::Destroy()
 
 bool EntityManager::ProviderAgent::NotifyEntitySystemUpdated()
 {
-	return (g_pGameEntitySystem = *(CGameEntitySystem **)((uintptr_t)g_pGameResourceServiceServer + g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().GetGameResourceServiceEntitySystemOffset())) != NULL;
+	return (g_pGameEntitySystem = *(CGameEntitySystem **)((uintptr_t)g_pGameResourceServiceServer + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntitySystemOffset())) != NULL;
 }
 
 bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()

@@ -36,6 +36,7 @@ namespace EntityManager
 		protected:
 			bool LoadEntityKeyValues(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadEntitySystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+			bool LoadGameResource(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadEntitySpawnGroup(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 
 		public:
@@ -97,11 +98,10 @@ namespace EntityManager
 				OnQueueSpawnEntityPtr QueueSpawnEntityFunction() const;
 				OnExecuteQueuedCreationPtr ExecuteQueuedCreationFunction() const;
 
-				ptrdiff_t GetGameResourceServiceEntitySystemOffset() const;
 				ptrdiff_t GetCurrentManifestOffset() const;
 				ptrdiff_t GetKeyValuesMemoryPoolOffset() const;
 
-			private: // Signatures.
+			private:
 				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
 				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
 				GameData::Config m_aGameConfig;
@@ -112,9 +112,31 @@ namespace EntityManager
 				OnExecuteQueuedCreationPtr m_pfnExecuteQueuedCreation = nullptr;
 
 			private: // Offsets.
-				ptrdiff_t m_nGameResourceServiceEntitySystemOffset = -1;
 				ptrdiff_t m_nCurrentManifestOffset = -1;
 				ptrdiff_t m_nKeyValuesMemoryPoolOffset = -1;
+			};
+
+			class GameResource
+			{
+			public:
+				GameResource();
+
+			public:
+				bool Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+				void Reset();
+
+			public:
+				ptrdiff_t GetPrecacheEntitiesAndConfirmResourcesAreLoadedOffset() const;
+				ptrdiff_t GetEntitySystemOffset() const;
+
+			private:
+				// GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
+				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
+				GameData::Config m_aGameConfig;
+
+			private: // Offsets.
+				ptrdiff_t m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset = -1;
+				ptrdiff_t m_nEntitySystemOffset = -1;
 			};
 
 			class SpawnGroup
@@ -142,11 +164,13 @@ namespace EntityManager
 
 			const EntityKeyValues &GetEntityKeyValues() const;
 			const EntitySystem &GetEntitySystem() const;
+			const GameResource &GetGameResource() const;
 			const SpawnGroup &GetSpawnGroup() const;
 
 		private:
 			EntityKeyValues m_aEntityKeyValues;
 			EntitySystem m_aEntitySystem;
+			GameResource m_aGameResource;
 			SpawnGroup m_aSpawnGroup;
 		};
 

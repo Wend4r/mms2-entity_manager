@@ -23,6 +23,8 @@
 #include <tier1/convar.h>
 
 #include "entity_manager.h"
+#include "entity_manager/provider/gameresource.h"
+#include "entity_manager/provider/spawngroup.h"
 
 class GameSessionConfiguration_t { };
 
@@ -158,14 +160,14 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 					{
 						CUtlVector<const CEntityKeyValues *> vecKeyValues;
 
-						ILoadingSpawnGroup *pLoadingSpawnGroup = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, &vecKeyValues);
+						ILoadingSpawnGroup *pLoading = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, &vecKeyValues);
 
-						pMap->SetSpawnGroupLoading(pLoadingSpawnGroup); // To respawn in next rounds.
+						pMap->SetSpawnGroupLoading(pLoading); // To respawn in next rounds.
 						// g_pSpawnGroupMgr->SpawnGroupInit(h, ((EntityManager::CEntitySystemProvider *)g_pGameEntitySystem)->GetCurrentManifest(), NULL, NULL /* Require CNetworkClientSpawnGroup_WaitForAssetLoadPrerequisit (from engine2, *(uintptr_t *)this + 11 is ISpawnGroupPrerequisiteRegistry) now (@Wend4r: needs to restore lifecycle of CSequentialPrerequisite progenitor and CNetworkClientSpawnGroup slaves )*/);
 						// g_pSpawnGroupMgr->SpawnGroupSpawnEntities(h);
-						g_pGameEntitySystem->BuildResourceManifest(h, &vecKeyValues, pMap->GetEntityFilterName(), NULL, ((EntityManager::CEntitySystemProvider *)g_pGameEntitySystem)->GetCurrentManifest()); // Precache entities now.
-						pLoadingSpawnGroup->SpawnEntities(); // Spawn created now.
-						// pLoadingSpawnGroup->Release(); // Free CLoadingSpawnGroup.
+						((EntityManager::CGameResourceServiceProvider *)g_pGameResourceServiceServer)->PrecacheEntitiesAndConfirmResourcesAreLoaded(h, pLoading->EntityCount(), pLoading->GetEntities(), pMap->GetWorldOffset()); // Precache entities now.
+						pLoading->SpawnEntities(); // Spawn created now.
+						// pLoading->Release(); // Free CLoadingSpawnGroup.
 					}
 					else
 					{
