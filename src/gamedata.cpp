@@ -169,25 +169,25 @@ bool GameData::Config::LoadEngine(IGameData *pRoot, KeyValues *pEngineValues, ch
 	if(pSectionValues) // Ignore the section not found for result.
 	{
 		bResult = this->LoadEngineSignatures(pRoot, pSectionValues, psError, nMaxLength);
+	}
 
-		if(bResult)
+	if(bResult)
+	{
+		pSectionValues = pEngineValues->FindKey("Offsets", false);
+
+		if(pSectionValues) // Same ignore.
 		{
-			pSectionValues = pEngineValues->FindKey("Offsets", false);
+			bResult = this->LoadEngineOffsets(pSectionValues, psError, nMaxLength);
+		}
+	}
 
-			if(pSectionValues) // Same ignore.
-			{
-				bResult = this->LoadEngineOffsets(pSectionValues, psError, nMaxLength);
-			}
+	if(bResult)
+	{
+		pSectionValues = pEngineValues->FindKey("Addresses", false);
 
-			if(bResult)
-			{
-				pSectionValues = pEngineValues->FindKey("Addresses", false);
-
-				if(pSectionValues)
-				{
-					bResult = this->LoadEngineAddresses(pSectionValues, psError, nMaxLength);
-				}
-			}
+		if(pSectionValues)
+		{
+			bResult = this->LoadEngineAddresses(pSectionValues, psError, nMaxLength);
 		}
 	}
 
