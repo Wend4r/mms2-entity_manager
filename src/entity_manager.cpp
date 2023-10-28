@@ -347,7 +347,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 {
 	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
 
-	s_aEntityManagerProviderAgent.AddSpawnQueuedToTail(const_cast<CUtlVector<const CEntityKeyValues *> *>(pKeyValues), handle);
+	s_aEntityManagerProviderAgent.AddSpawnQueueToTail(const_cast<CUtlVector<const CEntityKeyValues *> *>(pKeyValues), handle);
 	s_aEntityManagerProviderAgent.ReleaseSpawnQueued(handle);
 
 	RETURN_META_VALUE_NEWPARAMS(MRES_HANDLED, nullptr, &CSpawnGroupMgrGameSystem::CreateLoadingSpawnGroup, (handle, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, pKeyValues));

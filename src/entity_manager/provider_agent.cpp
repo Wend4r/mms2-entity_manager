@@ -152,7 +152,7 @@ void EntityManager::ProviderAgent::PushSpawnQueue(CEntityKeyValues *pKeyValues, 
 	this->m_vecEntitySpawnQueue.AddToTail({pKeyValues, hSpawnGroup});
 }
 
-int EntityManager::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEntityKeyValues *> *vecTarget)
+int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget)
 {
 	const auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
 
@@ -182,7 +182,7 @@ int EntityManager::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEntityK
 	return iResult;
 }
 
-int EntityManager::ProviderAgent::AddSpawnQueuedToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup)
+int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup)
 {
 	const auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
 

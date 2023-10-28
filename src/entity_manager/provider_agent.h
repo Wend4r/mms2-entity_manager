@@ -29,15 +29,13 @@ namespace EntityManager
 		bool NotifyEntitySystemUpdated();
 		bool NotifySpawnGroupMgrUpdated();
 
-	public:
+	public: // Spawn queue methods.
 		void PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
 		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
-
-		int AddSpawnQueuedToTail(CUtlVector<const CEntityKeyValues *> *vecTarget);
-		int AddSpawnQueuedToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup);
+		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget);
+		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup);
 		void ReleaseSpawnQueued();
 		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup);
-
 		int SpawnQueued();
 		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup);
 
