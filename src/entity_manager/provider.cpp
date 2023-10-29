@@ -409,6 +409,10 @@ EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
 		{
 			this->m_nMgrGameSystemSpawnGroupsOffset = nOffset;
 		});
+		aCallbacks.Insert("CLoadingMapGroup::m_spawnInfo", [this](const std::string &, const ptrdiff_t &nOffset)
+		{
+			this->m_nLoadingMapSpawnInfoOffset = nOffset;
+		});
 
 		this->m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
 	}
@@ -426,6 +430,7 @@ void EntityManager::Provider::GameDataStorage::SpawnGroup::Reset()
 	this->m_ppSpawnGroupMgrAddress = nullptr;
 
 	this->m_nMgrGameSystemSpawnGroupsOffset = -1;
+	this->m_nLoadingMapSpawnInfoOffset = -1;
 }
 
 CSpawnGroupMgrGameSystem **EntityManager::Provider::GameDataStorage::SpawnGroup::GetSpawnGroupMgrAddress() const
@@ -436,6 +441,11 @@ CSpawnGroupMgrGameSystem **EntityManager::Provider::GameDataStorage::SpawnGroup:
 ptrdiff_t EntityManager::Provider::GameDataStorage::SpawnGroup::GetMgrGameSystemSpawnGroupsOffset() const
 {
 	return this->m_nMgrGameSystemSpawnGroupsOffset;
+}
+
+ptrdiff_t EntityManager::Provider::GameDataStorage::SpawnGroup::GetLoadingMapSpawnInfoOffset() const
+{
+	return this->m_nLoadingMapSpawnInfoOffset;
 }
 
 

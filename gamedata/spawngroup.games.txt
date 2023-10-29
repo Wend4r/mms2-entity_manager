@@ -65,6 +65,12 @@
 				"linux64"       "0x140"
 			}
 
+			"CLoadingMapGroup::m_spawnInfo"
+			{
+				"windows64"     "8"
+				"linux64"       "8"
+			}
+
 			// Used in CMapSpawnGroup::OnSpawnGroupLoad():
 			//   v37 = CSpawnGroupMgrGameSystem::Get(g_pSpawnGroupMgr, v36);
 			//   if ( !v93 )

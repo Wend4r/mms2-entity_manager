@@ -20,6 +20,16 @@ namespace EntityManager
 	private:
 		CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups();
 	};
+
+	class CLoadingMapGroupProvider : public CLoadingSpawnGroup
+	{
+	public:
+		int AddSpawnInfos(const EntitySpawnInfo_t *pEntities, int iCount);
+		int FindAndRemoveSpawnInfoByKeyValues(const CEntityKeyValues *pElement, CUtlVector<CEntityIdentity *> &vecRemovedIdentities);
+
+	private:
+		CUtlVector<EntitySpawnInfo_t> *GetSpawnInfo();
+	};
 };
 
 #endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_SPAWNGROUP_PROVIDER_H_

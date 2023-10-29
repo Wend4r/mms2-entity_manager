@@ -49,3 +49,38 @@ CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *EntityManager::CSpawnGroupMgrGame
 {
 	return (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetMgrGameSystemSpawnGroupsOffset());
 }
+
+int EntityManager::CLoadingMapGroupProvider::AddSpawnInfos(const EntitySpawnInfo_t *pEntities, int iCount)
+{
+	return this->GetSpawnInfo()->AddMultipleToTail(iCount, pEntities);
+}
+
+int EntityManager::CLoadingMapGroupProvider::FindAndRemoveSpawnInfoByKeyValues(const CEntityKeyValues *pElement, CUtlVector<CEntityIdentity *> &vecRemovedIdentities)
+{
+	auto vecSpawnInfo = this->GetSpawnInfo();
+
+	const int iSpawnInfoCount = vecSpawnInfo->Count();
+
+	int iRemoveCount = 0;
+
+	// Find KV element.
+	for(int i = 0; i < iSpawnInfoCount; i++)
+	{
+		const auto &aInfo = vecSpawnInfo->Element(i);
+
+		if(aInfo.m_pKeyValues == pElement)
+		{
+			vecRemovedIdentities.AddToTail(aInfo.m_pEntity);
+
+			vecSpawnInfo->FastRemove(i);
+			iRemoveCount++;
+		}
+	}
+
+	return iRemoveCount;
+}
+
+CUtlVector<EntitySpawnInfo_t> *EntityManager::CLoadingMapGroupProvider::GetSpawnInfo()
+{
+	return (CUtlVector<EntitySpawnInfo_t> *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetLoadingMapSpawnInfoOffset());
+}

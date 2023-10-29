@@ -16,6 +16,7 @@
 #include <ISmmPlugin.h>
 #include <igameevents.h>
 #include <iplayerinfo.h>
+#include <metamod_oslink.h>
 #include <sh_vector.h>
 
 #include "entity_manager/logger.h"
@@ -56,6 +57,7 @@ public: // SourceHooks.
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *);
 	void OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
 	ILoadingSpawnGroup *OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues);
+	void OnSpawnGroupShutdownHook(SpawnGroupHandle_t handle);
 
 public:
 	const char *GetAuthor();
@@ -68,15 +70,10 @@ public:
 	const char *GetLogTag();
 
 private:
-#ifdef PLATFORM_WINDOWS
-	std::string m_sBasePath = "addons\\" META_PLUGIN_NAME;
-#else
-	std::string m_sBasePath = "addons/" META_PLUGIN_NAME;
-#endif
+	std::string m_sBasePath = "addons" PATH_SEP_STR META_PLUGIN_NAME;
+	std::string m_sCurrentMap = "\0";
 
 	EntityManager::Settings m_aSettings;
-
-	std::string m_sCurrentMap = "\0";
 };
 
 extern EntityManagerPlugin *g_pEntityManager;
