@@ -2,6 +2,7 @@
 #define SPAWNGROUP_MANAGER_H
 
 #include "eiface.h"
+#include "iserver.h"
 #include "entity2/entitysystem.h"
 #include "entity2/entityidentity.h"
 #include "tier1/utlstring.h"
@@ -34,30 +35,80 @@ struct EventServerPostEntityThink_t
 	bool m_bLastTick;
 };
 
+class IWorldReference;
+
 class ISpawnGroup
 {
 public:
-	virtual const char *GetName() const = 0;
+	virtual const char *GetWorldName() const = 0;
 	virtual const char *GetEntityLumpName() const = 0;
 	virtual const char *GetEntityFilterName() const = 0;
-	virtual SpawnGroupHandle_t GetSpawnGroupHandle() const = 0;
+	virtual SpawnGroupHandle_t GetHandle() const = 0;
 	virtual const matrix3x4a_t &GetWorldOffset() const = 0;
-	virtual bool UnkIsValid() const = 0;
-	virtual const char *UnkGetName() const = 0;
+	virtual bool ShouldLoadEntitiesFromSave() const = 0;
+	virtual const char *GetParentNameFixup() const = 0;
 	virtual const char *GetLocalNameFixup() const = 0;
-	virtual SpawnGroupHandle_t GetOwner() const = 0;
-	virtual ILoadingSpawnGroup *GetLoading() const = 0;
-	virtual void SetLoading(ILoadingSpawnGroup *pLoading) = 0;
+	virtual SpawnGroupHandle_t GetOwnerSpawnGroup() const = 0;
+	virtual ILoadingSpawnGroup *GetLoadingSpawnGroup() const = 0;
+	virtual void SetLoadingSpawnGroup(ILoadingSpawnGroup *pLoading) = 0;
+	virtual IWorldReference *GetWorldReference() const = 0;
+	virtual void Describe(CUtlString &sOutput) const = 0;
 
-	// And more at next one.
+public: // CNetworkClientSpawnGroup/CNetworkServerSpawnGroup
+	virtual uint64 GetCreationTick() const = 0;
+	virtual void RequestDeferredUnload(bool bUnk) = 0; // Client-side needs.
+	virtual uint64 GetDestructionTick() const = 0;
+
+public:
+	virtual uint64 UnkIsManualFlag1() const = 0;
+	virtual bool DontSpawnEntities() const = 0;
+	virtual SpawnGroupHandle_t GetParentSpawnGroup() const = 0;
+	virtual uint64 GetChildSpawnGroupCount() const = 0;
+	virtual void GetSpawnGroupDesc(SpawnGroupDesc_t *pDesc) const = 0;
+
+public:
+	virtual void UnkSetManualFlag2() = 0;
+	virtual void UnkIsManualFlag2() = 0;
+	virtual void UnkClientOrServerOnGameResourceManifestLoaded(HGameResourceManifest hManifest, int nResourceCount, void **pResourceHandles /* of ResourceHandle_t */) = 0;
+	virtual void Unk(SpawnGroupHandle_t h) = 0;
+	virtual void UnkIsManualFlag3() = 0;
+	virtual void UnkIsManualFlag4() = 0;
+	virtual void UnkIsManualFlag5() = 0;
+	virtual void UnkSetter(uint64_t n) = 0;
+	virtual void UnkIsManualFlag6() = 0;
+	virtual void UnkGetter() = 0;
+
+	virtual void ComputeWorldOrigin(matrix3x4_t *retstrp) = 0;
+	virtual void Release() = 0;
+	virtual void OnGameResourceManifestLoaded(HGameResourceManifest hManifest, int nResourceCount, void **pResourceHandles /* of ResourceHandle_t */) = 0;
+	virtual void Init(IResourceManifestRegistry *pResourceManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) = 0;
+	virtual void Shutdown() = 0;
+	virtual bool GetLoadStatus() const = 0;
+	virtual void ForceBlockingLoad() = 0;
+	virtual bool ShouldBlockUntilLoaded() const = 0;
+	virtual void ServiceBlockingLoads() = 0;
+	virtual bool GetEntityPrerequisites(HGameResourceManifest hManifest) const = 0;
+	virtual bool EntityPrerequisitesSatisfied() = 0;
+
+public: // CNetworkClientSpawnGroup/CNetworkServerSpawnGroup
+	virtual bool LoadEntities() = 0;
+	virtual uint64 Unk(uint64, int, uint64) = 0;
+	virtual uint64 Unk2(uint64, int, uint64) = 0;
+	virtual uint64 SetParentSpawnGroupForChild(SpawnGroupHandle_t h) = 0;
+
+public:
+	virtual void TransferOwnershipOfManifestsTo(ISpawnGroup *pTarget) = 0;
+
+public: // CNetworkClientSpawnGroup/CNetworkServerSpawnGroup
+	virtual uint64 UnkGet() = 0;
 };
 
 class CMapSpawnGroup
 {
 public:
-	const char *GetSpawnGroupName() const
+	const char *GetWorldName() const
 	{
-		return this->m_pSpawnGroup->GetName();
+		return this->m_pSpawnGroup->GetWorldName();
 	}
 
 	const char *GetEntityLumpName() const
@@ -72,12 +123,17 @@ public:
 
 	SpawnGroupHandle_t GetSpawnGroupHandle() const
 	{
-		return this->m_pSpawnGroup->GetSpawnGroupHandle();
+		return this->m_pSpawnGroup->GetHandle();
 	}
 
 	const matrix3x4a_t &GetWorldOffset() const
 	{
 		return this->m_pSpawnGroup->GetWorldOffset();
+	}
+
+	const char *GetParentNameFixup() const
+	{
+		return this->m_pSpawnGroup->GetParentNameFixup();
 	}
 
 	const char *GetLocalNameFixup() const
@@ -87,17 +143,32 @@ public:
 
 	SpawnGroupHandle_t GetOwnerSpawnGroup() const
 	{
-		return this->m_pSpawnGroup->GetOwner();
+		return this->m_pSpawnGroup->GetOwnerSpawnGroup();
 	}
 
-	ILoadingSpawnGroup *GetSpawnGroupLoading() const
+	ILoadingSpawnGroup *GetLoadingSpawnGroup() const
 	{
-		return this->m_pSpawnGroup->GetLoading();
+		return this->m_pSpawnGroup->GetLoadingSpawnGroup();
 	}
 
-	void SetSpawnGroupLoading(ILoadingSpawnGroup *pLoading)
+	void SetLoadingSpawnGroup(ILoadingSpawnGroup *pLoading)
 	{
-		this->m_pSpawnGroup->SetLoading(pLoading);
+		this->m_pSpawnGroup->SetLoadingSpawnGroup(pLoading);
+	}
+
+	int GetCreationTick() const
+	{
+		return this->m_pSpawnGroup->GetCreationTick();
+	}
+
+	bool DontSpawnEntities() const
+	{
+		return this->m_pSpawnGroup->DontSpawnEntities();
+	}
+
+	void GetSpawnGroupDesc(SpawnGroupDesc_t *pDesc) const
+	{
+		this->m_pSpawnGroup->GetSpawnGroupDesc(pDesc);
 	}
 
 private:
