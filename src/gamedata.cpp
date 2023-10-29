@@ -256,7 +256,7 @@ bool GameData::Config::LoadEngineSignatures(IGameData *pRoot, KeyValues *pSignat
 			}
 			else if(psError)
 			{
-				snprintf(psError, nMaxLength, "Failed to get library (\"%s\" key) at \"%s\" signature", pszLibraryKey, pszSigName);
+				snprintf(psError, nMaxLength, "Failed to get \"%s\" key at \"%s\" signature", pszLibraryKey, pszSigName);
 			}
 
 			pSigSection = pSigSection->GetNextKey();
