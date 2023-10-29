@@ -28,3 +28,13 @@ void EntityManager::CEntitySystemProvider::ExecuteQueuedCreation()
 {
 	g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().ExecuteQueuedCreationFunction()(this);
 }
+
+void EntityManager::CEntitySystemProvider::QueueDestroyEntity(CEntityIdentity *pEntity)
+{
+	g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().QueueDestroyEntityFunction()(this, pEntity);
+}
+
+void EntityManager::CEntitySystemProvider::ExecuteQueuedDeletion(bool bPerformDeallocation)
+{
+	g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().ExecuteQueuedDeletionFunction()(this, bPerformDeallocation);
+}

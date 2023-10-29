@@ -264,9 +264,17 @@ EntityManager::Provider::GameDataStorage::EntitySystem::EntitySystem()
 		{
 			this->m_pfnQueueSpawnEntity = pFucntion.RCast<decltype(this->m_pfnQueueSpawnEntity)>();
 		});
+		aCallbacks.Insert("CEntitySystem::QueueDestroyEntity", [this](const std::string &, const CMemory &pFucntion)
+		{
+			this->m_pfnQueueDestroyEntity = pFucntion.RCast<decltype(this->m_pfnQueueDestroyEntity)>();
+		});
 		aCallbacks.Insert("CEntitySystem::ExecuteQueuedCreation", [this](const std::string &, const CMemory &pFucntion)
 		{
 			this->m_pfnExecuteQueuedCreation = pFucntion.RCast<decltype(this->m_pfnExecuteQueuedCreation)>();
+		});
+		aCallbacks.Insert("CEntitySystem::ExecuteQueuedDeletion", [this](const std::string &, const CMemory &pFucntion)
+		{
+			this->m_pfnExecuteQueuedDeletion = pFucntion.RCast<decltype(this->m_pfnExecuteQueuedDeletion)>();
 		});
 
 		this->m_aGameConfig.GetAddresses().AddListener(&aCallbacks);
@@ -315,9 +323,19 @@ EntityManager::Provider::GameDataStorage::EntitySystem::OnQueueSpawnEntityPtr En
 	return this->m_pfnQueueSpawnEntity;
 }
 
+EntityManager::Provider::GameDataStorage::EntitySystem::OnQueueDestroyEntityPtr EntityManager::Provider::GameDataStorage::EntitySystem::QueueDestroyEntityFunction() const
+{
+	return this->m_pfnQueueDestroyEntity;
+}
+
 EntityManager::Provider::GameDataStorage::EntitySystem::OnExecuteQueuedCreationPtr EntityManager::Provider::GameDataStorage::EntitySystem::ExecuteQueuedCreationFunction() const
 {
 	return this->m_pfnExecuteQueuedCreation;
+}
+
+EntityManager::Provider::GameDataStorage::EntitySystem::OnExecuteQueuedDeletionPtr EntityManager::Provider::GameDataStorage::EntitySystem::ExecuteQueuedDeletionFunction() const
+{
+	return this->m_pfnExecuteQueuedDeletion;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetCurrentManifestOffset() const

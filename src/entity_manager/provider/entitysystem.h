@@ -24,6 +24,9 @@ namespace EntityManager
 		CEntityInstance *CreateEntity(SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
 		void QueueSpawnEntity(CEntityIdentity *pEntity, const CEntityKeyValues *pInitializationData);
 		void ExecuteQueuedCreation();
+
+		void QueueDestroyEntity(CEntityIdentity *pEntity);
+		void ExecuteQueuedDeletion(bool bPerformDeallocation = false);
 	};
 };
 

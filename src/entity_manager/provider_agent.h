@@ -39,6 +39,13 @@ namespace EntityManager
 		int SpawnQueued();
 		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup);
 
+	public: // Destroy queue methods.
+		void PushDestroyQueue(CEntityInstance *pEntity);
+		void PushDestroyQueue(CEntityIdentity *pEntity);
+		int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> *vecTarget);
+		void ReleaseDestroyQueued();
+		int DestroyQueued();
+
 	protected:
 		typedef CUtlMap<CUtlString, EntityKey> CacheMapType;
 		typedef CacheMapType::IndexType_t CacheMapOIndexType;
@@ -49,13 +56,13 @@ namespace EntityManager
 		CacheMapOIndexType CacheOrGetEntityKey(const char *pszName);
 
 	private:
-		class EntityData
+		class SpawnData
 		{
-			typedef EntityData ThisClass;
+			typedef SpawnData ThisClass;
 
 		public:
-			EntityData(CEntityKeyValues *pKeyValues);
-			EntityData(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup);
+			SpawnData(CEntityKeyValues *pKeyValues);
+			SpawnData(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup);
 
 			CEntityKeyValues *GetKeyValues() const;
 			CEntityKeyValuesProvider *GetKeyValuesProvider() const;
@@ -69,7 +76,23 @@ namespace EntityManager
 			SpawnGroupHandle_t m_hSpawnGroup;
 		};
 
-		CUtlVector<EntityData> m_vecEntitySpawnQueue; // To spawn.
+		CUtlVector<SpawnData> m_vecEntitySpawnQueue;
+
+		struct DestoryData
+		{
+			typedef DestoryData ThisClass;
+
+		public:
+			DestoryData(CEntityInstance *pInstance);
+			DestoryData(CEntityIdentity *pIdentity);
+
+			CEntityIdentity *GetIdnetity() const;
+
+		private:
+			CEntityIdentity *m_pIdentity;
+		};
+
+		CUtlVector<DestoryData> m_vecEntityDestroyQueue;
 
 		CacheMapType m_mapCachedKeys;
 		CacheMapOIndexType m_nElmCachedClassnameKey;

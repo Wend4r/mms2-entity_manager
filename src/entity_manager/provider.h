@@ -92,11 +92,15 @@ namespace EntityManager
 			public:
 				typedef CEntityInstance *(*OnCreateEntityPtr)(CEntitySystem * const pThis, SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, bool bCreateInIsolatedPrecacheList);
 				typedef void (*OnQueueSpawnEntityPtr)(CEntitySystem * const pThis, CEntityIdentity *pEntity, const CEntityKeyValues *pInitializationData);
+				typedef void (*OnQueueDestroyEntityPtr)(CEntitySystem * const pThis, CEntityIdentity *pEntity);
 				typedef void (*OnExecuteQueuedCreationPtr)(CEntitySystem * const pThis);
+				typedef void (*OnExecuteQueuedDeletionPtr)(CEntitySystem * const pThis, bool bPerformDeallocation);
 
 				OnCreateEntityPtr CreateEntityFunction() const;
 				OnQueueSpawnEntityPtr QueueSpawnEntityFunction() const;
+				OnQueueDestroyEntityPtr QueueDestroyEntityFunction() const;
 				OnExecuteQueuedCreationPtr ExecuteQueuedCreationFunction() const;
+				OnExecuteQueuedDeletionPtr ExecuteQueuedDeletionFunction() const;
 
 				ptrdiff_t GetCurrentManifestOffset() const;
 				ptrdiff_t GetKeyValuesMemoryPoolOffset() const;
@@ -109,7 +113,9 @@ namespace EntityManager
 			private: // Signatures.
 				OnCreateEntityPtr m_pfnCreateEntity = nullptr;
 				OnQueueSpawnEntityPtr m_pfnQueueSpawnEntity = nullptr;
+				OnQueueDestroyEntityPtr m_pfnQueueDestroyEntity = nullptr;
 				OnExecuteQueuedCreationPtr m_pfnExecuteQueuedCreation = nullptr;
+				OnExecuteQueuedDeletionPtr m_pfnExecuteQueuedDeletion = nullptr;
 
 			private: // Offsets.
 				ptrdiff_t m_nCurrentManifestOffset = -1;
