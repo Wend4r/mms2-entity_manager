@@ -63,7 +63,7 @@ public: // SourceHooks.
 	void OnSpawnGroupShutdownHook(SpawnGroupHandle_t handle);
 
 public:
-	void ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener = NULL);
+	void ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, const int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener = NULL);
 	int DestroyMyLoadingSpawnGroupEntities();
 	void OnMyEntityFinish(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues);
 
