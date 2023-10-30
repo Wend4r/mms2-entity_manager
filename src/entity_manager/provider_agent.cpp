@@ -173,8 +173,6 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 		{
 			CEntityKeyValues *pKeyValues = vecEntitySpawnQueue[i].GetKeyValues();
 
-			((CEntityKeyValuesProvider *)pKeyValues)->AddRef();
-
 			*ppKeyValuesCur = pKeyValues;
 			ppKeyValuesCur++;
 		}
@@ -203,8 +201,6 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 		if(hSpawnGroup == aSpawn.GetSpawnGroup())
 		{
 			CEntityKeyValues *pKeyValues = aSpawn.GetKeyValues();
-
-			aSpawn.GetKeyValuesProvider()->AddRef();
 
 			*ppKeyValuesCur = pKeyValues;
 			ppKeyValuesCur++;
