@@ -4,41 +4,37 @@
 
 #include <stdarg.h>
 
-#define FORMAT_ENTITY_MANAGER_MESSAGE_STARTWITH "[%s]: "
-#define FORMAT_ENTITY_MANAGER_MESSAGE FORMAT_ENTITY_MANAGER_MESSAGE_STARTWITH "%s\n"
+#define FORMAT_MESSAGE_STARTWITH "[%s]: "
+#define FORMAT_MESSAGE FORMAT_MESSAGE_STARTWITH "%s\n"
 
-#define FORMAT_ENTITY_MANAGER_WARNING_STARTWITH "[%s] WARNING: "
-#define FORMAT_ENTITY_MANAGER_WARNING FORMAT_ENTITY_MANAGER_WARNING_STARTWITH "%s\n"
+#define FORMAT_WARNING_STARTWITH "[%s] WARNING: "
+#define FORMAT_WARNING FORMAT_WARNING_STARTWITH "%s\n"
 
-#define FORMAT_ENTITY_MANAGER_ERROR_STARTWITH "[%s] ERROR "
-#define FORMAT_ENTITY_MANAGER_ERROR FORMAT_ENTITY_MANAGER_ERROR_STARTWITH "%s\n"
+#define FORMAT_ERROR_STARTWITH "[%s] ERROR "
+#define FORMAT_ERROR FORMAT_ERROR_STARTWITH "%s\n"
 
-#define FORMAT_ENTITY_MANAGER_DEV_MESSAGE_STARTWITH "[%s] DEV L%d: "
-#define FORMAT_ENTITY_MANAGER_DEV_MESSAGE FORMAT_ENTITY_MANAGER_DEV_MESSAGE_STARTWITH "%s\n"
+#define FORMAT_DEV_MESSAGE_STARTWITH "[%s] DEV L%d: "
+#define FORMAT_DEV_MESSAGE FORMAT_DEV_MESSAGE_STARTWITH "%s\n"
 
-#define FORMAT_ENTITY_MANAGER_DEV_WARNING_STARTWITH "[%s] DEV WARNING L%d: "
-#define FORMAT_ENTITY_MANAGER_DEV_WARNING FORMAT_ENTITY_MANAGER_DEV_WARNING_STARTWITH "%s\n"
+#define FORMAT_DEV_WARNING_STARTWITH "[%s] DEV WARNING L%d: "
+#define FORMAT_DEV_WARNING FORMAT_DEV_WARNING_STARTWITH "%s\n"
 
-const Color ENTITY_MANAGER_LOGGINING_COLOR = {255, 125, 125, 255};
-
-EntityManager::Logger::Logger()
+Logger::Logger(const char *pszName, RegisterTagsFunc pfnRegisterTagsFunc, int iFlags, LoggingVerbosity_t eVerbosity, const Color &aDefault)
 {
-	this->m_nChannelID = LoggingSystem_RegisterLoggingChannel(g_pEntityManager->GetName(), [](LoggingChannelID_t nTagChannelID) {
-		LoggingSystem_AddTagToChannel(nTagChannelID, g_pEntityManager->GetLogTag());
-	}, 0, LV_DEFAULT, ENTITY_MANAGER_LOGGINING_COLOR);
+	this->m_nChannelID = LoggingSystem_RegisterLoggingChannel(pszName, pfnRegisterTagsFunc, iFlags, eVerbosity, aDefault);
 }
 
-void EntityManager::Logger::Detailed(const char *pszContent)
+void Logger::Detailed(const char *pszContent)
 {
 	LoggingSystem_LogDirect(this->m_nChannelID, LS_DETAILED, pszContent);
 }
 
-void EntityManager::Logger::Detailed(Color aColor, const char *pszContent)
+void Logger::Detailed(Color aColor, const char *pszContent)
 {
 	LoggingSystem_LogDirect(this->m_nChannelID, LS_DETAILED, aColor, pszContent);
 }
 
-void EntityManager::Logger::DetailedFormat(const char *pszFormat, ...)
+void Logger::DetailedFormat(const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -49,7 +45,7 @@ void EntityManager::Logger::DetailedFormat(const char *pszFormat, ...)
 	this->Detailed((const char *)this->m_sFormatBuffer);
 }
 
-void EntityManager::Logger::DetailedFormat(Color aColor, const char *pszFormat, ...)
+void Logger::DetailedFormat(Color aColor, const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -60,17 +56,17 @@ void EntityManager::Logger::DetailedFormat(Color aColor, const char *pszFormat, 
 	this->Detailed(aColor, (const char *)this->m_sFormatBuffer);
 }
 
-void EntityManager::Logger::Message(const char *pszContent)
+void Logger::Message(const char *pszContent)
 {
 	LoggingSystem_LogDirect(this->m_nChannelID, LS_MESSAGE, pszContent);
 }
 
-void EntityManager::Logger::Message(Color aColor, const char *pszContent)
+void Logger::Message(Color aColor, const char *pszContent)
 {
 	LoggingSystem_LogDirect(this->m_nChannelID, LS_MESSAGE, aColor, pszContent);
 }
 
-void EntityManager::Logger::MessageFormat(const char *pszFormat, ...)
+void Logger::MessageFormat(const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -81,7 +77,7 @@ void EntityManager::Logger::MessageFormat(const char *pszFormat, ...)
 	this->Message((const char *)this->m_sFormatBuffer);
 }
 
-void EntityManager::Logger::MessageFormat(Color aColor, const char *pszFormat, ...)
+void Logger::MessageFormat(Color aColor, const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -92,17 +88,17 @@ void EntityManager::Logger::MessageFormat(Color aColor, const char *pszFormat, .
 	this->Message(aColor, (const char *)this->m_sFormatBuffer);
 }
 
-void EntityManager::Logger::Warning(const char *pszContent)
+void Logger::Warning(const char *pszContent)
 {
 	LoggingSystem_LogDirect(this->m_nChannelID, LS_WARNING, pszContent);
 }
 
-void EntityManager::Logger::Warning(Color aColor, const char *pszContent)
+void Logger::Warning(Color aColor, const char *pszContent)
 {
 	LoggingSystem_LogDirect(this->m_nChannelID, LS_WARNING, aColor, pszContent);
 }
 
-void EntityManager::Logger::WarningFormat(const char *pszFormat, ...)
+void Logger::WarningFormat(const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -113,7 +109,7 @@ void EntityManager::Logger::WarningFormat(const char *pszFormat, ...)
 	this->Warning((const char *)this->m_sFormatBuffer);
 }
 
-void EntityManager::Logger::WarningFormat(Color aColor, const char *pszFormat, ...)
+void Logger::WarningFormat(Color aColor, const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -124,17 +120,17 @@ void EntityManager::Logger::WarningFormat(Color aColor, const char *pszFormat, .
 	this->Warning(aColor, (const char *)this->m_sFormatBuffer);
 }
 
-void EntityManager::Logger::ThrowAssert(const char *pszFilename, int iLine, const char *pszContent)
+void Logger::ThrowAssert(const char *pszFilename, int iLine, const char *pszContent)
 {
 	LoggingSystem_Log(this->m_nChannelID, LS_ASSERT, "%s (%d) : %s", pszFilename, iLine, pszContent);
 }
 
-void EntityManager::Logger::ThrowAssert(const char *pszFilename, int iLine, Color aColor, const char *pszContent)
+void Logger::ThrowAssert(const char *pszFilename, int iLine, Color aColor, const char *pszContent)
 {
 	LoggingSystem_Log(this->m_nChannelID, LS_ASSERT, aColor, "%s (%d) : %s", pszFilename, iLine, pszContent);
 }
 
-void EntityManager::Logger::ThrowAssertFormat(const char *pszFilename, int iLine, const char *pszFormat, ...)
+void Logger::ThrowAssertFormat(const char *pszFilename, int iLine, const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -145,7 +141,7 @@ void EntityManager::Logger::ThrowAssertFormat(const char *pszFilename, int iLine
 	this->ThrowAssert(pszFilename, iLine, (const char *)this->m_sFormatBuffer);
 }
 
-void EntityManager::Logger::ThrowAssertFormat(const char *pszFilename, int iLine, Color aColor, const char *pszFormat, ...)
+void Logger::ThrowAssertFormat(const char *pszFilename, int iLine, Color aColor, const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -156,17 +152,17 @@ void EntityManager::Logger::ThrowAssertFormat(const char *pszFilename, int iLine
 	this->ThrowAssert(pszFilename, iLine, aColor, (const char *)this->m_sFormatBuffer);
 }
 
-void EntityManager::Logger::Error(const char *pszContent)
+void Logger::Error(const char *pszContent)
 {
 	LoggingSystem_LogDirect(this->m_nChannelID, LS_ERROR, pszContent);
 }
 
-void EntityManager::Logger::Error(Color aColor, const char *pszContent)
+void Logger::Error(Color aColor, const char *pszContent)
 {
 	LoggingSystem_LogDirect(this->m_nChannelID, LS_ERROR, aColor, pszContent);
 }
 
-void EntityManager::Logger::ErrorFormat(const char *pszFormat, ...)
+void Logger::ErrorFormat(const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -177,7 +173,7 @@ void EntityManager::Logger::ErrorFormat(const char *pszFormat, ...)
 	this->Error((const char *)this->m_sFormatBuffer);
 }
 
-void EntityManager::Logger::ErrorFormat(Color aColor, const char *pszFormat, ...)
+void Logger::ErrorFormat(Color aColor, const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -188,7 +184,7 @@ void EntityManager::Logger::ErrorFormat(Color aColor, const char *pszFormat, ...
 	this->Error(aColor, (const char *)this->m_sFormatBuffer);
 }
 
-void EntityManager::Logger::DoTest()
+void Logger::DoTests()
 { 
 	this->DetailedFormat("LS_DETAILED = %d\n", LS_DETAILED);
 	this->MessageFormat("LS_MESSAGE = %d\n", LS_MESSAGE);
@@ -197,24 +193,24 @@ void EntityManager::Logger::DoTest()
 	this->ErrorFormat("LS_ERROR = %d\n", LS_ERROR);
 }
 
-EntityManager::Logger::Scope::Scope(const char *pszStartWith)
+Logger::Scope::Scope(const char *pszStartWith)
 {
 	this->m_aStartWith = pszStartWith;
 	this->m_aEnd = "\n";
 }
 
-EntityManager::Logger::Scope::Scope(const char *pszStartWith, const char *pszEnd)
+Logger::Scope::Scope(const char *pszStartWith, const char *pszEnd)
 {
 	this->m_aStartWith = pszStartWith;
 	this->m_aEnd = pszEnd;
 }
 
-size_t EntityManager::Logger::Scope::Count()
+size_t Logger::Scope::Count()
 {
 	return this->m_vec.size();
 }
 
-size_t EntityManager::Logger::Scope::Push(const char *pszContent)
+size_t Logger::Scope::Push(const char *pszContent)
 {
 	Message aMsg;
 
@@ -225,7 +221,7 @@ size_t EntityManager::Logger::Scope::Push(const char *pszContent)
 	return nStoredLength;
 }
 
-size_t EntityManager::Logger::Scope::PushFormat(const char *pszFormat, ...)
+size_t Logger::Scope::PushFormat(const char *pszFormat, ...)
 {
 	va_list aParams;
 
@@ -242,7 +238,7 @@ size_t EntityManager::Logger::Scope::PushFormat(const char *pszFormat, ...)
 	return nStoredLength;
 }
 
-size_t EntityManager::Logger::Scope::Send(SendFunc funcOn)
+size_t Logger::Scope::Send(SendFunc funcOn)
 {
 	std::string sResultContent;
 
@@ -258,39 +254,39 @@ size_t EntityManager::Logger::Scope::Send(SendFunc funcOn)
 	return nSize;
 }
 
-const std::string &EntityManager::Logger::Scope::Message::Get() const
+const std::string &Logger::Scope::Message::Get() const
 {
 	return this->m_sContent;
 }
 
-size_t EntityManager::Logger::Scope::Message::SetWithCopy(const char *pszContent)
+size_t Logger::Scope::Message::SetWithCopy(const char *pszContent)
 {
 	this->m_sContent = pszContent;
 
 	return this->m_sContent.size();
 }
 
-EntityManager::Logger::Scope EntityManager::Logger::CreateDetailsScope()
+Logger::Scope Logger::CreateDetailsScope()
 {
 	return {};
 }
 
-EntityManager::Logger::Scope EntityManager::Logger::CreateMessagesScope()
+Logger::Scope Logger::CreateMessagesScope()
 {
 	return {};
 }
 
-EntityManager::Logger::Scope EntityManager::Logger::CreateWarningsScope()
+Logger::Scope Logger::CreateWarningsScope()
 {
 	return {};
 }
 
-EntityManager::Logger::Scope EntityManager::Logger::CreateAssertScope()
+Logger::Scope Logger::CreateAssertScope()
 {
 	return {};
 }
 
-EntityManager::Logger::Scope EntityManager::Logger::CreateErrorsScope()
+Logger::Scope Logger::CreateErrorsScope()
 {
 	return {};
 }

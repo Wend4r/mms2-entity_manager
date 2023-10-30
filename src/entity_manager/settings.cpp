@@ -26,7 +26,7 @@ bool EntityManager::Settings::Init(char *psError, size_t nMaxLength)
 	return true;
 }
 
-bool EntityManager::Settings::Load(SpawnGroupHandle_t hSpawnGroup, const char *pszBasePath, const char *pszSpawnGroupName, char *psError, size_t nMaxLength)
+bool EntityManager::Settings::Load(SpawnGroupHandle_t hSpawnGroup, const char *pszBasePath, const char *pszSpawnGroupName, char *psError, size_t nMaxLength, Logger::Scope *pDetails, Logger::Scope *pWarnings)
 {
 	char sBaseConfigsDir[MAX_PATH];
 
@@ -38,7 +38,7 @@ bool EntityManager::Settings::Load(SpawnGroupHandle_t hSpawnGroup, const char *p
 #endif
 		pszBasePath, ENTITY_MANAGER_MAP_CONFIG_DIR, ENTITY_MANAGER_MAP_CONFIG_SPAWNGROUPS_DIR, pszSpawnGroupName);
 
-	bool bResult = this->LoadWorld(hSpawnGroup, (const char *)sBaseConfigsDir, psError, nMaxLength);
+	bool bResult = this->LoadWorld(hSpawnGroup, (const char *)sBaseConfigsDir, psError, nMaxLength, pDetails, pWarnings);
 
 	if(bResult)
 	{
@@ -59,7 +59,7 @@ void EntityManager::Settings::Destroy()
 	this->m_pWorld = nullptr;
 }
 
-bool EntityManager::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const char *pszBaseConfigsDir, char *psError, size_t nMaxLength)
+bool EntityManager::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const char *pszBaseConfigsDir, char *psError, size_t nMaxLength, Logger::Scope *pDetails, Logger::Scope *pWarnings)
 {
 	char sConfigFile[MAX_PATH];
 
@@ -79,7 +79,7 @@ bool EntityManager::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const ch
 	{
 		FOR_EACH_SUBKEY(pWorldValues, pEntityValues)
 		{
-			g_pEntityManagerProviderAgent->PushSpawnQueueOld(pEntityValues, hSpawnGroup);
+			g_pEntityManagerProviderAgent->PushSpawnQueueOld(pEntityValues, hSpawnGroup, pDetails, pWarnings);
 		}
 	}
 	else if(psError)

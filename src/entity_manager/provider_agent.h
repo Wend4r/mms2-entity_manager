@@ -31,15 +31,14 @@ namespace EntityManager
 		bool NotifySpawnGroupMgrUpdated();
 
 	public: // Spawn queue methods.
-		void PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
+		void PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
 		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
 		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget);
 		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup);
 		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues);
 		void ReleaseSpawnQueued();
 		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup);
-		int SpawnQueued();
-		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup);
+		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
 
 	public: // Destroy queue methods.
 		void PushDestroyQueue(CEntityInstance *pEntity);
@@ -49,7 +48,7 @@ namespace EntityManager
 		int DestroyQueued();
 
 	public:
-		void DumpEntityKeyValues(Logger::Scope &aOutput, const CEntityKeyValues *pKeyValues);
+		void DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput);
 
 	protected:
 		typedef CUtlMap<CUtlString, EntityKey> CacheMapType;

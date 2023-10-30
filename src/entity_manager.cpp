@@ -26,6 +26,8 @@
 #include "entity_manager/provider/gameresource.h"
 #include "entity_manager/provider/spawngroup.h"
 
+const Color ENTITY_MANAGER_LOGGINING_COLOR = {125, 125, 125, 255};
+
 class GameSessionConfiguration_t { };
 
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
@@ -37,9 +39,6 @@ SH_DECL_HOOK1_void(CSpawnGroupMgrGameSystem, SpawnGroupShutdown, SH_NOATTRIB, 0,
 
 static EntityManagerPlugin s_aEntityManager;
 EntityManagerPlugin *g_pEntityManager = &s_aEntityManager;  // To extern usage.
-
-static EntityManager::Logger s_aEntityManagerLogger;
-EntityManager::Logger *g_pEntityManagerLogger = &s_aEntityManagerLogger;
 
 static EntityManager::Provider s_aEntityManagerProvider;
 EntityManager::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
@@ -69,6 +68,15 @@ CGlobalVars *GetGameGlobals()
 }
 
 PLUGIN_EXPOSE(EntityManagerPlugin, s_aEntityManager);
+
+EntityManagerPlugin::EntityManagerPlugin()
+ :  m_aLogger(this->GetName(), [](LoggingChannelID_t nTagChannelID)
+    {
+    	LoggingSystem_AddTagToChannel(nTagChannelID, s_aEntityManager.GetLogTag());
+    }, 0, LV_DEFAULT, ENTITY_MANAGER_LOGGINING_COLOR)
+{
+}
+
 bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late)
 {
 	PLUGIN_SAVEVARS();
@@ -152,7 +160,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 			{
 				auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
 
-				auto aWarnings = s_aEntityManagerLogger.CreateWarningsScope();
+				auto aWarnings = this->m_aLogger.CreateWarningsScope();
 
 				pSpawnGroupMgr->WhileBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void {
 					char sSettingsError[256];
@@ -180,8 +188,8 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 					}
 				});
 
-				aWarnings.Send([](const char *pszContent) {
-					s_aEntityManagerLogger.Warning({255, 0, 0, 255}, pszContent);
+				aWarnings.Send([this](const char *pszContent) {
+					this->m_aLogger.Warning({255, 0, 0, 255}, pszContent);
 				});
 			}
 		}
@@ -258,7 +266,25 @@ bool EntityManagerPlugin::LoadProvider(char *psError, size_t nMaxLength)
 
 bool EntityManagerPlugin::LoadSettings(SpawnGroupHandle_t hSpawnGroup, const char *pszSpawnGroupName, char *psError, size_t nMaxLength)
 {
-	return this->m_aSettings.Load(hSpawnGroup, this->m_sBasePath.c_str(), pszSpawnGroupName, psError, nMaxLength);
+	Logger::Scope aDetails = {};
+	Logger::Scope aWarnings = {};
+
+	bool bResult = this->m_aSettings.Load(hSpawnGroup, this->m_sBasePath.c_str(), pszSpawnGroupName, psError, nMaxLength, &aDetails, &aWarnings);
+
+	if(bResult)
+	{
+		aDetails.Send([this](const char *pszContent)
+		{
+			this->m_aLogger.Detailed(pszContent);
+		});
+
+		aWarnings.Send([this](const char *pszContent)
+		{
+			this->m_aLogger.Warning(pszContent);
+		});
+	}
+
+	return bResult;
 }
 
 void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
@@ -271,7 +297,7 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 
 		if(!this->LoadProvider((char *)sProviderError, sizeof(sProviderError)))
 		{
-			s_aEntityManagerLogger.WarningFormat("Failed to load a provider: %s\n", sProviderError);
+			this->m_aLogger.WarningFormat("Failed to load a provider: %s\n", sProviderError);
 		}
 	}
 
@@ -332,13 +358,13 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 	}
 	else
 	{
-		s_aEntityManagerLogger.Warning({255, 255, 0, 255}, "Failed to get a net server\n");
+		this->m_aLogger.Warning({255, 255, 0, 255}, "Failed to get a net server\n");
 	}
 }
 
 void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
 {
-	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %s)\n", handle, pSpawnGroup->GetWorldName());
+	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %s)\n", handle, pSpawnGroup->GetWorldName());
 
 	// Load settings by spawn group name
 	{
@@ -346,14 +372,14 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 
 		if(!this->LoadSettings(handle, pSpawnGroup->GetWorldName(), (char *)sSettingsError, sizeof(sSettingsError)))
 		{
-			s_aEntityManagerLogger.WarningFormat({255, 0, 0, 255}, "Failed to load a settings: %s\n", sSettingsError);
+			this->m_aLogger.WarningFormat({255, 0, 0, 255}, "Failed to load a settings: %s\n", sSettingsError);
 		}
 	}
 }
 
 ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
 {
-	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
+	this->m_aLogger.MessageFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
 
 	auto funcCreateLoadingSpawnGroup = &CSpawnGroupMgrGameSystem::CreateLoadingSpawnGroup;
 
@@ -369,7 +395,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 	if(iCount)
 	{
 #ifdef DEBUG
-		EntityManager::Logger::Scope aMessages = s_aEntityManagerLogger.CreateDetailsScope();
+		auto aMessages = this->m_aLogger.CreateDetailsScope();
 #endif
 
 		CUtlVector<EntitySpawnInfo_t> aMyEntities;
@@ -397,7 +423,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 #ifdef DEBUG
 				aMessages.PushFormat(pszMyEntityMessages[bInSpawnQueue], aEntity.m_pEntity->GetEntityIndex().Get());
-				s_aEntityManagerProviderAgent.DumpEntityKeyValues(aMessages, aEntity.m_pKeyValues);
+				s_aEntityManagerProviderAgent.DumpEntityKeyValues(aEntity.m_pKeyValues, aMessages);
 				aMessages.Push("-----");
 #endif
 
@@ -412,9 +438,9 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 		}
 
 #ifdef DEBUG
-		aMessages.Send([](const char *pszContent)
+		aMessages.Send([this](const char *pszContent)
 		{
-			s_aEntityManagerLogger.Detailed(pszContent);
+			this->m_aLogger.Detailed(pszContent);
 		});
 #endif
 
@@ -428,12 +454,12 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 void EntityManagerPlugin::OnSpawnGroupShutdownHook(SpawnGroupHandle_t handle)
 {
-	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", handle);
+	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", handle);
 }
 
 void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, const int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener)
 {
-	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::ListenLoadingSpawnGroup(%d, %d, %p, %p)\n", hSpawnGroup, iCount, pEntities, pListener);
+	this->m_aLogger.MessageFormat("EntityManagerPlugin::ListenLoadingSpawnGroup(%d, %d, %p, %p)\n", hSpawnGroup, iCount, pEntities, pListener);
 
 	if(iCount)
 	{
@@ -478,7 +504,7 @@ int EntityManagerPlugin::DestroyMyLoadingSpawnGroupEntities()
 
 void EntityManagerPlugin::OnMyEntityFinish(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues)
 {
-	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::OnMyEntityFinish(%s (%d))\n", pEntity->GetClassname(), pEntity->GetEntityIndex().Get());
+	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnMyEntityFinish(%s (%d))\n", pEntity->GetClassname(), pEntity->GetEntityIndex().Get());
 
 	this->m_vecMyEntities.AddToTail(pEntity);
 }

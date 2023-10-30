@@ -22,10 +22,10 @@
 #include <tier1/utlvector.h>
 #include <entity2/entityidentity.h>
 
-#include "entity_manager/logger.h"
 #include "entity_manager/provider.h"
 #include "entity_manager/provider_agent.h"
 #include "entity_manager/settings.h"
+#include "logger.h"
 
 #define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
 
@@ -34,6 +34,8 @@ class ISpawnGroup;
 class EntityManagerPlugin final : public ISmmPlugin, public IMetamodListener
 {
 public:
+	EntityManagerPlugin();
+
 	bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late);
 	bool Unload(char *error, size_t maxlen);
 	bool Pause(char *error, size_t maxlen);
@@ -82,12 +84,12 @@ private:
 	std::string m_sCurrentMap = "\0";
 
 	EntityManager::Settings m_aSettings;
+	Logger m_aLogger;
 
 	CUtlVector<CEntityInstance *> m_vecMyEntities;
 };
 
 extern EntityManagerPlugin *g_pEntityManager;
-extern EntityManager::Logger *g_pEntityManagerLogger;
 extern EntityManager::Provider *g_pEntityManagerProvider;
 extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
