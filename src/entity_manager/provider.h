@@ -6,6 +6,7 @@
 
 #include <tier0/dbg.h>
 #include <tier0/platform.h>
+#include <tier1/utldelegateimpl.h>
 #include <tier1/utlscratchmemory.h>
 
 #include "provider/entitykeyvalues.h"
@@ -95,12 +96,14 @@ namespace EntityManager
 				typedef void (*OnQueueDestroyEntityPtr)(CEntitySystem * const pThis, CEntityIdentity *pEntity);
 				typedef void (*OnExecuteQueuedCreationPtr)(CEntitySystem * const pThis);
 				typedef void (*OnExecuteQueuedDeletionPtr)(CEntitySystem * const pThis, bool bPerformDeallocation);
+				typedef void (*OnListenForEntityInSpawnGroupToFinishPtr)(CGameEntitySystem * const pThis, SpawnGroupHandle_t hSpawnGroup, CEntityInstance *pEntityToListenFor, const CEntityKeyValues *pKeyValues, CEntityInstance *pListener, CUtlDelegate<void (CEntityInstance *, const CEntityKeyValues *)> handler);
 
 				OnCreateEntityPtr CreateEntityFunction() const;
 				OnQueueSpawnEntityPtr QueueSpawnEntityFunction() const;
 				OnQueueDestroyEntityPtr QueueDestroyEntityFunction() const;
 				OnExecuteQueuedCreationPtr ExecuteQueuedCreationFunction() const;
 				OnExecuteQueuedDeletionPtr ExecuteQueuedDeletionFunction() const;
+				OnListenForEntityInSpawnGroupToFinishPtr ListenForEntityInSpawnGroupToFinishFunction() const;
 
 				ptrdiff_t GetCurrentManifestOffset() const;
 				ptrdiff_t GetKeyValuesMemoryPoolOffset() const;
@@ -116,6 +119,7 @@ namespace EntityManager
 				OnQueueDestroyEntityPtr m_pfnQueueDestroyEntity = nullptr;
 				OnExecuteQueuedCreationPtr m_pfnExecuteQueuedCreation = nullptr;
 				OnExecuteQueuedDeletionPtr m_pfnExecuteQueuedDeletion = nullptr;
+				OnListenForEntityInSpawnGroupToFinishPtr m_pfnListenForEntityInSpawnGroupToFinish = nullptr;
 
 			private: // Offsets.
 				ptrdiff_t m_nCurrentManifestOffset = -1;

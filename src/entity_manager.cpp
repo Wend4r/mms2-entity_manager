@@ -157,18 +157,22 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 				pSpawnGroupMgr->WhileBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void {
 					char sSettingsError[256];
 
-					if(this->LoadSettings(h, pMap->GetSpawnGroupName(), (char *)sSettingsError, sizeof(sSettingsError)))
+					if(this->LoadSettings(h, pMap->GetWorldName(), (char *)sSettingsError, sizeof(sSettingsError)))
 					{
 						CUtlVector<const CEntityKeyValues *> vecKeyValues;
 
-						ILoadingSpawnGroup *pLoading = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, &vecKeyValues);
+						ILoadingSpawnGroup *pMyLoading = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, &vecKeyValues);
 
-						pMap->SetSpawnGroupLoading(pLoading); // To respawn in next rounds.
 						// g_pSpawnGroupMgr->SpawnGroupInit(h, ((EntityManager::CEntitySystemProvider *)g_pGameEntitySystem)->GetCurrentManifest(), NULL, NULL /* Require CNetworkClientSpawnGroup_WaitForAssetLoadPrerequisit (from engine2, *(uintptr_t *)this + 11 is ISpawnGroupPrerequisiteRegistry) now (@Wend4r: needs to restore lifecycle of CSequentialPrerequisite progenitor and CNetworkClientSpawnGroup slaves )*/);
 						// g_pSpawnGroupMgr->SpawnGroupSpawnEntities(h);
-						// ((EntityManager::CGameResourceServiceProvider *)g_pGameResourceServiceServer)->PrecacheEntitiesAndConfirmResourcesAreLoaded(h, pLoading->EntityCount(), pLoading->GetEntities(), &pMap->GetWorldOffset()); // Precache entities now.
-						// pLoading->SpawnEntities(); // Spawn created now.
-						// pLoading->Release(); // Free CLoadingSpawnGroup.
+						// ((EntityManager::CGameResourceServiceProvider *)g_pGameResourceServiceServer)->PrecacheEntitiesAndConfirmResourcesAreLoaded(h, pMyLoading->EntityCount(), pMyLoading->GetEntities(), &pMap->GetWorldOffset()); // Precache entities now.
+						// pMap->LoadEntities();
+						// pMyLoading->SpawnEntities(); // Spawn created now.
+						// pMyLoading->Release(); // Free CLoadingSpawnGroup.
+
+						this->ListenLoadingSpawnGroup(h, pMyLoading->EntityCount(), pMyLoading->GetEntities());
+
+						pMap->SetLoadingSpawnGroup(pMyLoading); // To respawn in next rounds.
 					}
 					else
 					{
@@ -188,43 +192,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 {
-	auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
-
-	CUtlVector<const CEntityKeyValues *> vecSpawnQueue;
-
-	CUtlVector<CEntityIdentity *> aIdenties;
-
-	pSpawnGroupMgr->WhileBySpawnGroups([this, &vecSpawnQueue, &aIdenties](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void {
-		s_aEntityManagerProviderAgent.AddSpawnQueueToTail(&vecSpawnQueue);
-
-		FOR_EACH_VEC(vecSpawnQueue, i)
-		{
-			auto pMapProvider = (EntityManager::CLoadingMapGroupProvider *)pMap->GetSpawnGroupLoading();
-
-			if(pMapProvider)
-			{
-				pMapProvider->FindAndRemoveSpawnInfoByKeyValues(vecSpawnQueue[i], aIdenties);
-				
-				const int iCount = aIdenties.Count();
-
-				if(iCount)
-				{
-					int j = 0;
-
-					do
-					{
-						s_aEntityManagerProviderAgent.PushDestroyQueue(aIdenties[j]);
-					}
-					while(j < iCount);
-
-					s_aEntityManagerProviderAgent.DestroyQueued();
-				}
-
-				aIdenties.Purge();
-			}
-		}
-	});
-
+	this->DestroyMyLoadingSpawnGroupEntities();
 	this->m_aSettings.Destroy();
 
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManagerPlugin::OnGameFrameHook, true);
@@ -370,13 +338,13 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 
 void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
 {
-	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %s)\n", handle, pSpawnGroup->GetName());
+	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %s)\n", handle, pSpawnGroup->GetWorldName());
 
 	// Load settings by spawn group name
 	{
 		char sSettingsError[256];
 
-		if(!this->LoadSettings(handle, pSpawnGroup->GetName(), (char *)sSettingsError, sizeof(sSettingsError)))
+		if(!this->LoadSettings(handle, pSpawnGroup->GetWorldName(), (char *)sSettingsError, sizeof(sSettingsError)))
 		{
 			s_aEntityManagerLogger.WarningFormat({255, 0, 0, 255}, "Failed to load a settings: %s\n", sSettingsError);
 		}
@@ -385,24 +353,99 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 
 ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
 {
-	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
+	static bool s_bIsRecall = false;
 
-	s_aEntityManagerProviderAgent.AddSpawnQueueToTail(const_cast<CUtlVector<const CEntityKeyValues *> *>(pKeyValues), handle);
-	s_aEntityManagerProviderAgent.ReleaseSpawnQueued(handle);
+	if(!s_bIsRecall)
+	{
+		s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
 
-	auto funcCreateLoadingSpawnGroup = &CSpawnGroupMgrGameSystem::CreateLoadingSpawnGroup;
+		auto funcCreateLoadingSpawnGroup = &CSpawnGroupMgrGameSystem::CreateLoadingSpawnGroup;
 
-	SET_META_RESULT(MRES_HANDLED);
-	SH_GLOB_SHPTR->DoRecall();
+		SET_META_RESULT(MRES_HANDLED);
+		SH_GLOB_SHPTR->DoRecall();
 
-	ILoadingSpawnGroup *pLoadingResult = (SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup)->*(funcCreateLoadingSpawnGroup))(handle, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, pKeyValues);
+		ILoadingSpawnGroup *pBasicLoading = (SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup)->*(funcCreateLoadingSpawnGroup))(handle, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, pKeyValues);
 
-	RETURN_META_VALUE(MRES_SUPERCEDE, pLoadingResult);
+		{
+			CUtlVector<const CEntityKeyValues *> aMyKeyValues;
+
+			s_aEntityManagerProviderAgent.AddSpawnQueueToTail(&aMyKeyValues, handle);
+
+			if(aMyKeyValues.Count())
+			{
+				s_aEntityManagerProviderAgent.ReleaseSpawnQueued(handle);
+
+				// SET_META_RESULT(MRES_HANDLED);
+				// SH_GLOB_SHPTR->DoRecall();
+
+				s_bIsRecall = true;
+
+				ILoadingSpawnGroup *pMyLoading = (SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup)->*(funcCreateLoadingSpawnGroup))(handle, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, &aMyKeyValues);
+
+				s_bIsRecall = false;
+
+				this->ListenLoadingSpawnGroup(handle, pMyLoading->EntityCount(), pMyLoading->GetEntities());
+
+				((EntityManager::CLoadingSpawnGroupProvider *)pBasicLoading)->AddSpawnInfos(pMyLoading->EntityCount(), pMyLoading->GetEntities());
+
+				pMyLoading->Release();
+			}
+		}
+
+		RETURN_META_VALUE(MRES_SUPERCEDE, pBasicLoading);
+	}
+
+	RETURN_META_VALUE(MRES_IGNORED, nullptr);
 }
 
 void EntityManagerPlugin::OnSpawnGroupShutdownHook(SpawnGroupHandle_t handle)
 {
 	s_aEntityManagerLogger.MessageFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", handle);
+}
+
+void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener)
+{
+	int i = 0;
+
+	do
+	{
+		const auto &aEntity = pEntities[i];
+
+		((EntityManager::CEntitySystemProvider *)g_pGameEntitySystem)->ListenForEntityInSpawnGroupToFinish(hSpawnGroup, aEntity.m_pEntity->m_pInstance, aEntity.m_pKeyValues, 0, UtlMakeDelegate(this, &EntityManagerPlugin::OnMyEntityFinish));
+		i++;
+
+	}
+	while(i < iCount);
+}
+
+int EntityManagerPlugin::DestroyMyLoadingSpawnGroupEntities()
+{
+	auto &aIdenties = this->m_vecMyEntities;
+
+	const int iCount = aIdenties.Count();
+
+	if(iCount)
+	{
+		int j = 0;
+
+		do
+		{
+			s_aEntityManagerProviderAgent.PushDestroyQueue(aIdenties[j]);
+			j++;
+		}
+		while(j < iCount);
+
+		s_aEntityManagerProviderAgent.DestroyQueued();
+	}
+
+	aIdenties.Purge();
+
+	return iCount;
+}
+
+void EntityManagerPlugin::OnMyEntityFinish(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues)
+{
+	this->m_vecMyEntities.AddToTail(pEntity);
 }
 
 bool EntityManagerPlugin::Pause(char *error, size_t maxlen)

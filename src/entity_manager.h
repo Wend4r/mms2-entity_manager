@@ -19,6 +19,9 @@
 #include <metamod_oslink.h>
 #include <sh_vector.h>
 
+#include <tier1/utlvector.h>
+#include <entity2/entityidentity.h>
+
 #include "entity_manager/logger.h"
 #include "entity_manager/provider.h"
 #include "entity_manager/provider_agent.h"
@@ -60,6 +63,11 @@ public: // SourceHooks.
 	void OnSpawnGroupShutdownHook(SpawnGroupHandle_t handle);
 
 public:
+	void ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener = NULL);
+	int DestroyMyLoadingSpawnGroupEntities();
+	void OnMyEntityFinish(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues);
+
+public:
 	const char *GetAuthor();
 	const char *GetName();
 	const char *GetDescription();
@@ -74,6 +82,8 @@ private:
 	std::string m_sCurrentMap = "\0";
 
 	EntityManager::Settings m_aSettings;
+
+	CUtlVector<CEntityInstance *> m_vecMyEntities;
 };
 
 extern EntityManagerPlugin *g_pEntityManager;

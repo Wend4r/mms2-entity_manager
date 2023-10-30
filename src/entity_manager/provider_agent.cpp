@@ -215,6 +215,21 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 	return iResult;
 }
 
+bool EntityManager::ProviderAgent::HasInSpawnQueue(CEntityKeyValues *pKeyValues)
+{
+	FOR_EACH_VEC(this->m_vecEntitySpawnQueue, i)
+	{
+		const auto &aSpawn = this->m_vecEntitySpawnQueue[i];
+
+		if(aSpawn.GetKeyValues() == pKeyValues)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void EntityManager::ProviderAgent::ReleaseSpawnQueued()
 {
 	this->m_vecEntitySpawnQueue.Purge();

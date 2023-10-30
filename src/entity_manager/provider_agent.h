@@ -34,6 +34,7 @@ namespace EntityManager
 		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
 		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget);
 		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup);
+		bool HasInSpawnQueue(CEntityKeyValues *pKeyValues);
 		void ReleaseSpawnQueued();
 		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup);
 		int SpawnQueued();

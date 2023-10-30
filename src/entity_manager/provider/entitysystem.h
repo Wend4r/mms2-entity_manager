@@ -14,7 +14,7 @@ enum EntityNetworkingMode_t
 
 namespace EntityManager
 {
-	class CEntitySystemProvider : public CEntitySystem
+	class CEntitySystemProvider : public CGameEntitySystem
 	{
 	public:
 		IEntityResourceManifest *GetCurrentManifest();
@@ -27,6 +27,9 @@ namespace EntityManager
 
 		void QueueDestroyEntity(CEntityIdentity *pEntity);
 		void ExecuteQueuedDeletion(bool bPerformDeallocation = false);
+
+	public: // CGameEntitySystem.
+		void ListenForEntityInSpawnGroupToFinish(SpawnGroupHandle_t hSpawnGroup, CEntityInstance *pEntityToListenFor, const CEntityKeyValues *pKeyValues, CEntityInstance *pListener, CUtlDelegate<void (CEntityInstance *, const CEntityKeyValues *)> handler);
 	};
 };
 

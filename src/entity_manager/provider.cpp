@@ -276,6 +276,10 @@ EntityManager::Provider::GameDataStorage::EntitySystem::EntitySystem()
 		{
 			this->m_pfnExecuteQueuedDeletion = pFucntion.RCast<decltype(this->m_pfnExecuteQueuedDeletion)>();
 		});
+		aCallbacks.Insert("CGameEntitySystem::ListenForEntityInSpawnGroupToFinish", [this](const std::string &, const CMemory &pFucntion)
+		{
+			this->m_pfnListenForEntityInSpawnGroupToFinish = pFucntion.RCast<decltype(this->m_pfnListenForEntityInSpawnGroupToFinish)>();
+		});
 
 		this->m_aGameConfig.GetAddresses().AddListener(&aCallbacks);
 	}
@@ -336,6 +340,11 @@ EntityManager::Provider::GameDataStorage::EntitySystem::OnExecuteQueuedCreationP
 EntityManager::Provider::GameDataStorage::EntitySystem::OnExecuteQueuedDeletionPtr EntityManager::Provider::GameDataStorage::EntitySystem::ExecuteQueuedDeletionFunction() const
 {
 	return this->m_pfnExecuteQueuedDeletion;
+}
+
+EntityManager::Provider::GameDataStorage::EntitySystem::OnListenForEntityInSpawnGroupToFinishPtr EntityManager::Provider::GameDataStorage::EntitySystem::ListenForEntityInSpawnGroupToFinishFunction() const
+{
+	return this->m_pfnListenForEntityInSpawnGroupToFinish;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetCurrentManifestOffset() const

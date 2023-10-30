@@ -38,3 +38,8 @@ void EntityManager::CEntitySystemProvider::ExecuteQueuedDeletion(bool bPerformDe
 {
 	g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().ExecuteQueuedDeletionFunction()(this, bPerformDeallocation);
 }
+
+void EntityManager::CEntitySystemProvider::ListenForEntityInSpawnGroupToFinish(SpawnGroupHandle_t hSpawnGroup, CEntityInstance *pEntityToListenFor, const CEntityKeyValues *pKeyValues, CEntityInstance *pListener, CUtlDelegate<void (CEntityInstance *, const CEntityKeyValues *)> handler)
+{
+	g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().ListenForEntityInSpawnGroupToFinishFunction()(this, hSpawnGroup, pEntityToListenFor, pKeyValues, pListener, handler);
+}
