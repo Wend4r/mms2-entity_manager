@@ -162,7 +162,8 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 				auto aWarnings = this->m_aLogger.CreateWarningsScope();
 
-				pSpawnGroupMgr->WhileBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void {
+				pSpawnGroupMgr->LoopBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void
+				{
 					char sSettingsError[256];
 
 					if(this->LoadSettings(h, pMap->GetWorldName(), (char *)sSettingsError, sizeof(sSettingsError)))

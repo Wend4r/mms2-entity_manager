@@ -14,8 +14,8 @@ namespace EntityManager
 	public: // Custom methods.
 		typedef void (EachSpawnGroupFunc)(SpawnGroupHandle_t h, CMapSpawnGroup *pSpawnGroup); // Return true to continue, otherwise break.
 		typedef EachSpawnGroupFunc *EachSpawnGroupFuncPtr;
-		void WhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc); // In order.
-		void FastWhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc);
+		void LoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc); // In order.
+		void FastLoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc);
 
 	private:
 		CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups();

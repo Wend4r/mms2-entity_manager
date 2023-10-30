@@ -14,7 +14,7 @@ CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupH
 	return iFoundIndex == pMgrSpawnGroupMap->InvalidIndex() ? nullptr : pMgrSpawnGroupMap->Element(iFoundIndex);
 }
 
-void EntityManager::CSpawnGroupMgrGameSystemProvider::WhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
+void EntityManager::CSpawnGroupMgrGameSystemProvider::LoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
 {
 	auto pMgrSpawnGroupMap = this->GetSpawnGroups();
 
@@ -28,7 +28,7 @@ void EntityManager::CSpawnGroupMgrGameSystemProvider::WhileBySpawnGroups(std::fu
 	}
 }
 
-void EntityManager::CSpawnGroupMgrGameSystemProvider::FastWhileBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
+void EntityManager::CSpawnGroupMgrGameSystemProvider::FastLoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
 {
 	auto pMgrSpawnGroupMap = this->GetSpawnGroups();
 
