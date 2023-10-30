@@ -111,8 +111,12 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 
 	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesMemoryPool(), 3);
 
+	Color rgbaPrev = LOGGER_COLOR_MESSAGE;
+
 	if(pDetails)
 	{
+		rgbaPrev = pDetails->GetColor();
+		pDetails->SetColor(pOldKeyValues->GetColor("color", rgbaPrev));
 		pDetails->PushFormat("- Queue entity #%d -", iNewIndex);
 	}
 
@@ -137,6 +141,11 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 		{
 			pWarnings->PushFormat("Failed to get \"%s\" attribute", pszKey);
 		}
+	}
+
+	if(pDetails)
+	{
+		pDetails->SetColor(rgbaPrev);
 	}
 
 	this->PushSpawnQueue(pNewKeyValues, hSpawnGroup);

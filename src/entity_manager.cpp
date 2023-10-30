@@ -188,8 +188,9 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 					}
 				});
 
-				aWarnings.Send([this](const char *pszContent) {
-					this->m_aLogger.Warning({255, 0, 0, 255}, pszContent);
+				aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
+				{
+					this->m_aLogger.Warning(rgba, pszContent);
 				});
 			}
 		}
@@ -266,21 +267,21 @@ bool EntityManagerPlugin::LoadProvider(char *psError, size_t nMaxLength)
 
 bool EntityManagerPlugin::LoadSettings(SpawnGroupHandle_t hSpawnGroup, const char *pszSpawnGroupName, char *psError, size_t nMaxLength)
 {
-	Logger::Scope aDetails = {};
-	Logger::Scope aWarnings = {};
+	Logger::Scope aDetails = this->m_aLogger.CreateDetailsScope();
+	Logger::Scope aWarnings = this->m_aLogger.CreateWarningsScope();
 
 	bool bResult = this->m_aSettings.Load(hSpawnGroup, this->m_sBasePath.c_str(), pszSpawnGroupName, psError, nMaxLength, &aDetails, &aWarnings);
 
 	if(bResult)
 	{
-		aDetails.Send([this](const char *pszContent)
+		aDetails.SendColor([this](const Color &rgba, const char *pszContent)
 		{
-			this->m_aLogger.Detailed(pszContent);
+			this->m_aLogger.Detailed(rgba, pszContent);
 		});
 
-		aWarnings.Send([this](const char *pszContent)
+		aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
 		{
-			this->m_aLogger.Warning(pszContent);
+			this->m_aLogger.Warning(rgba, pszContent);
 		});
 	}
 
@@ -358,7 +359,7 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 	}
 	else
 	{
-		this->m_aLogger.Warning({255, 255, 0, 255}, "Failed to get a net server\n");
+		this->m_aLogger.Warning(LOGGER_COLOR_WARNING, "Failed to get a net server\n");
 	}
 }
 
@@ -372,7 +373,7 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 
 		if(!this->LoadSettings(handle, pSpawnGroup->GetWorldName(), (char *)sSettingsError, sizeof(sSettingsError)))
 		{
-			this->m_aLogger.WarningFormat({255, 0, 0, 255}, "Failed to load a settings: %s\n", sSettingsError);
+			this->m_aLogger.WarningFormat(LOGGER_COLOR_WARNING, "Failed to load a settings: %s\n", sSettingsError);
 		}
 	}
 }
@@ -438,9 +439,9 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 		}
 
 #ifdef DEBUG
-		aMessages.Send([this](const char *pszContent)
+		aMessages.SendColor([this](const Color &rgba, const char *pszContent)
 		{
-			this->m_aLogger.Detailed(pszContent);
+			this->m_aLogger.Detailed(rgba, pszContent);
 		});
 #endif
 

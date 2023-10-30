@@ -4,21 +4,6 @@
 
 #include <stdarg.h>
 
-#define FORMAT_MESSAGE_STARTWITH "[%s]: "
-#define FORMAT_MESSAGE FORMAT_MESSAGE_STARTWITH "%s\n"
-
-#define FORMAT_WARNING_STARTWITH "[%s] WARNING: "
-#define FORMAT_WARNING FORMAT_WARNING_STARTWITH "%s\n"
-
-#define FORMAT_ERROR_STARTWITH "[%s] ERROR "
-#define FORMAT_ERROR FORMAT_ERROR_STARTWITH "%s\n"
-
-#define FORMAT_DEV_MESSAGE_STARTWITH "[%s] DEV L%d: "
-#define FORMAT_DEV_MESSAGE FORMAT_DEV_MESSAGE_STARTWITH "%s\n"
-
-#define FORMAT_DEV_WARNING_STARTWITH "[%s] DEV WARNING L%d: "
-#define FORMAT_DEV_WARNING FORMAT_DEV_WARNING_STARTWITH "%s\n"
-
 Logger::Logger(const char *pszName, RegisterTagsFunc pfnRegisterTagsFunc, int iFlags, LoggingVerbosity_t eVerbosity, const Color &aDefault)
 {
 	this->m_nChannelID = LoggingSystem_RegisterLoggingChannel(pszName, pfnRegisterTagsFunc, iFlags, eVerbosity, aDefault);
@@ -193,16 +178,25 @@ void Logger::DoTests()
 	this->ErrorFormat("LS_ERROR = %d\n", LS_ERROR);
 }
 
-Logger::Scope::Scope(const char *pszStartWith)
+Logger::Scope::Scope(const Color &rgba, const char *pszStartWith)
 {
+	this->m_aColor = rgba;
+
 	this->m_aStartWith = pszStartWith;
 	this->m_aEnd = "\n";
 }
 
-Logger::Scope::Scope(const char *pszStartWith, const char *pszEnd)
+Logger::Scope::Scope(const Color &rgba, const char *pszStartWith, const char *pszEnd)
 {
+	this->m_aColor = rgba;
+
 	this->m_aStartWith = pszStartWith;
 	this->m_aEnd = pszEnd;
+}
+
+const Color &Logger::Scope::GetColor() const
+{
+	return this->m_aColor;
 }
 
 size_t Logger::Scope::Count()
@@ -210,9 +204,14 @@ size_t Logger::Scope::Count()
 	return this->m_vec.size();
 }
 
+void Logger::Scope::SetColor(const Color &rgba)
+{
+	this->m_aColor = rgba;
+}
+
 size_t Logger::Scope::Push(const char *pszContent)
 {
-	Message aMsg;
+	Message aMsg(this->m_aColor);
 
 	size_t nStoredLength = aMsg.SetWithCopy(pszContent);
 
@@ -229,7 +228,7 @@ size_t Logger::Scope::PushFormat(const char *pszFormat, ...)
 	V_vsnprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), pszFormat, aParams);
 	va_end(aParams);
 
-	Message aMsg;
+	Message aMsg(this->m_aColor);
 
 	size_t nStoredLength = aMsg.SetWithCopy((const char *)this->m_sFormatBuffer);
 
@@ -254,6 +253,49 @@ size_t Logger::Scope::Send(SendFunc funcOn)
 	return nSize;
 }
 
+size_t Logger::Scope::SendColor(SendColorFunc funcOn)
+{
+	std::string sResultContent;
+
+	size_t nSize = this->m_vec.size();
+
+	Color rgbaSave = this->m_aColor;
+
+	for(size_t n = 0; n < nSize; n++)
+	{
+		const auto &aMsg = this->m_vec[n];
+
+		if(aMsg.GetColor() == rgbaSave)
+		{
+			sResultContent += this->m_aStartWith + aMsg.Get() + this->m_aEnd;
+		}
+		else
+		{
+			funcOn(rgbaSave, sResultContent.c_str());
+
+			sResultContent = this->m_aStartWith + aMsg.Get() + this->m_aEnd;
+			rgbaSave = aMsg.GetColor();
+		}
+	}
+
+	if(sResultContent.size())
+	{
+		funcOn(rgbaSave, sResultContent.c_str());
+	}
+
+	return nSize;
+}
+
+Logger::Scope::Message::Message(const Color &rgbaInit)
+ :  m_aColor(rgbaInit)
+{
+}
+
+const Color &Logger::Scope::Message::GetColor() const
+{
+	return this->m_aColor;
+}
+
 const std::string &Logger::Scope::Message::Get() const
 {
 	return this->m_sContent;
@@ -268,25 +310,45 @@ size_t Logger::Scope::Message::SetWithCopy(const char *pszContent)
 
 Logger::Scope Logger::CreateDetailsScope()
 {
-	return {};
+#ifdef DEBUG
+	return {LOGGER_COLOR_DETAILED, LOGGER_FORMAT_DETAILED_STARTWITH};
+#else
+	return {LOGGER_COLOR_DETAILED};
+#endif
 }
 
 Logger::Scope Logger::CreateMessagesScope()
 {
-	return {};
+#ifdef DEBUG
+	return {LOGGER_COLOR_MESSAGE, LOGGER_FORMAT_MESSAGE_STARTWITH};
+#else
+	return {LOGGER_COLOR_MESSAGE};
+#endif
 }
 
 Logger::Scope Logger::CreateWarningsScope()
 {
-	return {};
+#ifdef DEBUG
+	return {LOGGER_COLOR_WARNING, LOGGER_FORMAT_WARNING_STARTWITH};
+#else
+	return {LOGGER_COLOR_WARNING};
+#endif
 }
 
 Logger::Scope Logger::CreateAssertScope()
 {
-	return {};
+#ifdef DEBUG
+	return {LOGGER_COLOR_ASSERT, LOGGER_FORMAT_ASSERT_STARTWITH};
+#else
+	return {LOGGER_COLOR_ASSERT};
+#endif
 }
 
 Logger::Scope Logger::CreateErrorsScope()
 {
-	return {};
+#ifdef DEBUG
+	return {LOGGER_COLOR_ERROR, LOGGER_FORMAT_ERROR_STARTWITH};
+#else
+	return {LOGGER_COLOR_ERROR};
+#endif
 }
