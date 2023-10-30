@@ -3,6 +3,7 @@
 
 #include "eiface.h"
 #include "iserver.h"
+#include "igamesystem.h"
 #include "entity2/entitysystem.h"
 #include "entity2/entityidentity.h"
 #include "tier1/utlstring.h"
@@ -36,6 +37,19 @@ struct EventServerPostEntityThink_t
 };
 
 class IWorldReference;
+
+enum SpawnGroupState_t
+{
+	SPAWN_GROUP_ALLOCATED = 0,
+	SPAWN_GROUP_WORLD_LOADED = 1,
+	SPAWN_GROUP_ENTITIES_ALLOCATED = 2,
+	SPAWN_GROUP_GAMESYSTEMS_PRECACHE_START = 3,
+	SPAWN_GROUP_GAMESYSTEMS_PRECACHE_END = 4,
+	SPAWN_GROUP_ENTITY_PRECACHE_START = 5,
+	SPAWN_GROUP_ENTITY_PRECACHE_END = 6,
+	SPAWN_GROUP_READY_TO_SPAWN_ENTITIES = 7,
+	SPAWN_GROUP_ENTITIES_SPAWNED = 8
+};
 
 class ISpawnGroup
 {
@@ -83,11 +97,11 @@ public:
 	virtual void OnGameResourceManifestLoaded(HGameResourceManifest hManifest, int nResourceCount, void **pResourceHandles /* of ResourceHandle_t */) = 0;
 	virtual void Init(IResourceManifestRegistry *pResourceManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) = 0;
 	virtual void Shutdown() = 0;
-	virtual bool GetLoadStatus() const = 0;
+	virtual bool GetLoadStatus() = 0;
 	virtual void ForceBlockingLoad() = 0;
 	virtual bool ShouldBlockUntilLoaded() const = 0;
 	virtual void ServiceBlockingLoads() = 0;
-	virtual bool GetEntityPrerequisites(HGameResourceManifest hManifest) const = 0;
+	virtual bool GetEntityPrerequisites(HGameResourceManifest hManifest) = 0;
 	virtual bool EntityPrerequisitesSatisfied() = 0;
 
 public: // CNetworkClientSpawnGroup/CNetworkServerSpawnGroup
@@ -226,11 +240,9 @@ public:
 	virtual void FrameBoundary(const EventGameInit_t &msg) = 0;
 	virtual void PreSpawnGroupLoad(const EventPreSpawnGroupLoad_t &msg) = 0;
 	virtual ~IGameSpawnGroupMgr() = 0;
-
-	// IGameSystem is at next one.
 };
 
-class CSpawnGroupMgrGameSystem : public IGameSpawnGroupMgr //, public IGameSystem
+class CSpawnGroupMgrGameSystem : public IGameSpawnGroupMgr, public IGameSystem
 {
 };
 
