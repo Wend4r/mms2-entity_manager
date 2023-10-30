@@ -5,6 +5,7 @@
 #include "logger.h"
 
 #include <tier0/dbg.h>
+#include <tier0/memalloc.h>
 #include <tier0/platform.h>
 #include <tier1/generichash.h>
 #include <tier1/KeyValues.h>
@@ -162,7 +163,7 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 
 	int iQueueLength = vecEntitySpawnQueue.Count();
 
-	CEntityKeyValues **ppKeyValuesArr = (CEntityKeyValues **)malloc(iQueueLength * sizeof(CEntityKeyValues *));
+	CEntityKeyValues **ppKeyValuesArr = (CEntityKeyValues **)MemAlloc_Alloc(iQueueLength * sizeof(CEntityKeyValues *));
 
 	// Fill ppKeyValuesArr from .
 	{
@@ -181,7 +182,7 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 
 	int iResult = vecTarget->AddMultipleToTail(iQueueLength, ppKeyValuesArr);
 
-	free(ppKeyValuesArr);
+	MemAlloc_Free(ppKeyValuesArr);
 
 	return iResult;
 }
@@ -192,7 +193,7 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 
 	const int iQueueLength = vecEntitySpawnQueue.Count();
 
-	CEntityKeyValues **ppKeyValuesArr = (CEntityKeyValues **)malloc(iQueueLength * sizeof(CEntityKeyValues *));
+	CEntityKeyValues **ppKeyValuesArr = (CEntityKeyValues **)MemAlloc_Alloc(iQueueLength * sizeof(CEntityKeyValues *));
 	CEntityKeyValues **ppKeyValuesCur = ppKeyValuesArr;
 
 	for(int i = 0; i < iQueueLength; i++)
@@ -212,7 +213,7 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 
 	int iResult = vecTarget->AddMultipleToTail(((uintptr_t)ppKeyValuesCur - (uintptr_t)ppKeyValuesArr) / sizeof(decltype(ppKeyValuesArr)), ppKeyValuesArr);
 
-	free(ppKeyValuesArr);
+	MemAlloc_Free(ppKeyValuesArr);
 
 	return iResult;
 }

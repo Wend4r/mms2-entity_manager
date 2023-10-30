@@ -1,7 +1,8 @@
 #include "entitykeyvalues.h"
-
-#include <entity2/entitysystem.h>
 #include <entity_manager/provider.h>
+
+#include <tier0/memalloc.h>
+#include <entity2/entitysystem.h>
 
 extern EntityManager::Provider *g_pEntityManagerProvider;
 
@@ -11,7 +12,7 @@ CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(CUtlScratchMem
 {
 	const auto &aGameData = g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues();
 
-	CEntityKeyValues *pNewKeyValues = (CEntityKeyValues *)malloc(aGameData.GetSizeof());
+	CEntityKeyValues *pNewKeyValues = (CEntityKeyValues *)MemAlloc_Alloc(aGameData.GetSizeof());
 
 	if(pNewKeyValues)
 	{
