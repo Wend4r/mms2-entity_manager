@@ -34,7 +34,7 @@ namespace EntityManager
 		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
 		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget);
 		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup);
-		bool HasInSpawnQueue(CEntityKeyValues *pKeyValues);
+		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues);
 		void ReleaseSpawnQueued();
 		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup);
 		int SpawnQueued();
@@ -64,6 +64,7 @@ namespace EntityManager
 		public:
 			SpawnData(CEntityKeyValues *pKeyValues);
 			SpawnData(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup);
+			~SpawnData();
 
 			CEntityKeyValues *GetKeyValues() const;
 			CEntityKeyValuesProvider *GetKeyValuesProvider() const;
@@ -71,6 +72,8 @@ namespace EntityManager
 			SpawnGroupHandle_t GetSpawnGroup() const;
 			static SpawnGroupHandle_t GetAnySpawnGroup();
 			bool IsAnySpawnGroup() const;
+
+			void Release();
 
 		private:
 			CEntityKeyValues *m_pKeyValues;
@@ -86,6 +89,7 @@ namespace EntityManager
 		public:
 			DestoryData(CEntityInstance *pInstance);
 			DestoryData(CEntityIdentity *pIdentity);
+			~DestoryData();
 
 			CEntityIdentity *GetIdnetity() const;
 
