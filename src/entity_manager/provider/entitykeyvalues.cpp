@@ -28,7 +28,7 @@ void EntityManager::CEntityKeyValuesProvider::AddRef()
 	g_pGameEntitySystem->AddRefKeyValues(this);
 }
 
-uint16 EntityManager::CEntityKeyValuesProvider::GetRefCount()
+uint16 EntityManager::CEntityKeyValuesProvider::GetRefCount() const
 {
 	return *(uint16 *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().GetRefCountOffset());
 }
@@ -38,12 +38,12 @@ void EntityManager::CEntityKeyValuesProvider::Release()
 	g_pGameEntitySystem->ReleaseKeyValues(this);
 }
 
-CEntityKeyValuesAttribute *EntityManager::CEntityKeyValuesProvider::GetAttribute(const EntityKey &key, char *psValue)
+CEntityKeyValuesAttribute *EntityManager::CEntityKeyValuesProvider::GetAttribute(const EntityKey &key, char *psValue) const
 {
 	return (g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().GetAttributeFunction())(this, key, psValue);
 }
 
-const char *EntityManager::CEntityKeyValuesAttributeProvider::GetValueString(const char *pszDefaultValue)
+const char *EntityManager::CEntityKeyValuesAttributeProvider::GetValueString(const char *pszDefaultValue) const
 {
 	return (g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().AttributeGetValueStringFunction())(this, pszDefaultValue);
 }

@@ -470,6 +470,35 @@ int EntityManager::ProviderAgent::DestroyQueued()
 	return iQueueLength;
 }
 
+void EntityManager::ProviderAgent::DumpEntityKeyValues(Logger::Scope &aOutput, const CEntityKeyValues *pKeyValues)
+{
+	static const char *pszOutputKeys[] = 
+	{
+		"classname",
+		"model",
+		"origin",
+		"angles"
+	};
+
+	static const char *pszAttrFormat[] =
+	{
+		"\"%s\" is not found", 
+		"\"%s\" = \"%s\""
+	};
+
+	const CEntityKeyValuesProvider *pProvider = (const CEntityKeyValuesProvider *)pKeyValues;
+
+	aOutput.PushFormat("ref count is %d", pProvider->GetRefCount());
+
+	for(size_t n = 0; n < sizeof(pszOutputKeys) / sizeof(const char *); n++)
+	{
+		const char *pszCurAttr = pszOutputKeys[n], 
+		           *pszAttrValue = ((CEntityKeyValuesAttributeProvider *)pProvider->GetAttribute(this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszCurAttr))))->GetValueString(NULL);
+
+		aOutput.PushFormat(pszAttrFormat[pszAttrValue != NULL], pszCurAttr, pszAttrValue);
+	}
+}
+
 const EntityKey &EntityManager::ProviderAgent::GetCachedEntityKey(CacheMapOIndexType nElm)
 {
 	return this->m_mapCachedKeys[nElm];

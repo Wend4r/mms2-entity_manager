@@ -9,6 +9,7 @@
 #include <tier1/utlvector.h>
 #include <entity2/entityidentity.h>
 
+#include "logger.h"
 #include "provider/entitykeyvalues.h"
 
 class KeyValues;
@@ -46,6 +47,9 @@ namespace EntityManager
 		int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> *vecTarget);
 		void ReleaseDestroyQueued();
 		int DestroyQueued();
+
+	public:
+		void DumpEntityKeyValues(Logger::Scope &aOutput, const CEntityKeyValues *pKeyValues);
 
 	protected:
 		typedef CUtlMap<CUtlString, EntityKey> CacheMapType;

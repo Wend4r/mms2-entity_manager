@@ -52,8 +52,8 @@ namespace EntityManager
 
 			public:
 				typedef void (*OnEntityKeyValuesPtr)(CEntityKeyValues * const pThis, CUtlScratchMemoryPool *pMemoryPool, char eContainerType);
-				typedef CEntityKeyValuesAttribute *(*OnGetAttributePtr)(CEntityKeyValues * const pThis, const EntityKey &key, char *psValue);
-				typedef const char *(*OnAttributeGetValueStringPtr)(CEntityKeyValuesAttribute * const pThis, const char *pszDefaultValue);
+				typedef CEntityKeyValuesAttribute *(*OnGetAttributePtr)(const CEntityKeyValues * const pThis, const EntityKey &key, char *psValue);
+				typedef const char *(*OnAttributeGetValueStringPtr)(const CEntityKeyValuesAttribute * const pThis, const char *pszDefaultValue);
 				typedef void (*OnSetAttributeValuePtr)(CEntityKeyValues * const pThis, CEntityKeyValuesAttribute *pAttribute, const char *pString);
 
 				OnEntityKeyValuesPtr EntityKeyValuesFunction() const;

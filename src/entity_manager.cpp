@@ -368,18 +368,40 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 	if(iCount)
 	{
+#ifdef DEBUG
+		EntityManager::Logger::Scope aMessages = s_aEntityManagerLogger.CreateDetailsScope();
+#endif
+
 		CUtlVector<EntitySpawnInfo_t> aMyEntities;
 
 		{
+			int i = 0;
+
 			const EntitySpawnInfo_t *pEntities = pLoading->GetEntities();
 
-			int i = 0;
+#ifdef DEBUG
+			static const char *pszMyEntityMessages[] = 
+			{
+				"Map group entity #%d:",
+				"My entity #%d:",
+			};
+
+			aMessages.Push("-----");
+#endif
 
 			do
 			{
 				const auto &aEntity = pEntities[i];
 
-				if(s_aEntityManagerProviderAgent.HasInSpawnQueue(aEntity.m_pKeyValues))
+				bool bInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(aEntity.m_pKeyValues);
+
+#ifdef DEBUG
+				aMessages.PushFormat(pszMyEntityMessages[bInSpawnQueue], aEntity.m_pEntity->GetEntityIndex().Get());
+				s_aEntityManagerProviderAgent.DumpEntityKeyValues(aMessages, aEntity.m_pKeyValues);
+				aMessages.Push("-----");
+#endif
+
+				if(bInSpawnQueue)
 				{
 					aMyEntities.AddToTail(aEntity);
 				}
@@ -388,6 +410,13 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 			}
 			while(i < iCount);
 		}
+
+#ifdef DEBUG
+		aMessages.Send([](const char *pszContent)
+		{
+			s_aEntityManagerLogger.Detailed(pszContent);
+		});
+#endif
 
 		this->ListenLoadingSpawnGroup(handle, aMyEntities.Count(), aMyEntities.Base());
 	}

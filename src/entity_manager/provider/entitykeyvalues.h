@@ -33,18 +33,18 @@ namespace EntityManager
 
 	public: // Reference.
 		void AddRef();
-		uint16 GetRefCount();
+		uint16 GetRefCount() const;
 		void Release();
 
 	public: // Attributes.
-		CEntityKeyValuesAttribute *GetAttribute(const EntityKey &key, char *psValue = nullptr);
+		CEntityKeyValuesAttribute *GetAttribute(const EntityKey &key, char *psValue = nullptr) const;
 		void SetAttributeValue(CEntityKeyValuesAttribute *pAttr, const char *pString);
 	};
 
 	class CEntityKeyValuesAttributeProvider : public CEntityKeyValuesAttribute
 	{
 	public:
-		const char *GetValueString(const char *pszDefaultValue = "");
+		const char *GetValueString(const char *pszDefaultValue = "") const;
 	};
 };
 
