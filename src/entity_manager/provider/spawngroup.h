@@ -21,10 +21,10 @@ namespace EntityManager
 		CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups();
 	};
 
-	class CLoadingMapGroupProvider : public CLoadingSpawnGroup
+	class CLoadingSpawnGroupProvider : public CLoadingSpawnGroup
 	{
 	public:
-		int AddSpawnInfos(const EntitySpawnInfo_t *pEntities, int iCount);
+		int AddSpawnInfos(int iCount, const EntitySpawnInfo_t *pEntities);
 		int FindAndRemoveSpawnInfoByKeyValues(const CEntityKeyValues *pElement, CUtlVector<CEntityIdentity *> &vecRemovedIdentities);
 
 	private:
