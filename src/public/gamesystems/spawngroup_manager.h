@@ -10,16 +10,10 @@
 #include "tier1/utlscratchmemory.h"
 #include "tier1/utlvector.h"
 
-class matrix3x4a_t; // "mathlib/mathlib.h"
-
+class matrix3x4a_t;
 class CEntityKeyValues;
 class ISpawnGroupPrerequisiteRegistry;
-
-struct SaveRestoreDataHandle_t__
-{
-	int unused;
-};
-typedef SaveRestoreDataHandle_t__ *SaveRestoreDataHandle_t;
+class IWorldReference;
 
 struct EventGameInit_t;
 
@@ -36,7 +30,24 @@ struct EventServerPostEntityThink_t
 	bool m_bLastTick;
 };
 
-class IWorldReference;
+enum ResourceManifestLoadBehavior_t
+{
+	RESOURCE_MANIFEST_LOAD_DEFAULT = -1,
+	RESOURCE_MANIFEST_LOAD_STREAMING_DATA = 0,
+	RESOURCE_MANIFEST_INITIALLY_USE_FALLBACKS,
+};
+
+enum ResourceManifestLoadPriority_t
+{
+	RESOURCE_MANIFEST_LOAD_PRIORITY_DEFAULT = -1,
+	RESOURCE_MANIFEST_LOAD_PRIORITY_LOW = 0,
+	RESOURCE_MANIFEST_LOAD_PRIORITY_MEDIUM,
+	RESOURCE_MANIFEST_LOAD_PRIORITY_HIGH,
+	RESOURCE_MANIFEST_LOAD_PRIORITY_IMMEDIATE,
+	RESOURCE_MANIFEST_LOAD_PRIORITY_COUNT,
+};
+
+typedef int *SaveRestoreDataHandle_t;
 
 enum SpawnGroupState_t
 {
