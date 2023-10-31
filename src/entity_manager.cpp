@@ -497,9 +497,8 @@ int EntityManagerPlugin::DestroyMyLoadingSpawnGroupEntities()
 		while(j < iCount);
 
 		s_aEntityManagerProviderAgent.DestroyQueued();
+		aIdenties.Purge();
 	}
-
-	aIdenties.Purge();
 
 	return iCount;
 }

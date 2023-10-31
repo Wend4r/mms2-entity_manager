@@ -372,20 +372,23 @@ int EntityManager::ProviderAgent::DestroyQueued()
 {
 	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
 
-	const auto &vecEntityDestroyQueue = this->m_vecEntityDestroyQueue;
+	auto &vecEntityDestroyQueue = this->m_vecEntityDestroyQueue;
 
 	const int iQueueLength = vecEntityDestroyQueue.Count();
 
-	for(int i = 0; i < iQueueLength; i++)
-	{
-		const auto &aDestroy = vecEntityDestroyQueue[i];
-
-		pEntitySystem->QueueDestroyEntity(aDestroy.GetIdnetity());
-	}
-
 	if(iQueueLength)
 	{
+		int i = 0;
+
+		do
+		{
+			pEntitySystem->QueueDestroyEntity(vecEntityDestroyQueue[i].GetIdnetity());
+			i++;
+		}
+		while(i < iQueueLength);
+
 		pEntitySystem->ExecuteQueuedDeletion();
+		vecEntityDestroyQueue.Purge();
 	}
 
 	return iQueueLength;
