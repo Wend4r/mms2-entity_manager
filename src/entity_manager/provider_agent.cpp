@@ -413,10 +413,20 @@ void EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 
 	for(size_t n = 0; n < sizeof(pszOutputKeys) / sizeof(const char *); n++)
 	{
-		const char *pszCurAttr = pszOutputKeys[n], 
-		           *pszAttrValue = ((CEntityKeyValuesAttributeProvider *)pProvider->GetAttribute(this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszCurAttr))))->GetValueString(NULL);
+		const char *pszCurAttr = pszOutputKeys[n];
 
-		aOutput.PushFormat(pszAttrFormat[pszAttrValue != NULL], pszCurAttr, pszAttrValue);
+		CEntityKeyValuesAttributeProvider *pAttrProv = (CEntityKeyValuesAttributeProvider *)pProvider->GetAttribute(this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszCurAttr)));
+
+		if(pAttrProv)
+		{
+			const char *pszAttrValue = pAttrProv->GetValueString(NULL);
+
+			aOutput.PushFormat(pszAttrFormat[pszAttrValue != NULL], pszCurAttr, pszAttrValue);
+		}
+		else
+		{
+			aOutput.PushFormat("Failed to get \"%s\" key attribute", pszCurAttr);
+		}
 	}
 }
 
