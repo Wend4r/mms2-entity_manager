@@ -12,6 +12,7 @@
 
 class matrix3x4a_t;
 class CEntityKeyValues;
+class CGameResourceManifest;
 class ISpawnGroupPrerequisiteRegistry;
 class IWorldReference;
 
@@ -94,7 +95,7 @@ public:
 public:
 	virtual void UnkSetManualFlag2() = 0;
 	virtual void UnkIsManualFlag2() = 0;
-	virtual void UnkClientOrServerOnGameResourceManifestLoaded(HGameResourceManifest hManifest, int nResourceCount, void **pResourceHandles /* of ResourceHandle_t */) = 0;
+	virtual void UnkClientOrServerOnGameResourceManifestLoaded(CGameResourceManifest *pManifest, int nResourceCount, void **pResourceHandles /* of ResourceHandle_t */) = 0;
 	virtual void Unk(SpawnGroupHandle_t h) = 0;
 	virtual void UnkIsManualFlag3() = 0;
 	virtual void UnkIsManualFlag4() = 0;
@@ -105,14 +106,14 @@ public:
 
 	virtual void ComputeWorldOrigin(matrix3x4_t *retstrp) = 0;
 	virtual void Release() = 0;
-	virtual void OnGameResourceManifestLoaded(HGameResourceManifest hManifest, int nResourceCount, void **pResourceHandles /* of ResourceHandle_t */) = 0;
+	virtual void OnGameResourceManifestLoaded(CGameResourceManifest *pManifest, int nResourceCount, void **pResourceHandles /* of ResourceHandle_t */) = 0;
 	virtual void Init(IResourceManifestRegistry *pResourceManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) = 0;
 	virtual void Shutdown() = 0;
 	virtual bool GetLoadStatus() = 0;
 	virtual void ForceBlockingLoad() = 0;
 	virtual bool ShouldBlockUntilLoaded() const = 0;
 	virtual void ServiceBlockingLoads() = 0;
-	virtual bool GetEntityPrerequisites(HGameResourceManifest hManifest) = 0;
+	virtual bool GetEntityPrerequisites(CGameResourceManifest *pManifest) = 0;
 	virtual bool EntityPrerequisitesSatisfied() = 0;
 
 public: // CNetworkClientSpawnGroup/CNetworkServerSpawnGroup
