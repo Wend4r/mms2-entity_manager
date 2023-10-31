@@ -2,7 +2,7 @@
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_SPAWNGROUP_PROVIDER_H_
 
 #include <functional>
-#include <game_systems/spawngroup_manager.h>
+#include <gamesystems/spawngroup_manager.h>
 
 namespace EntityManager
 {

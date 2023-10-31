@@ -18,7 +18,7 @@
 #include <eiface.h>
 #include <iserver.h>
 #include <entity2/entitysystem.h>
-#include <game_systems/spawngroup_manager.h>
+#include <gamesystems/spawngroup_manager.h>
 #include <tier0/dbg.h>
 #include <tier1/convar.h>
 
