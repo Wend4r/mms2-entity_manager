@@ -50,7 +50,7 @@ bool EntityManager::Settings::Load(SpawnGroupHandle_t hSpawnGroup, const char *p
 
 void EntityManager::Settings::Clear()
 {
-	this->m_pWorld->Clear();
+	// Todo.
 }
 
 void EntityManager::Settings::Destroy()
@@ -86,6 +86,8 @@ bool EntityManager::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const ch
 	{
 		snprintf(psError, nMaxLength, "Can't to load KeyValues from \"%s\" file", sConfigFile);
 	}
+
+	pWorldValues->Clear();
 
 	return bResult;
 }
