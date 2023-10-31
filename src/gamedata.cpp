@@ -4,9 +4,19 @@
 
 #include <tier1/KeyValues.h>
 
+// Windows: linkage corresponds to a final class type.
+#ifdef META_IS_SOURCE2
+class IVEngineServer2;
+class IFileSystem;
+class ISource2Server;
+
+typedef IVEngineServer2 IVEngineServer;
+typedef ISource2Server IServerGameDLL;
+#else
 class IVEngineServer;
 class IFileSystem;
 class IServerGameDLL;
+#endif
 
 extern IVEngineServer *engine;
 extern IFileSystem *filesystem;
