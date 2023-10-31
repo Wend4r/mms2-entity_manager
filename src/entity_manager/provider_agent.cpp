@@ -336,7 +336,7 @@ void EntityManager::ProviderAgent::PushDestroyQueue(CEntityInstance *pEntity)
 
 void EntityManager::ProviderAgent::PushDestroyQueue(CEntityIdentity *pEntity)
 {
-	this->m_vecEntityDestroyQueue.AddToTail(pEntity);
+	this->m_vecEntityDestroyQueue.AddToTail(pEntity->m_pInstance);
 }
 
 int EntityManager::ProviderAgent::AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> *vecTarget)
