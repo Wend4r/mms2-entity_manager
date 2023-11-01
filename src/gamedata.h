@@ -209,8 +209,6 @@ public:
 			public: // IListener
 				void OnChanged(const K &aKey, const V &aValue)
 				{
-					Msg("OnChanged(%s, %s)\n", aKey.c_str(), aValue.c_str());
-
 					auto &map = this->m_mapCallbacks;
 
 					auto it = map.find(aKey);
