@@ -136,7 +136,10 @@ namespace EntityManager
 				void Reset();
 
 			public:
+				ptrdiff_t GetDestroyResourceManifestOffset() const;
 				ptrdiff_t GetPrecacheEntitiesAndConfirmResourcesAreLoadedOffset() const;
+				ptrdiff_t GetAllocGameResourceManifestOffset() const;
+				ptrdiff_t GetAppendToAndCreateGameResourceManifestOffset() const;
 				ptrdiff_t GetEntitySystemOffset() const;
 
 			private:
@@ -145,7 +148,10 @@ namespace EntityManager
 				GameData::Config m_aGameConfig;
 
 			private: // Offsets.
+				ptrdiff_t m_nDestroyResourceManifestOffset = -1;
 				ptrdiff_t m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset = -1;
+				ptrdiff_t m_nAllocGameResourceManifestOffset = -1;
+				ptrdiff_t m_nAppendToAndCreateGameResourceManifestOffset = -1;
 				ptrdiff_t m_nEntitySystemOffset = -1;
 			};
 

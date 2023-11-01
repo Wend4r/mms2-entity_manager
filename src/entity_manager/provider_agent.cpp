@@ -95,6 +95,18 @@ void EntityManager::ProviderAgent::Destroy()
 	this->Clear();
 }
 
+bool EntityManager::ProviderAgent::NotifyGameResourceUpdated()
+{
+	bool bResult = this->m_aResourceManifest.Reinit(RESOURCE_MANIFEST_LOAD_STREAMING_DATA, __FUNCTION__, RESOURCE_MANIFEST_LOAD_PRIORITY_HIGH /* Run-time entities update at players view */);
+
+	if(bResult)
+	{
+		// ...
+	}
+
+	return bResult;
+}
+
 bool EntityManager::ProviderAgent::NotifyEntitySystemUpdated()
 {
 	return (g_pGameEntitySystem = *(CGameEntitySystem **)((uintptr_t)g_pGameResourceServiceServer + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntitySystemOffset())) != NULL;
@@ -103,6 +115,11 @@ bool EntityManager::ProviderAgent::NotifyEntitySystemUpdated()
 bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()
 {
 	return (g_pSpawnGroupMgr = *g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetSpawnGroupMgrAddress()) != NULL;
+}
+
+bool EntityManager::ProviderAgent::ErectResourceManifest(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset)
+{
+	return this->m_aResourceManifest.Erect(hSpawnGroup, nCount, pEntities, vWorldOffset);
 }
 
 void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup, Logger::Scope *pDetails, Logger::Scope *pWarnings)

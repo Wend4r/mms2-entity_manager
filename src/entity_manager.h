@@ -30,6 +30,7 @@
 #define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
 
 class ISpawnGroup;
+class ISpawnGroupPrerequisiteRegistry;
 
 class EntityManagerPlugin final : public ISmmPlugin, public IMetamodListener
 {
@@ -43,6 +44,9 @@ public:
 	void AllPluginsLoaded();
 
 protected:
+	bool InitGameResource();
+	void DestroyGameResource();
+
 	bool InitEntitySystem();
 	void DestroyEntitySystem();
 
@@ -61,6 +65,7 @@ public: // SourceHooks.
 	void OnGameFrameHook(bool simulating, bool bFirstTick, bool bLastTick);
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *);
 	void OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
+	void OnSpawnGroupInitHook(SpawnGroupHandle_t handle, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry);
 	ILoadingSpawnGroup *OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues);
 	void OnSpawnGroupShutdownHook(SpawnGroupHandle_t handle);
 

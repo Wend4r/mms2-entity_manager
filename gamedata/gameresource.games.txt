@@ -6,20 +6,53 @@
 		{
 			// Virtual method index.
 			// 
+			// Calls CGameResourceManifest::~CGameResourceManifest(this)
+			"CGameResourceService::DestroyResourceManifest"
+			{
+				"windows64"     "31"
+				"linux64"       "31"
+			}
+
 			// Used strings:
 			//   "PrecacheEntitiesAndConfirmResourcesAreLoaded"
 			// 
+			// Calls CGameResourceService::BuildResourceManifest() .
+			// 
 			// Declaration: 
 			// void CGameResourceService::PrecacheEntitiesAndConfirmResourcesAreLoaded(
-			//   CGameResourceService *const this,
-			//   SpawnGroupHandle_t hSpawnGroup,
-			//   int nCount,
-			//   const EntitySpawnInfo_t *pEntities,
-			//   const matrix3x4a_t &vWorldOffset)
+			//         CGameResourceService *const this,
+			//         SpawnGroupHandle_t hSpawnGroup,
+			//         int nCount,
+			//         const EntitySpawnInfo_t *pEntities,
+			//         const matrix3x4a_t *const vWorldOffset)
 			"CGameResourceService::PrecacheEntitiesAndConfirmResourcesAreLoaded"
 			{
 				"windows64"     "35"
 				"linux64"       "35"
+			}
+
+			// Just calls CGameResourceManifest::CGameResourceManifest(this)
+			// Not to be confused with CGameResourceService::CreateGameResourceManifest() .
+			"CGameResourceService::AllocGameResourceManifest"
+			{
+				"windows64"     "38"
+				"linux64"       "38"
+			}
+
+			// Calls CGameResourceService::BuildResourceManifest() .
+			// 
+			// Declaration: 
+			// bool CGameResourceService::AppendToAndCreateGameResourceManifest(
+			//         CGameResourceService *const this,
+			//         CGameResourceManifest *pResourceManifest,
+			//         SpawnGroupHandle_t hSpawnGroup,
+			//         int nCount,
+			//         const EntitySpawnInfo_t *pEntities,
+			//         const matrix3x4a_t *const vWorldOffset)
+			"CGameResourceService::AppendToAndCreateGameResourceManifest"
+			{
+				"windows64"     "44"
+				"linux64"       "44"
 			}
 
 			// Field in class.

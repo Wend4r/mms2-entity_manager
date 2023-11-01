@@ -11,6 +11,7 @@
 
 #include "logger.h"
 #include "provider/entitykeyvalues.h"
+#include "provider_agent/resourcemanifest.h"
 
 class KeyValues;
 class CEntityKeyValues;
@@ -27,8 +28,12 @@ namespace EntityManager
 		void Destroy();
 
 	public:
-		bool NotifyEntitySystemUpdated();
-		bool NotifySpawnGroupMgrUpdated();
+		virtual bool NotifyGameResourceUpdated();
+		virtual bool NotifyEntitySystemUpdated();
+		virtual bool NotifySpawnGroupMgrUpdated();
+
+	public:
+		bool ErectResourceManifest(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
 
 	public: // Spawn queue methods.
 		void PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
@@ -56,7 +61,6 @@ namespace EntityManager
 
 		const EntityKey &GetCachedEntityKey(CacheMapOIndexType nElm);
 		const EntityKey &GetCachedClassnameKey();
-
 		CacheMapOIndexType CacheOrGetEntityKey(const char *pszName);
 
 	private:
@@ -104,6 +108,8 @@ namespace EntityManager
 
 		CacheMapType m_mapCachedKeys;
 		CacheMapOIndexType m_nElmCachedClassnameKey;
+
+		ResourceManifest m_aResourceManifest;
 	};
 };
 

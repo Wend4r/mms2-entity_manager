@@ -20,6 +20,7 @@ for sdk_name in EntityManager.sdks:
       'entity_manager/provider/entitysystem.cpp',
       'entity_manager/provider/gameresource.cpp',
       'entity_manager/provider/spawngroup.cpp',
+      'entity_manager/provider_agent/resourcemanifest.cpp',
       'entity_manager/provider.cpp',
       'entity_manager/provider_agent.cpp',
       'entity_manager/settings.cpp',

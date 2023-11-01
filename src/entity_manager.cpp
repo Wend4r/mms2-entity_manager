@@ -153,6 +153,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 		if(pNewServer)
 		{
+			this->InitGameResource();
 			this->InitEntitySystem();
 			this->InitSpawnGroup();
 
@@ -168,9 +169,12 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 					if(this->LoadSettings(h, pMap->GetWorldName(), (char *)sSettingsError, sizeof(sSettingsError)))
 					{
-						CUtlVector<const CEntityKeyValues *> vecKeyValues;
+						CUtlVector<CEntityKeyValues *> vecKeyValues;
 
-						ILoadingSpawnGroup *pMyLoading = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, &vecKeyValues);
+						ILoadingSpawnGroup *pMyLoading = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, (CUtlVector<const CEntityKeyValues *> *)&vecKeyValues);
+						int iEntityCount = pMyLoading->EntityCount();
+
+						const EntitySpawnInfo_t *pEntities = pMyLoading->GetEntities();
 
 						// g_pSpawnGroupMgr->SpawnGroupInit(h, ((EntityManager::CEntitySystemProvider *)g_pGameEntitySystem)->GetCurrentManifest(), NULL, NULL /* Require CNetworkClientSpawnGroup_WaitForAssetLoadPrerequisit (from engine2, *(uintptr_t *)this + 11 is ISpawnGroupPrerequisiteRegistry) now (@Wend4r: needs to restore lifecycle of CSequentialPrerequisite progenitor and CNetworkClientSpawnGroup slaves )*/);
 						// g_pSpawnGroupMgr->SpawnGroupSpawnEntities(h);
@@ -179,9 +183,14 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 						// pMyLoading->SpawnEntities(); // Spawn created now.
 						// pMyLoading->Release(); // Free CLoadingSpawnGroup.
 
-						this->ListenLoadingSpawnGroup(h, pMyLoading->EntityCount(), pMyLoading->GetEntities());
+						s_aEntityManagerProviderAgent.ErectResourceManifest(h, iEntityCount, pEntities, &pMap->GetWorldOffset());
 
+						this->ListenLoadingSpawnGroup(h, iEntityCount, pEntities);
 						pMap->SetLoadingSpawnGroup(pMyLoading); // To respawn in next rounds.
+
+						// pMap->LoadEntities();
+						// pMyLoading->SpawnEntities(); // Spawn created now.
+						// pMyLoading->Release(); // Free CLoadingSpawnGroup.
 					}
 					else
 					{
@@ -219,6 +228,23 @@ void EntityManagerPlugin::AllPluginsLoaded()
 	/* This is where we'd do stuff that relies on the mod or other plugins 
 	 * being initialized (for example, cvars added and events registered).
 	 */
+}
+
+bool EntityManagerPlugin::InitGameResource()
+{
+	bool bResult = s_aEntityManagerProviderAgent.NotifyGameResourceUpdated();
+
+	if(bResult)
+	{
+		// ...
+	}
+
+	return bResult;
+}
+
+void EntityManagerPlugin::DestroyGameResource()
+{
+	// ...
 }
 
 bool EntityManagerPlugin::InitEntitySystem()
@@ -345,6 +371,11 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 	{
 		const char *pszMapName = pNetServer->GetMapName();
 
+		if(g_pGameResourceServiceServer)
+		{
+			this->DestroyGameResource();
+		}
+
 		if(g_pGameEntitySystem)
 		{
 			this->DestroyEntitySystem();
@@ -355,6 +386,7 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 			this->DestroySpawnGroup();
 		}
 
+		this->InitGameResource();
 		this->InitEntitySystem();
 		this->InitSpawnGroup();
 	}
