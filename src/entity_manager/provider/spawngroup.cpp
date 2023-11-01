@@ -1,7 +1,7 @@
 #include "spawngroup.h"
+#include "provider.h"
 
 #include <tier1/utlmap.h>
-#include <entity_manager/provider.h>
 
 extern EntityManager::Provider *g_pEntityManagerProvider;
 

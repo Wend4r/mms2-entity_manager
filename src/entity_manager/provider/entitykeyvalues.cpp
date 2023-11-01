@@ -1,5 +1,5 @@
 #include "entitykeyvalues.h"
-#include <entity_manager/provider.h>
+#include "provider.h"
 
 #include <tier0/memalloc.h>
 #include <entity2/entitysystem.h>
