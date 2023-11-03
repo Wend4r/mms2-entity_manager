@@ -175,7 +175,7 @@ void EntityManager::ProviderAgent::PushSpawnQueue(CEntityKeyValues *pKeyValues, 
 	this->m_vecEntitySpawnQueue.AddToTail({pKeyValues, hSpawnGroup});
 }
 
-int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget)
+int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *&pvecTarget, SpawnGroupHandle_t hSpawnGroup)
 {
 	const auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
 
@@ -187,49 +187,43 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 	{
 		CEntityKeyValues **ppKeyValuesCur = ppKeyValuesArr;
 
-		for(int i = 0; i < iQueueLength; i++)
+		if(hSpawnGroup == SpawnData::GetAnySpawnGroup())
 		{
-			CEntityKeyValues *pKeyValues = vecEntitySpawnQueue[i].GetKeyValues();
+			for(int i = 0; i < iQueueLength; i++)
+			{
+				CEntityKeyValues *pKeyValues = vecEntitySpawnQueue[i].GetKeyValues();
 
-			((CEntityKeyValuesProvider *)pKeyValues)->AddRef();
+				((CEntityKeyValuesProvider *)pKeyValues)->AddRef();
 
-			*ppKeyValuesCur = pKeyValues;
-			ppKeyValuesCur++;
+				*ppKeyValuesCur = pKeyValues;
+				ppKeyValuesCur++;
+			}
+		}
+		else
+		{
+			for(int i = 0; i < iQueueLength; i++)
+			{
+				const auto &aSpawn = vecEntitySpawnQueue[i];
+
+				if(hSpawnGroup == aSpawn.GetSpawnGroup())
+				{
+					CEntityKeyValues *pKeyValues = aSpawn.GetKeyValues();
+
+					((CEntityKeyValuesProvider *)pKeyValues)->AddRef();
+
+					*ppKeyValuesCur = pKeyValues;
+					ppKeyValuesCur++;
+				}
+			}
 		}
 	}
 
-	int iResult = vecTarget->AddMultipleToTail(iQueueLength, ppKeyValuesArr);
-
-	MemAlloc_Free(ppKeyValuesArr);
-
-	return iResult;
-}
-
-int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup)
-{
-	const auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
-
-	const int iQueueLength = vecEntitySpawnQueue.Count();
-
-	CEntityKeyValues **ppKeyValuesArr = (CEntityKeyValues **)MemAlloc_Alloc(iQueueLength * sizeof(CEntityKeyValues *));
-	CEntityKeyValues **ppKeyValuesCur = ppKeyValuesArr;
-
-	for(int i = 0; i < iQueueLength; i++)
+	if(!pvecTarget)
 	{
-		const auto &aSpawn = vecEntitySpawnQueue[i];
-
-		if(hSpawnGroup == aSpawn.GetSpawnGroup())
-		{
-			CEntityKeyValues *pKeyValues = aSpawn.GetKeyValues();
-
-			aSpawn.GetKeyValuesProvider()->AddRef();
-
-			*ppKeyValuesCur = pKeyValues;
-			ppKeyValuesCur++;
-		}
+		pvecTarget = new CUtlVector<const CEntityKeyValues *>();
 	}
 
-	int iResult = vecTarget->AddMultipleToTail(((uintptr_t)ppKeyValuesCur - (uintptr_t)ppKeyValuesArr) / sizeof(decltype(ppKeyValuesArr)), ppKeyValuesArr);
+	int iResult = pvecTarget->AddMultipleToTail(iQueueLength, ppKeyValuesArr);
 
 	MemAlloc_Free(ppKeyValuesArr);
 
@@ -251,11 +245,6 @@ bool EntityManager::ProviderAgent::HasInSpawnQueue(const CEntityKeyValues *pKeyV
 	return false;
 }
 
-void EntityManager::ProviderAgent::ReleaseSpawnQueued()
-{
-	this->m_vecEntitySpawnQueue.Purge();
-}
-
 int EntityManager::ProviderAgent::ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup)
 {
 	auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
@@ -263,14 +252,23 @@ int EntityManager::ProviderAgent::ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGr
 	const int iQueueLengthBefore = vecEntitySpawnQueue.Count();
 
 	// Find and fast remove.
-	for(int i = 0; i < vecEntitySpawnQueue.Count(); i++)
 	{
-		auto &aSpawn = vecEntitySpawnQueue[i];
-
-		if(hSpawnGroup == aSpawn.GetSpawnGroup())
+		if(hSpawnGroup == SpawnData::GetAnySpawnGroup())
 		{
-			vecEntitySpawnQueue.FastRemove(i);
-			i--;
+			vecEntitySpawnQueue.RemoveAll();
+		}
+		else
+		{
+			for(int i = 0; i < vecEntitySpawnQueue.Count(); i++)
+			{
+				auto &aSpawn = vecEntitySpawnQueue[i];
+
+				if(hSpawnGroup == aSpawn.GetSpawnGroup())
+				{
+					vecEntitySpawnQueue.FastRemove(i);
+					i--;
+				}
+			}
 		}
 	}
 
@@ -356,7 +354,7 @@ void EntityManager::ProviderAgent::PushDestroyQueue(CEntityIdentity *pEntity)
 	this->m_vecEntityDestroyQueue.AddToTail(pEntity->m_pInstance);
 }
 
-int EntityManager::ProviderAgent::AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> *vecTarget)
+int EntityManager::ProviderAgent::AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> *&pvecTarget)
 {
 	const auto &vecEntityDestroyQueue = this->m_vecEntityDestroyQueue;
 
@@ -373,7 +371,12 @@ int EntityManager::ProviderAgent::AddDestroyQueueToTail(CUtlVector<const CEntity
 		pEntityCur++;
 	}
 
-	int iResult = vecTarget->AddMultipleToTail(((uintptr_t)pEntityCur - (uintptr_t)pEntityArr) / sizeof(decltype(pEntityArr)), pEntityArr);
+	if(!pvecTarget)
+	{
+		pvecTarget = new CUtlVector<const CEntityIdentity *>();
+	}
+
+	int iResult = pvecTarget->AddMultipleToTail(((uintptr_t)pEntityCur - (uintptr_t)pEntityArr) / sizeof(decltype(pEntityArr)), pEntityArr);
 
 	free(pEntityArr);
 
@@ -503,7 +506,7 @@ SpawnGroupHandle_t EntityManager::ProviderAgent::SpawnData::GetSpawnGroup() cons
 
 SpawnGroupHandle_t EntityManager::ProviderAgent::SpawnData::GetAnySpawnGroup()
 {
-	return (SpawnGroupHandle_t)-1;
+	return INVALID_SPAWN_GROUP;
 }
 
 bool EntityManager::ProviderAgent::SpawnData::IsAnySpawnGroup() const

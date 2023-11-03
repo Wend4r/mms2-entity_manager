@@ -13,6 +13,8 @@
 #include "provider/entitykeyvalues.h"
 #include "provider_agent/resourcemanifest.h"
 
+#define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
+
 class KeyValues;
 class CEntityKeyValues;
 
@@ -36,19 +38,17 @@ namespace EntityManager
 		bool ErectResourceManifest(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
 
 	public: // Spawn queue methods.
-		void PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
-		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1);
-		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget);
-		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *vecTarget, SpawnGroupHandle_t hSpawnGroup);
+		void PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
+		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
+		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *&pvecTarget, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
 		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues);
-		void ReleaseSpawnQueued();
-		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup);
-		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup = (SpawnGroupHandle_t)-1, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
+		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
+		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
 
 	public: // Destroy queue methods.
 		void PushDestroyQueue(CEntityInstance *pEntity);
 		void PushDestroyQueue(CEntityIdentity *pEntity);
-		int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> *vecTarget);
+		int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> *&pvecTarget);
 		void ReleaseDestroyQueued();
 		int DestroyQueued();
 

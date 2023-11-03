@@ -400,7 +400,7 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 {
 	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %s)\n", handle, pSpawnGroup->GetWorldName());
 
-	// Load settings by spawn group name
+	// Load settings by spawn group name.
 	{
 		char sSettingsError[256];
 
@@ -420,7 +420,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 	SET_META_RESULT(MRES_HANDLED);
 	SH_GLOB_SHPTR->DoRecall();
 
-	s_aEntityManagerProviderAgent.AddSpawnQueueToTail(const_cast<CUtlVector<const CEntityKeyValues *> *>(pKeyValues), handle);
+	s_aEntityManagerProviderAgent.AddSpawnQueueToTail(const_cast<CUtlVector<const CEntityKeyValues *> *&>(pKeyValues), handle);
 
 	ILoadingSpawnGroup *pLoading = (SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup)->*(funcCreateLoadingSpawnGroup))(handle, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, pKeyValues);
 
