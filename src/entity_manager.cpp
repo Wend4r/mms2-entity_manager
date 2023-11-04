@@ -212,7 +212,6 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 {
-	this->DestroyMyLoadingSpawnGroupEntities();
 	this->m_aSettings.Destroy();
 
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManagerPlugin::OnGameFrameHook, true);
@@ -528,35 +527,9 @@ void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup
 	}
 }
 
-int EntityManagerPlugin::DestroyMyLoadingSpawnGroupEntities()
-{
-	auto &aIdenties = this->m_vecMyEntities;
-
-	const int iCount = aIdenties.Count();
-
-	if(iCount)
-	{
-		int j = 0;
-
-		do
-		{
-			s_aEntityManagerProviderAgent.PushDestroyQueue(aIdenties[j]);
-			j++;
-		}
-		while(j < iCount);
-
-		s_aEntityManagerProviderAgent.DestroyQueued();
-		aIdenties.Purge();
-	}
-
-	return iCount;
-}
-
 void EntityManagerPlugin::OnMyEntityFinish(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues)
 {
 	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnMyEntityFinish(%s (%d))\n", pEntity->GetClassname(), pEntity->GetEntityIndex().Get());
-
-	this->m_vecMyEntities.AddToTail(pEntity);
 }
 
 bool EntityManagerPlugin::Pause(char *error, size_t maxlen)

@@ -71,7 +71,6 @@ public: // SourceHooks.
 
 public:
 	void ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, const int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener = NULL);
-	int DestroyMyLoadingSpawnGroupEntities();
 	void OnMyEntityFinish(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues);
 
 public:
@@ -90,8 +89,6 @@ private:
 
 	EntityManager::Settings m_aSettings;
 	Logger m_aLogger;
-
-	CUtlVector<CEntityInstance *> m_vecMyEntities;
 };
 
 extern EntityManagerPlugin *g_pEntityManager;
