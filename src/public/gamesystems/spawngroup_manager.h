@@ -126,7 +126,7 @@ public:
 	virtual void TransferOwnershipOfManifestsTo(ISpawnGroup *pTarget) = 0;
 
 public: // CNetworkClientSpawnGroup/CNetworkServerSpawnGroup
-	virtual uint64 UnkGet() = 0;
+	virtual IGameSpawnGroupMgr *GetSpawnGroupMgr() = 0;
 };
 
 class CMapSpawnGroup
@@ -195,6 +195,12 @@ public:
 	void GetSpawnGroupDesc(SpawnGroupDesc_t *pDesc) const
 	{
 		this->m_pSpawnGroup->GetSpawnGroupDesc(pDesc);
+	}
+
+public:
+	ISpawnGroup *GetSpawnGroup() const
+	{
+		return this->m_pSpawnGroup;
 	}
 
 private:
