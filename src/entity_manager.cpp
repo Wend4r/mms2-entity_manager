@@ -167,11 +167,12 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 				{
 					char sSettingsError[256];
 
-					if(this->LoadSettings(h, pMap->GetWorldName(), (char *)sSettingsError, sizeof(sSettingsError)))
+					if(this->LoadSettings(pMap->GetSpawnGroup(), (char *)sSettingsError, sizeof(sSettingsError)))
 					{
 						CUtlVector<CEntityKeyValues *> vecKeyValues;
 
 						ILoadingSpawnGroup *pMyLoading = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, (CUtlVector<const CEntityKeyValues *> *)&vecKeyValues);
+
 						int iEntityCount = pMyLoading->EntityCount();
 
 						const EntitySpawnInfo_t *pEntities = pMyLoading->GetEntities();
@@ -292,12 +293,28 @@ bool EntityManagerPlugin::LoadProvider(char *psError, size_t nMaxLength)
 	return bResult;
 }
 
-bool EntityManagerPlugin::LoadSettings(SpawnGroupHandle_t hSpawnGroup, const char *pszSpawnGroupName, char *psError, size_t nMaxLength)
+bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, size_t nMaxLength)
 {
 	Logger::Scope aDetails = this->m_aLogger.CreateDetailsScope();
 	Logger::Scope aWarnings = this->m_aLogger.CreateWarningsScope();
 
-	bool bResult = this->m_aSettings.Load(hSpawnGroup, this->m_sBasePath.c_str(), pszSpawnGroupName, psError, nMaxLength, &aDetails, &aWarnings);
+	char sSpawnGroupPath[MAX_PATH];
+
+	{
+		strncpy((char *)sSpawnGroupPath, pSpawnGroup->GetWorldName(), sizeof(sSpawnGroupPath));
+
+		SpawnGroupHandle_t hOwner;
+
+		CMapSpawnGroup *pMap;
+
+		while((hOwner = pSpawnGroup->GetOwnerSpawnGroup()) != INVALID_SPAWN_GROUP && (pMap = ((EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr)->Get(hOwner)))
+		{
+			snprintf((char *)sSpawnGroupPath, sizeof(sSpawnGroupPath), "%s" PATH_SEP_STR "%s", pMap->GetWorldName(), sSpawnGroupPath);
+			pSpawnGroup = pMap->GetSpawnGroup();
+		}
+	}
+
+	bool bResult = this->m_aSettings.Load(pSpawnGroup->GetHandle(), this->m_sBasePath.c_str(), (const char *)sSpawnGroupPath, psError, nMaxLength, &aDetails, &aWarnings);
 
 	if(bResult)
 	{
@@ -398,13 +415,13 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 
 void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %s)\n", handle, pSpawnGroup->GetWorldName());
+	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %p)\n", handle, pSpawnGroup);
 
 	// Load settings by spawn group name.
 	{
 		char sSettingsError[256];
 
-		if(!this->LoadSettings(handle, pSpawnGroup->GetWorldName(), (char *)sSettingsError, sizeof(sSettingsError)))
+		if(!this->LoadSettings(pSpawnGroup, (char *)sSettingsError, sizeof(sSettingsError)))
 		{
 			this->m_aLogger.WarningFormat(LOGGER_COLOR_WARNING, "Failed to load a settings: %s\n", sSettingsError);
 		}

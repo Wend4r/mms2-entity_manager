@@ -55,7 +55,7 @@ protected:
 
 protected:
 	bool LoadProvider(char *psError = NULL, size_t nMaxLength = 0);
-	bool LoadSettings(SpawnGroupHandle_t hSpawnGroup, const char *pszSpawnGroupName, char *psError = NULL, size_t nMaxLength = 0);
+	bool LoadSettings(ISpawnGroup *pSpawnGroup, char *psError = NULL, size_t nMaxLength = 0);
 	virtual void OnBasePathChanged(const char *pszNewOne);
 
 private: // Commands.
