@@ -36,6 +36,7 @@ namespace EntityManager
 
 	public:
 		bool ErectResourceManifest(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
+		IEntityResourceManifest *GetMyEntityManifest();
 
 	public: // Spawn queue methods.
 		void PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);

@@ -122,6 +122,11 @@ bool EntityManager::ProviderAgent::ErectResourceManifest(SpawnGroupHandle_t hSpa
 	return this->m_aResourceManifest.Erect(hSpawnGroup, nCount, pEntities, vWorldOffset);
 }
 
+IEntityResourceManifest *EntityManager::ProviderAgent::GetMyEntityManifest()
+{
+	return this->m_aResourceManifest.GetEntityPart();
+}
+
 void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup, Logger::Scope *pDetails, Logger::Scope *pWarnings)
 {
 	int iNewIndex = this->m_vecEntitySpawnQueue.Count();

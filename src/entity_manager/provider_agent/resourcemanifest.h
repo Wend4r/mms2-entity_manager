@@ -15,6 +15,7 @@ namespace EntityManager
 		bool Destroy();
 
 		bool Erect(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
+		IEntityResourceManifest *GetEntityPart();
 
 	private:
 		CGameResourceManifest *m_pStorage;

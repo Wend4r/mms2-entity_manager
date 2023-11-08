@@ -141,6 +141,8 @@ namespace EntityManager
 				ptrdiff_t GetAllocGameResourceManifestOffset() const;
 				ptrdiff_t GetAppendToAndCreateGameResourceManifestOffset() const;
 				ptrdiff_t GetEntitySystemOffset() const;
+				ptrdiff_t GetEntityManifestOffset() const;
+				ptrdiff_t GetEntityManifestVFTableOffset() const;
 
 			private:
 				// GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
@@ -153,6 +155,8 @@ namespace EntityManager
 				ptrdiff_t m_nAllocGameResourceManifestOffset = -1;
 				ptrdiff_t m_nAppendToAndCreateGameResourceManifestOffset = -1;
 				ptrdiff_t m_nEntitySystemOffset = -1;
+				ptrdiff_t m_nEntityManifestOffset = -1;
+				ptrdiff_t m_nEntityManifestVFTableOffset = -1;
 			};
 
 			class SpawnGroup

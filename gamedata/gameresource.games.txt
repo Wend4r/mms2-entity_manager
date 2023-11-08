@@ -33,6 +33,10 @@
 
 			// Just calls CGameResourceManifest::CGameResourceManifest(this)
 			// Not to be confused with CGameResourceService::CreateGameResourceManifest() .
+			// CGameResourceManifest *CGameResourceService::AllocGameResourceManifest(
+			//         ResourceManifestLoadBehavior_t eBehavior,
+			//         const char *pszAllocatorName,
+			//         ResourceManifestLoadPriority_t ePriority)
 			"CGameResourceService::AllocGameResourceManifest"
 			{
 				"windows64"     "38"
@@ -51,19 +55,40 @@
 			//         const matrix3x4a_t *const vWorldOffset)
 			"CGameResourceService::AppendToAndCreateGameResourceManifest"
 			{
-				"windows64"     "44"
+				"windows64"     "43"
 				"linux64"       "44"
 			}
 
 			// Field in class.
+			// Contains IEntityResourceManifestBuilder * .
 			// 
 			// Near strings (engine):
-			//  "CGameResourceService::BuildResourceManifest(start)"
+			//  "CGameResourceService::BuildResourceManifest(start)"z
 			//  "CGameResourceService::BuildResourceManifest(finish)"
 			"CGameResourceService::m_pEntitySystem"
 			{
 				"windows64"     "88"
 				"linux64"       "80"
+			}
+
+			// Field in class.
+			// Contains  CEntityResourceManifest * .
+			// 
+			// Created in CGameResourceService::AllocGameResourceManifest() .
+			"CGameResourceManifest::m_pEntityManifest"
+			{
+				"windows64"     "152"
+				"linux64"       "152"
+			}
+
+			// Field in class.
+			// Contains  IEntityResourceManifest * .
+			// 
+			// Created in CGameResourceService::AllocGameResourceManifest() .
+			"CEntityResourceManifest::`vftable'"
+			{
+				"windows64"     "8"
+				"linux64"       "8"
 			}
 		}
 	}

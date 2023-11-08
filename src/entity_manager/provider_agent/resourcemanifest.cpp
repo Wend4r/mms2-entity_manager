@@ -54,4 +54,16 @@ bool EntityManager::ResourceManifest::Erect(SpawnGroupHandle_t hSpawnGroup, int 
 	return bResult;
 }
 
+IEntityResourceManifest *EntityManager::ResourceManifest::GetEntityPart()
+{
+	IEntityResourceManifest *pEntityManifestVFT = nullptr;
 
+	CEntityResourceManifest *pEntityManifest = ((CGameResourceManifestProvider *)this->m_pStorage)->GetEntityPart();
+
+	if(pEntityManifest)
+	{
+		pEntityManifestVFT = ((CEntityResourceManifestProvider *)(pEntityManifest))->GetInterface();
+	}
+
+	return pEntityManifestVFT;
+}

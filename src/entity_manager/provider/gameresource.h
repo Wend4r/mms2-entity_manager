@@ -11,6 +11,14 @@ class CGameResourceService : public IGameResourceService
 {
 };
 
+class CGameResourceManifest
+{
+};
+
+class CEntityResourceManifest
+{
+};
+
 namespace EntityManager
 {
 	class CGameResourceServiceProvider : public CGameResourceService
@@ -20,6 +28,18 @@ namespace EntityManager
 		void PrecacheEntitiesAndConfirmResourcesAreLoaded(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
 		CGameResourceManifest *AllocGameResourceManifest(ResourceManifestLoadBehavior_t eBehavior, const char *pszAllocatorName, ResourceManifestLoadPriority_t ePriority);
 		bool AppendToAndCreateGameResourceManifest(CGameResourceManifest *pResourceManifest, SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
+	};
+
+	class CGameResourceManifestProvider : public CGameResourceManifest
+	{
+	public:
+		CEntityResourceManifest *GetEntityPart();
+	};
+
+	class CEntityResourceManifestProvider : public CEntityResourceManifest
+	{
+	public:
+		IEntityResourceManifest *GetInterface();
 	};
 };
 

@@ -16,11 +16,6 @@ EntityManager::Provider::GameDataStorage::GameResource::GameResource()
 		{
 			this->m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset = nOffset;
 		});
-		aCallbacks.Insert("CGameResourceService::m_pEntitySystem", [this](const std::string &, const ptrdiff_t &nOffset)
-		{
-			this->m_nEntitySystemOffset = nOffset;
-			g_pEntityManagerProviderAgent->NotifyEntitySystemUpdated();
-		});
 		aCallbacks.Insert("CGameResourceService::AllocGameResourceManifest", [this](const std::string &, const ptrdiff_t &nOffset)
 		{
 			this->m_nAllocGameResourceManifestOffset = nOffset;
@@ -28,6 +23,19 @@ EntityManager::Provider::GameDataStorage::GameResource::GameResource()
 		aCallbacks.Insert("CGameResourceService::AppendToAndCreateGameResourceManifest", [this](const std::string &, const ptrdiff_t &nOffset)
 		{
 			this->m_nAppendToAndCreateGameResourceManifestOffset = nOffset;
+		});
+		aCallbacks.Insert("CGameResourceService::m_pEntitySystem", [this](const std::string &, const ptrdiff_t &nOffset)
+		{
+			this->m_nEntitySystemOffset = nOffset;
+			g_pEntityManagerProviderAgent->NotifyEntitySystemUpdated();
+		});
+		aCallbacks.Insert("CGameResourceService::m_pEntityManifest", [this](const std::string &, const ptrdiff_t &nOffset)
+		{
+			this->m_nEntityManifestOffset = nOffset;
+		});
+		aCallbacks.Insert("CEntityResourceManifest::`vftable'", [this](const std::string &, const ptrdiff_t &nOffset)
+		{
+			this->m_nEntityManifestVFTableOffset = nOffset;
 		});
 
 		this->m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
@@ -46,6 +54,8 @@ void EntityManager::Provider::GameDataStorage::GameResource::Reset()
 	this->m_nAllocGameResourceManifestOffset = -1;
 	this->m_nAppendToAndCreateGameResourceManifestOffset = -1;
 	this->m_nEntitySystemOffset = -1;
+	this->m_nEntityManifestOffset = -1;
+	this->m_nEntityManifestVFTableOffset = -1;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetDestroyResourceManifestOffset() const
@@ -71,4 +81,14 @@ ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetAppendToAnd
 ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetEntitySystemOffset() const
 {
 	return this->m_nEntitySystemOffset;
+}
+
+ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetEntityManifestOffset() const
+{
+	return this->m_nEntityManifestOffset;
+}
+
+ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetEntityManifestVFTableOffset() const
+{
+	return this->m_nEntityManifestVFTableOffset;
 }

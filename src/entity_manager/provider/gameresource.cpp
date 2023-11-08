@@ -24,3 +24,13 @@ bool EntityManager::CGameResourceServiceProvider::AppendToAndCreateGameResourceM
 {
 	return ((VirtualTable *)this)->CallMethod<bool>(g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetAppendToAndCreateGameResourceManifestOffset(), pResourceManifest, hSpawnGroup, nCount, pEntities, vWorldOffset);
 }
+
+CEntityResourceManifest *EntityManager::CGameResourceManifestProvider::GetEntityPart()
+{
+	return *(CEntityResourceManifest **)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntityManifestOffset());
+}
+
+IEntityResourceManifest *EntityManager::CEntityResourceManifestProvider::GetInterface()
+{
+	return *(IEntityResourceManifest **)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntityManifestVFTableOffset());
+}
