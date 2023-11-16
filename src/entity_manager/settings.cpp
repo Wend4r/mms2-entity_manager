@@ -4,8 +4,8 @@
 
 #include <tier0/dbg.h>
 #include <tier0/platform.h>
-#include <tier1/KeyValues.h>
-#include <tier1/utlstring.h>
+#include <tier0/keyvalues.h>
+#include <tier0/utlstring.h>
 #include <tier1/utlvector.h>
 #include <filesystem.h>
 

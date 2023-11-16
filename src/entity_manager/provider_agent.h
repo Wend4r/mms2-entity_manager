@@ -5,7 +5,7 @@
 
 #include <eiface.h>
 #include <tier1/utlmap.h>
-#include <tier1/utlstring.h>
+#include <tier0/utlstring.h>
 #include <tier1/utlvector.h>
 #include <entity2/entityidentity.h>
 

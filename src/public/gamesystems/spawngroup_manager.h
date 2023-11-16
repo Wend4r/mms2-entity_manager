@@ -1,13 +1,16 @@
 #ifndef SPAWNGROUP_MANAGER_H
 #define SPAWNGROUP_MANAGER_H
+#ifdef _WIN32
+#pragma once
+#endif
 
 #include "eiface.h"
 #include "iserver.h"
 #include "igamesystem.h"
 #include "entity2/entitysystem.h"
 #include "entity2/entityidentity.h"
-#include "tier1/utlstring.h"
-#include "tier1/utlscratchmemory.h"
+#include "tier0/utlstring.h"
+#include "tier0/utlscratchmemory.h"
 #include "tier1/utlvector.h"
 
 class matrix3x4a_t;

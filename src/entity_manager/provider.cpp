@@ -3,6 +3,7 @@
 #include "gamedata.h"
 #include "provider_agent.h"
 
+#include <filesystem.h>
 #include <entity2/entitysystem.h>
 
 #define GAMECONFIG_FOLDER_DIR "gamedata"

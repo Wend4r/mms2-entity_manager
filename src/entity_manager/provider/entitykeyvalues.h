@@ -2,8 +2,8 @@
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_ENTITYKEYVALUES_PROVIDER_H_
 
 #include <eiface.h>
-#include <tier1/utlstring.h>
-#include <tier1/utlscratchmemory.h>
+#include <tier0/utlstring.h>
+#include <tier0/utlscratchmemory.h>
 #include <entity2/entityidentity.h>
 #include <entity2/entitysystem.h>
 

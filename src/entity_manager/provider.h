@@ -6,8 +6,8 @@
 
 #include <tier0/dbg.h>
 #include <tier0/platform.h>
+#include <tier0/utlscratchmemory.h>
 #include <tier1/utldelegateimpl.h>
-#include <tier1/utlscratchmemory.h>
 
 #include "provider/entitykeyvalues.h"
 #include "provider/entitysystem.h"

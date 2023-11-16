@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include <tier1/KeyValues.h>
+#include <tier0/keyvalues.h>
 
 // Windows: linkage corresponds to a final class type.
 #ifdef META_IS_SOURCE2
@@ -301,7 +301,7 @@ bool GameData::Config::LoadEngineOffsets(KeyValues *pOffsetsValues, char *psErro
 
 			if(pPlatformValues)
 			{
-				this->SetOffset(pszOffsetName, GameData::ReadOffset(pPlatformValues->GetString(NULL)));
+				this->SetOffset(pszOffsetName, GameData::ReadOffset(pPlatformValues->GetString()));
 			}
 			else if(psError)
 			{
@@ -342,7 +342,7 @@ bool GameData::Config::LoadEngineAddresses(KeyValues *pAddressesValues, char *ps
 
 			if(bResult)
 			{
-				const char *pszSignatureName = pSignatureValues->GetString(NULL);
+				const char *pszSignatureName = pSignatureValues->GetString();
 
 				CMemory pSigAddress = this->GetAddress(pszSignatureName);
 
@@ -408,7 +408,7 @@ bool GameData::Config::LoadEngineAddressActions(uintptr_t &pAddrCur, KeyValues *
 		{
 			const char *pszName = pAction->GetName();
 
-			ptrdiff_t nActionValue = GameData::ReadOffset(pAction->GetString(NULL));
+			ptrdiff_t nActionValue = GameData::ReadOffset(pAction->GetString());
 
 			if(!strcmp(pszName, "offset"))
 			{

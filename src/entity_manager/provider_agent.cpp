@@ -7,8 +7,8 @@
 #include <tier0/dbg.h>
 #include <tier0/memalloc.h>
 #include <tier0/platform.h>
+#include <tier0/keyvalues.h>
 #include <tier1/generichash.h>
-#include <tier1/KeyValues.h>
 
 extern EntityManager::Provider *g_pEntityManagerProvider;
 
@@ -150,7 +150,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 
 		if(pAttr)
 		{
-			const char *pszValue = pKeyValue->GetString(NULL);
+			const char *pszValue = pKeyValue->GetString();
 
 			if(pDetails)
 			{
@@ -470,7 +470,7 @@ const EntityKey &EntityManager::ProviderAgent::GetCachedClassnameKey()
 
 EntityManager::ProviderAgent::CacheMapOIndexType EntityManager::ProviderAgent::CacheOrGetEntityKey(const char *pszName)
 {
-	const CUtlString sName = pszName;
+	const CUtlString sName(pszName, V_strlen(pszName) + 1);
 
 	CacheMapOIndexType nFindElm = this->m_mapCachedKeys.Find(sName);
 
