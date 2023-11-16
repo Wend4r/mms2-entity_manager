@@ -85,19 +85,19 @@ GameData::Platform GameData::GetCurrentPlatform()
 {
 #if defined(_WINDOWS)
 #	if defined(X64BITS)
-	return Platform::WINDOWS64;
+	return Platform::PLAT_WINDOWS64;
 #	else
-	return Platform::WINDOWS;
+	return Platform::PLAT_WINDOWS;
 #	endif
 #elif defined(_LINUX)
 #	if defined(X64BITS)
-	return Platform::LINUX64;
+	return Platform::PLAT_LINUX64;
 #	else
-	return Platform::LINUX;
+	return Platform::PLAT_LINUX;
 #	endif
 #else
 #	error Unsupported platform
-	return Platform::UNKNOWN;
+	return Platform::PLAT_UNKNOWN;
 #endif
 }
 
@@ -108,7 +108,7 @@ const char *GameData::GetCurrentPlatformName()
 
 const char *GameData::GetPlatformName(Platform eElm)
 {
-	const char *sPlatformNames[Platform::PLATFORM_MAX] =
+	const char *sPlatformNames[Platform::PLAT_MAX] =
 	{
 		"windows",
 		"windows64",
@@ -356,7 +356,7 @@ bool GameData::Config::LoadEngineAddresses(KeyValues *pAddressesValues, char *ps
 
 						int iCurrentPlat = This::GetCurrentPlatform();
 
-						for(int iPlat = PLATFORM_FIRST; iPlat < PLATFORM_MAX; iPlat++)
+						for(int iPlat = PLAT_FIRST; iPlat < PLAT_MAX; iPlat++)
 						{
 							if(iCurrentPlat != iPlat)
 							{

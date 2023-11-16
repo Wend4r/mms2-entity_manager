@@ -92,6 +92,13 @@
 				"windows64"     "32"
 				"linux64"       "32"
 			}
+
+			// In ctor: see CEntityKeyValues::CEntityKeyValues()
+			"CEntityKeyValues::m_eContainerType"
+			{
+				"windows64"     "37"
+				"linux64"       "37"
+			}
 		}
 	}
 }

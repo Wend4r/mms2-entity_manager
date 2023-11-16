@@ -54,7 +54,7 @@ namespace EntityManager
 		int DestroyQueued();
 
 	public:
-		void DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput);
+		bool DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput);
 
 	protected:
 		typedef CUtlMap<CUtlString, EntityKey> CacheMapType;

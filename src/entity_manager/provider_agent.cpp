@@ -419,43 +419,72 @@ int EntityManager::ProviderAgent::DestroyQueued()
 	return iQueueLength;
 }
 
-void EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput)
+bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput)
 {
-	static const char *pszOutputKeys[] = 
-	{
-		"classname",
-		"model",
-		"origin",
-		"angles"
-	};
-
-	static const char *pszAttrFormat[] =
-	{
-		"\"%s\" is not found", 
-		"\"%s\" = \"%s\""
-	};
-
 	const CEntityKeyValuesProvider *pProvider = (const CEntityKeyValuesProvider *)pKeyValues;
 
-	aOutput.PushFormat("ref count is %d", pProvider->GetRefCount());
+	bool bResult = pProvider != nullptr;
 
-	for(size_t n = 0; n < sizeof(pszOutputKeys) / sizeof(const char *); n++)
+	if(bResult)
 	{
-		const char *pszCurAttr = pszOutputKeys[n];
+		bResult = pProvider->GetRefCount() != 0;
 
-		CEntityKeyValuesAttributeProvider *pAttrProv = (CEntityKeyValuesAttributeProvider *)pProvider->GetAttribute(this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszCurAttr)));
-
-		if(pAttrProv)
+		if(bResult)
 		{
-			const char *pszAttrValue = pAttrProv->GetValueString(NULL);
+			uint8 nType = pProvider->GetContainerType();
 
-			aOutput.PushFormat(pszAttrFormat[pszAttrValue != NULL], pszCurAttr, pszAttrValue);
+			bResult = !nType || nType == 3;
+
+			if(bResult)
+			{
+				static const char *pszOutputKeys[] = 
+				{
+					"classname",
+					"model",
+					"origin",
+					"angles"
+				};
+
+				static const char *pszAttrFormat[] =
+				{
+					"\"%s\" is not found", 
+					"\"%s\" = \"%s\""
+				};
+
+				for(size_t n = 0; n < sizeof(pszOutputKeys) / sizeof(const char *); n++)
+				{
+					const char *pszCurAttr = pszOutputKeys[n];
+
+					CEntityKeyValuesAttributeProvider *pAttrProv = (CEntityKeyValuesAttributeProvider *)pProvider->GetAttribute(this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszCurAttr)));
+
+					if(pAttrProv)
+					{
+						const char *pszAttrValue = pAttrProv->GetValueString(NULL);
+
+						aOutput.PushFormat(pszAttrFormat[pszAttrValue != NULL], pszCurAttr, pszAttrValue);
+					}
+					else
+					{
+						aOutput.PushFormat("Failed to get \"%s\" key attribute", pszCurAttr);
+					}
+				}
+			}
+			else
+			{
+				aOutput.PushFormat("Invalid entity key values. It is an uninitialized? (dest is %p, unknown type is %d)", pProvider, nType);
+			}
 		}
 		else
 		{
-			aOutput.PushFormat("Failed to get \"%s\" key attribute", pszCurAttr);
+			aOutput.PushFormat("Skip ref-empty entity key values (dest is %p)", pProvider);
 		}
 	}
+	else
+	{
+		aOutput.Push("Skip an entity without key values");
+	}
+
+	return bResult;
 }
 
 const EntityKey &EntityManager::ProviderAgent::GetCachedEntityKey(CacheMapOIndexType nElm)

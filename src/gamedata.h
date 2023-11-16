@@ -37,19 +37,19 @@ protected:
 
 	enum Platform : int
 	{
-		UNKNOWN = -1,
-		PLATFORM_FIRST = 0,
+		PLAT_UNKNOWN = -1,
+		PLAT_FIRST = 0,
 
-		WINDOWS = 0,
-		WINDOWS64,
+		PLAT_WINDOWS = 0,
+		PLAT_WINDOWS64,
 
-		LINUX,
-		LINUX64,
+		PLAT_LINUX,
+		PLAT_LINUX64,
 
-		MAC,
-		MAC64,
+		PLAT_MAC,
+		PLAT_MAC64,
 
-		PLATFORM_MAX
+		PLAT_MAX
 	};
 
 	inline static Platform GetCurrentPlatform();
@@ -182,7 +182,7 @@ public:
 
 					if(it != map.cend())
 					{
-						it.push_back(funcCallback);
+						it.second.push_back(funcCallback);
 					}
 					else
 					{

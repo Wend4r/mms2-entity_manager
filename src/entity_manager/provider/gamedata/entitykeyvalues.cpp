@@ -36,6 +36,10 @@ EntityManager::Provider::GameDataStorage::EntityKeyValues::EntityKeyValues()
 		{
 			this->m_nRefCountOffset = nOffset;
 		});
+		aCallbacks.Insert("CEntityKeyValues::m_eContainerType", [this](const std::string &, const ptrdiff_t &nOffset)
+		{
+			this->m_nContainerTypeOffset = nOffset;
+		});
 
 		this->m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
 	}
@@ -87,4 +91,9 @@ ptrdiff_t EntityManager::Provider::GameDataStorage::EntityKeyValues::GetSizeof()
 ptrdiff_t EntityManager::Provider::GameDataStorage::EntityKeyValues::GetRefCountOffset() const
 {
 	return this->m_nRefCountOffset;
+}
+
+ptrdiff_t EntityManager::Provider::GameDataStorage::EntityKeyValues::GetContainerTypeOffset() const
+{
+	return this->m_nContainerTypeOffset;
 }

@@ -32,6 +32,9 @@ class GameSessionConfiguration_t { };
 
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 SH_DECL_HOOK3_void(INetworkServerService, StartupServer, SH_NOATTRIB, 0, const GameSessionConfiguration_t &, ISource2WorldSession *, const char *);
+
+SH_DECL_HOOK2_void(CGameEntitySystem, Spawn, SH_NOATTRIB, 0, int, const EntitySpawnInfo_t *);
+
 SH_DECL_HOOK2_void(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, SH_NOATTRIB, 0, SpawnGroupHandle_t, ISpawnGroup *);
 SH_DECL_HOOK4_void(CSpawnGroupMgrGameSystem, SpawnGroupInit, SH_NOATTRIB, 0, SpawnGroupHandle_t, IEntityResourceManifest *, IEntityPrecacheConfiguration *, ISpawnGroupPrerequisiteRegistry *);
 SH_DECL_HOOK4(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, SH_NOATTRIB, 0, ILoadingSpawnGroup *, SpawnGroupHandle_t, bool, bool, const CUtlVector<const CEntityKeyValues *> *);
@@ -249,12 +252,19 @@ void EntityManagerPlugin::DestroyGameResource()
 
 bool EntityManagerPlugin::InitEntitySystem()
 {
-	return s_aEntityManagerProviderAgent.NotifyEntitySystemUpdated();
+	bool bResult = s_aEntityManagerProviderAgent.NotifyEntitySystemUpdated();
+
+	if(bResult)
+	{
+		SH_ADD_HOOK_MEMFUNC(CGameEntitySystem, Spawn, g_pGameEntitySystem, this, &EntityManagerPlugin::OnEntitySystemSpawnHook, false);
+	}
+
+	return bResult;
 }
 
 void EntityManagerPlugin::DestroyEntitySystem()
 {
-	// ...
+	SH_REMOVE_HOOK_MEMFUNC(CGameEntitySystem, Spawn, g_pGameEntitySystem, this, &EntityManagerPlugin::OnEntitySystemSpawnHook, false);
 }
 
 bool EntityManagerPlugin::InitSpawnGroup()
@@ -410,6 +420,44 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 	{
 		this->m_aLogger.Warning(LOGGER_COLOR_WARNING, "Failed to get a net server\n");
 	}
+}
+
+void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnInfo_t *pInfo)
+{
+	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnEntitySystemSpawnHook(%d, %p)\n", iCount, pInfo);
+
+	auto aDetails = this->m_aLogger.CreateDetailsScope();
+
+	aDetails.Push("-- Spawn (head) --");
+
+	{
+		for(int i = 0; i < iCount; i++)
+		{
+			const EntitySpawnInfo_t &pInfoOne = pInfo[i];
+
+			CEntityIdentity *pEntity = pInfoOne.m_pEntity;
+
+			int iEntity = pEntity->GetEntityIndex().Get();
+
+			const char *pszClassname = pEntity->GetClassname();
+
+			const CEntityKeyValues *pKeyValues = pInfoOne.m_pKeyValues;
+
+			if(!s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aDetails))
+			{
+				aDetails.PushFormat("Instance data: classname is \"%s\", index is %d", pszClassname, iEntity);
+			}
+
+			aDetails.Push("-- Spawn --");
+		}
+	}
+
+	aDetails.SendColor([this](const Color &rgba, const std::string sContent)
+	{
+		this->m_aLogger.Detailed(rgba, sContent.c_str());
+	});
+
+	SET_META_RESULT(MRES_HANDLED);
 }
 
 void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)

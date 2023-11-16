@@ -33,6 +33,11 @@ uint16 EntityManager::CEntityKeyValuesProvider::GetRefCount() const
 	return *(uint16 *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().GetRefCountOffset());
 }
 
+uint8 EntityManager::CEntityKeyValuesProvider::GetContainerType() const
+{
+	return *(uint8 *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().GetContainerTypeOffset());
+}
+
 void EntityManager::CEntityKeyValuesProvider::Release()
 {
 	g_pGameEntitySystem->ReleaseKeyValues(this);

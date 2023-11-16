@@ -34,6 +34,7 @@ namespace EntityManager
 	public: // Reference.
 		void AddRef();
 		uint16 GetRefCount() const;
+		uint8 GetContainerType() const;
 		void Release();
 
 	public: // Attributes.

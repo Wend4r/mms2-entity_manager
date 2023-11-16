@@ -64,6 +64,7 @@ namespace EntityManager
 			public:
 				ptrdiff_t GetSizeof() const;
 				ptrdiff_t GetRefCountOffset() const;
+				ptrdiff_t GetContainerTypeOffset() const;
 
 			private:
 				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
@@ -79,6 +80,7 @@ namespace EntityManager
 			private: // Offsets.
 				ptrdiff_t m_nSizeof = -1;
 				ptrdiff_t m_nRefCountOffset = -1;
+				ptrdiff_t m_nContainerTypeOffset = -1;
 			};
 
 			class EntitySystem
