@@ -194,9 +194,67 @@ Logger::Scope::Scope(const Color &rgba, const char *pszStartWith, const char *ps
 	this->m_aEnd = pszEnd;
 }
 
+Logger::Scope &Logger::Scope::operator+=(const Scope &aTarget)
+{
+	std::string sResultContent;
+
+	size_t nSize = aTarget.m_vec.size();
+
+	Color rgbaSave = aTarget.m_aColor;
+
+	{
+		size_t n = 0;
+
+		while(1)
+		{
+			const auto &aMsg = aTarget.m_vec[n];
+
+			if(aMsg.GetColor() == rgbaSave)
+			{
+				sResultContent += aTarget.m_aStartWith + aMsg.Get();
+			}
+			else
+			{
+				this->Push(rgbaSave, sResultContent.c_str());
+
+				sResultContent = aTarget.m_aStartWith + aMsg.Get();
+				rgbaSave = aMsg.GetColor();
+			}
+
+			n++;
+
+			if(n < nSize)
+			{
+				sResultContent += aTarget.m_aEnd;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+
+	if(sResultContent.size())
+	{
+		this->Push(rgbaSave, sResultContent.c_str());
+	}
+
+	return *this;
+}
+
 const Color &Logger::Scope::GetColor() const
 {
 	return this->m_aColor;
+}
+
+const char *Logger::Scope::GetStartWith() const
+{
+	return this->m_aStartWith.c_str();
+}
+
+const char *Logger::Scope::GetEnd() const
+{
+	return this->m_aEnd.c_str();
 }
 
 size_t Logger::Scope::Count()
@@ -220,6 +278,17 @@ size_t Logger::Scope::Push(const char *pszContent)
 	return nStoredLength;
 }
 
+size_t Logger::Scope::Push(const Color &rgba, const char *pszContent)
+{
+	Message aMsg(rgba);
+
+	size_t nStoredLength = aMsg.SetWithCopy(pszContent);
+
+	this->m_vec.push_back(aMsg);
+
+	return nStoredLength;
+}
+
 size_t Logger::Scope::PushFormat(const char *pszFormat, ...)
 {
 	va_list aParams;
@@ -229,6 +298,23 @@ size_t Logger::Scope::PushFormat(const char *pszFormat, ...)
 	va_end(aParams);
 
 	Message aMsg(this->m_aColor);
+
+	size_t nStoredLength = aMsg.SetWithCopy((const char *)this->m_sFormatBuffer);
+
+	this->m_vec.push_back(aMsg);
+
+	return nStoredLength;
+}
+
+size_t Logger::Scope::PushFormat(const Color &rgba, const char *pszFormat, ...)
+{
+	va_list aParams;
+
+	va_start(aParams, pszFormat);
+	V_vsnprintf((char *)this->m_sFormatBuffer, sizeof(this->m_sFormatBuffer), pszFormat, aParams);
+	va_end(aParams);
+
+	Message aMsg(rgba);
 
 	size_t nStoredLength = aMsg.SetWithCopy((const char *)this->m_sFormatBuffer);
 

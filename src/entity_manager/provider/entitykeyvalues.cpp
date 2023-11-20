@@ -8,7 +8,7 @@ extern EntityManager::Provider *g_pEntityManagerProvider;
 
 extern CGameEntitySystem *g_pGameEntitySystem;
 
-CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(CUtlScratchMemoryPool *pMemoryPool, char eContainerType)
+CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(CKeyValues3Cluster *pClusterAllocator, char eContainerType)
 {
 	const auto &aGameData = g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues();
 
@@ -16,11 +16,21 @@ CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(CUtlScratchMem
 
 	if(pNewKeyValues)
 	{
-		(aGameData.EntityKeyValuesFunction())(pNewKeyValues, pMemoryPool, eContainerType);
+		(aGameData.EntityKeyValuesFunction())(pNewKeyValues, pClusterAllocator, eContainerType);
 		++*(uint16 *)((uintptr_t)pNewKeyValues + aGameData.GetRefCountOffset());
 	}
 
 	return pNewKeyValues;
+}
+
+KeyValues3 *EntityManager::CEntityKeyValuesProvider::Root()
+{
+	return *(KeyValues3 **)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().GetRootOffset());
+}
+
+const KeyValues3 *EntityManager::CEntityKeyValuesProvider::Root() const
+{
+	return *(const KeyValues3 **)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().GetRootOffset());
 }
 
 void EntityManager::CEntityKeyValuesProvider::AddRef()
@@ -43,7 +53,7 @@ void EntityManager::CEntityKeyValuesProvider::Release()
 	g_pGameEntitySystem->ReleaseKeyValues(this);
 }
 
-CEntityKeyValuesAttribute *EntityManager::CEntityKeyValuesProvider::GetAttribute(const EntityKey &key, char *psValue) const
+CEntityKeyValuesAttribute *EntityManager::CEntityKeyValuesProvider::GetAttribute(const EntityKeyId_t &key, char *psValue) const
 {
 	return (g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues().GetAttributeFunction())(this, key, psValue);
 }

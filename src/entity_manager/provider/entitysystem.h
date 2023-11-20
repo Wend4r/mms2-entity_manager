@@ -18,7 +18,7 @@ namespace EntityManager
 	{
 	public:
 		IEntityResourceManifest *GetCurrentManifest();
-		CUtlScratchMemoryPool *GetKeyValuesMemoryPool();
+		CKeyValues3Cluster *GetKeyValuesClusterAllocator();
 
 	public: // Action methods.
 		CEntityInstance *CreateEntity(SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, bool bCreateInIsolatedPrecacheList);

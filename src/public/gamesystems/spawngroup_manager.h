@@ -15,6 +15,7 @@
 
 class matrix3x4a_t;
 class CEntityKeyValues;
+class CKeyValues3Cluster;
 class CGameResourceManifest;
 class ISpawnGroupPrerequisiteRegistry;
 class IWorldReference;
@@ -225,7 +226,7 @@ public:
 	virtual bool IsLevelTransition() const = 0;
 	virtual const char *GetLevelTransitionPreviousMap() const = 0;
 	virtual const char *GetLevelTransitionLandmarkName() const = 0;
-	virtual CUtlScratchMemoryPool *GetEntityKeyValuesAllocator() = 0;
+	virtual CKeyValues3Cluster *GetEntityKeyValuesAllocator() = 0;
 	virtual CEntityInstance *CreateEntityToSpawn(SpawnGroupHandle_t hSpawnGroup, const matrix3x4a_t *const vecSpawnOffset, int createType, const CEntityKeyValues *pEntityKeyValues) = 0;
 	virtual void SpawnEntities() = 0;
 	virtual void Release() = 0;

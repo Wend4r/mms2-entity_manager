@@ -75,13 +75,20 @@ public:
 		Scope(const Color &rgbaInit, const char *pszStartWith = "");
 		Scope(const Color &rgbaInit, const char *pszStartWith, const char *pszEnd);
 
+		Scope &operator+=(const Scope &);
+
 		const Color &GetColor() const;
+		const char *GetStartWith() const;
+		const char *GetEnd() const;
 		size_t Count();
 
 		void SetColor(const Color &rgba);
 
 		size_t Push(const char *pszContent);
+		size_t Push(const Color &rgba, const char *pszContent);
+
 		size_t PushFormat(const char *pszFormat, ...);
+		size_t PushFormat(const Color &rgba, const char *pszFormat, ...);
 
 		size_t Send(SendFunc funcOn);
 		size_t SendColor(SendColorFunc funcOn);

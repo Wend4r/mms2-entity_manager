@@ -2,12 +2,13 @@
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_ENTITYKEYVALUES_PROVIDER_H_
 
 #include <eiface.h>
+// #include <variant.h>
 #include <tier0/utlstring.h>
+#include <tier0/utlstringtoken.h>
 #include <tier0/utlscratchmemory.h>
+#include <tier1/keyvalues3.h>
 #include <entity2/entityidentity.h>
 #include <entity2/entitysystem.h>
-
-#define ENTITY_KEY_MAGIC_MEOW 0x31415926u
 
 class CEntityKeyValues
 {
@@ -17,19 +18,18 @@ class CEntityKeyValuesAttribute
 {
 };
 
-class EntityKey
-{
-public:
-	uint32 m_nHashCode;
-	const char *m_pszName;
-};
+typedef CUtlStringToken EntityKeyId_t;
 
 namespace EntityManager
 {
 	class CEntityKeyValuesProvider : public CEntityKeyValues
 	{
 	public:
-		static CEntityKeyValues *Create(CUtlScratchMemoryPool *pMemoryPool = nullptr, char eContainerType = 0);
+		static CEntityKeyValues *Create(CKeyValues3Cluster *pClusterAllocator = nullptr, char eContainerType = 0);
+
+	public:
+		KeyValues3 *Root();
+		const KeyValues3 *Root() const;
 
 	public: // Reference.
 		void AddRef();
@@ -38,7 +38,7 @@ namespace EntityManager
 		void Release();
 
 	public: // Attributes.
-		CEntityKeyValuesAttribute *GetAttribute(const EntityKey &key, char *psValue = nullptr) const;
+		CEntityKeyValuesAttribute *GetAttribute(const EntityKeyId_t &key, char *psValue = nullptr) const;
 		void SetAttributeValue(CEntityKeyValuesAttribute *pAttr, const char *pString);
 	};
 

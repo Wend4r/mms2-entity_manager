@@ -101,7 +101,7 @@ ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetCurrentMani
 	return this->m_nCurrentManifestOffset;
 }
 
-ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetKeyValuesMemoryPoolOffset() const
+ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetKeyValuesMemoryPoolOffsetOffset() const
 {
 	return this->m_nKeyValuesMemoryPoolOffset;
 }

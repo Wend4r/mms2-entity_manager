@@ -11,7 +11,7 @@
 			// Declaration:
 			// void CEntityKeyValues::CEntityKeyValues(
 			//         CEntityKeyValues *const this, 
-			//         CUtlScratchMemoryPool *pEntitySystemSubobject, // Can be nullptr by 0 type.
+			//         CKeyValues3Cluster *pClusterAllocator, // Can be nullptr by 0 type.
 			//         char eContainerType) // Usually, 0 or 3
 			"CEntityKeyValues::CEntityKeyValues"
 			{
@@ -26,15 +26,8 @@
 			// Declaration:
 			// CEntityKeyValuesAttribute *CEntityKeyValues::GetAttribute( // Returns an unknown attribute structure.
 			//         CEntityKeyValues *const this, 
-			//         const EntityKey *key,
+			//         const EntityKeyId_t *key,
 			//         char *psValue) // Can be nullptr
-			// 
-			// Type declarations:
-			// class EntityKey // Like CUtlStringToken
-			// {
-			// 	uint32 m_nHashCode;
-			// 	const char *pszName;
-			// };
 			"CEntityKeyValues::GetAttribute"
 			{
 				"library"       "server"
@@ -66,7 +59,7 @@
 			// Declaration:
 			// void CEntityKeyValues::SetAttributeValue(
 			//         CEntityKeyValues *const this, 
-			//         void *pAttribute, 
+			//         CEntityKeyValuesAttribute *pAttr, 
 			//         const char *pString)
 			// 
 			"CEntityKeyValues::SetAttributeValue"
@@ -84,6 +77,20 @@
 			{
 				"windows64"     "0x38"
 				"linux64"       "0x38"
+			}
+
+			// In ctor: see CEntityKeyValues::CEntityKeyValues()
+			"CEntityKeyValues::m_pClusterAllocator"
+			{
+				"windows64"     "0"
+				"linux64"       "0"
+			}
+
+			// In ctor: see CEntityKeyValues::CEntityKeyValues()
+			"CEntityKeyValues::m_pRoot"
+			{
+				"windows64"     "16"
+				"linux64"       "16"
 			}
 
 			// Near ctor: see CEntityKeyValues::CEntityKeyValues()

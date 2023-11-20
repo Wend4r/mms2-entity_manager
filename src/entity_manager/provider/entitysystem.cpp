@@ -8,9 +8,9 @@ IEntityResourceManifest *EntityManager::CEntitySystemProvider::GetCurrentManifes
 	return *(IEntityResourceManifest **)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().GetCurrentManifestOffset());
 }
 
-CUtlScratchMemoryPool *EntityManager::CEntitySystemProvider::GetKeyValuesMemoryPool()
+CKeyValues3Cluster *EntityManager::CEntitySystemProvider::GetKeyValuesClusterAllocator()
 {
-	return (CUtlScratchMemoryPool *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().GetKeyValuesMemoryPoolOffset());
+	return (CKeyValues3Cluster *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().GetKeyValuesMemoryPoolOffsetOffset());
 }
 
 CEntityInstance *EntityManager::CEntitySystemProvider::CreateEntity(SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, bool bCreateInIsolatedPrecacheList)

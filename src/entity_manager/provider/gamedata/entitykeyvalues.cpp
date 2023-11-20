@@ -32,6 +32,10 @@ EntityManager::Provider::GameDataStorage::EntityKeyValues::EntityKeyValues()
 		{
 			this->m_nSizeof = nOffset;
 		});
+		aCallbacks.Insert("CEntityKeyValues::m_pRoot", [this](const std::string &, const ptrdiff_t &nOffset)
+		{
+			this->m_nRootOffset = nOffset;
+		});
 		aCallbacks.Insert("CEntityKeyValues::m_nRefCount", [this](const std::string &, const ptrdiff_t &nOffset)
 		{
 			this->m_nRefCountOffset = nOffset;
@@ -60,7 +64,9 @@ void EntityManager::Provider::GameDataStorage::EntityKeyValues::Reset()
 	this->m_pfnSetAttributeValue = nullptr;
 
 	this->m_nSizeof = -1;
+	this->m_nRootOffset = -1;
 	this->m_nRefCountOffset = -1;
+	this->m_nContainerTypeOffset = -1;
 }
 
 EntityManager::Provider::GameDataStorage::EntityKeyValues::OnEntityKeyValuesPtr EntityManager::Provider::GameDataStorage::EntityKeyValues::EntityKeyValuesFunction() const
@@ -86,6 +92,11 @@ EntityManager::Provider::GameDataStorage::EntityKeyValues::OnSetAttributeValuePt
 ptrdiff_t EntityManager::Provider::GameDataStorage::EntityKeyValues::GetSizeof() const
 {
 	return this->m_nSizeof;
+}
+
+ptrdiff_t EntityManager::Provider::GameDataStorage::EntityKeyValues::GetRootOffset() const
+{
+	return this->m_nRootOffset;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::EntityKeyValues::GetRefCountOffset() const

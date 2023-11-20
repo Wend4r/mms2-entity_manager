@@ -51,8 +51,8 @@ namespace EntityManager
 				void Reset();
 
 			public:
-				typedef void (*OnEntityKeyValuesPtr)(CEntityKeyValues * const pThis, CUtlScratchMemoryPool *pMemoryPool, char eContainerType);
-				typedef CEntityKeyValuesAttribute *(*OnGetAttributePtr)(const CEntityKeyValues * const pThis, const EntityKey &key, char *psValue);
+				typedef void (*OnEntityKeyValuesPtr)(CEntityKeyValues * const pThis, CKeyValues3Cluster *pClusterAllocator, char eContainerType);
+				typedef CEntityKeyValuesAttribute *(*OnGetAttributePtr)(const CEntityKeyValues * const pThis, const EntityKeyId_t &key, char *psValue);
 				typedef const char *(*OnAttributeGetValueStringPtr)(const CEntityKeyValuesAttribute * const pThis, const char *pszDefaultValue);
 				typedef void (*OnSetAttributeValuePtr)(CEntityKeyValues * const pThis, CEntityKeyValuesAttribute *pAttribute, const char *pString);
 
@@ -63,6 +63,7 @@ namespace EntityManager
 
 			public:
 				ptrdiff_t GetSizeof() const;
+				ptrdiff_t GetRootOffset() const;
 				ptrdiff_t GetRefCountOffset() const;
 				ptrdiff_t GetContainerTypeOffset() const;
 
@@ -79,6 +80,7 @@ namespace EntityManager
 
 			private: // Offsets.
 				ptrdiff_t m_nSizeof = -1;
+				ptrdiff_t m_nRootOffset = -1;
 				ptrdiff_t m_nRefCountOffset = -1;
 				ptrdiff_t m_nContainerTypeOffset = -1;
 			};
@@ -108,7 +110,7 @@ namespace EntityManager
 				OnListenForEntityInSpawnGroupToFinishPtr ListenForEntityInSpawnGroupToFinishFunction() const;
 
 				ptrdiff_t GetCurrentManifestOffset() const;
-				ptrdiff_t GetKeyValuesMemoryPoolOffset() const;
+				ptrdiff_t GetKeyValuesMemoryPoolOffsetOffset() const;
 
 			private:
 				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;

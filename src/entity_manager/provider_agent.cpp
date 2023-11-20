@@ -9,55 +9,13 @@
 #include <tier0/platform.h>
 #include <tier0/keyvalues.h>
 #include <tier1/generichash.h>
+#include <tier1/keyvalues3.h>
 
 extern EntityManager::Provider *g_pEntityManagerProvider;
 
 extern IGameResourceServiceServer *g_pGameResourceServiceServer;
 CGameEntitySystem *g_pGameEntitySystem = NULL;
 CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
-
-// tier0 module.
-PLATFORM_INTERFACE bool g_bUpdateStringTokenDatabase;
-PLATFORM_INTERFACE void RegisterStringToken(uint32 nHashCode, const char *pszName, uint64 nUnk1 = 0LL, bool bUnk2 = true);
-
-// Entity key caclulation.
-FORCEINLINE const EntityKey CalcEntityKey(const char *pszName, const char *pszSafeName, int nLength)
-{
-	return {MurmurHash2LowerCase(pszName, nLength, ENTITY_KEY_MAGIC_MEOW), pszSafeName};
-}
-
-FORCEINLINE const EntityKey CalcEntityKey(const char *pszName, int nLength)
-{
-	return CalcEntityKey(pszName, pszName, nLength);
-}
-
-FORCEINLINE const EntityKey CalcEntityKey(const char *pszName)
-{
-	return CalcEntityKey(pszName, pszName, strlen(pszName));
-}
-
-// Make an entity key.
-FORCEINLINE const EntityKey MakeEntityKey(const char *pszName, const char *pszSafeName, int nLength)
-{
-	const EntityKey aKey = CalcEntityKey(pszName, pszSafeName, nLength);
-
-	if(g_bUpdateStringTokenDatabase)
-	{
-		RegisterStringToken(aKey.m_nHashCode, aKey.m_pszName);
-	}
-
-	return aKey;
-}
-
-FORCEINLINE const EntityKey MakeEntityKey(const char *pszName, int nLength)
-{
-	return MakeEntityKey(pszName, pszName, nLength);
-}
-
-FORCEINLINE const EntityKey MakeEntityKey(const char *pszName)
-{
-	return MakeEntityKey(pszName, pszName, strlen(pszName));
-}
 
 class CDefOpsString
 {
@@ -75,7 +33,7 @@ EntityManager::ProviderAgent::ProviderAgent()
 	{
 		static const char szClassname[] = "classname";
 
-		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert((const char *)szClassname, MakeEntityKey((const char *)szClassname, sizeof(szClassname) - 1));
+		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert(szClassname, szClassname);
 	}
 }
 
@@ -131,7 +89,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 {
 	int iNewIndex = this->m_vecEntitySpawnQueue.Count();
 
-	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesMemoryPool(), 3);
+	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesClusterAllocator(), 3);
 
 	Color rgbaPrev = LOGGER_COLOR_MESSAGE;
 
@@ -139,7 +97,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 	{
 		rgbaPrev = pDetails->GetColor();
 		pDetails->SetColor(pOldKeyValues->GetColor("color", rgbaPrev));
-		pDetails->PushFormat("- Queue entity #%d -", iNewIndex);
+		pDetails->PushFormat("-- Queue entity #%d --", iNewIndex);
 	}
 
 	FOR_EACH_VALUE(pOldKeyValues, pKeyValue)
@@ -154,7 +112,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 
 			if(pDetails)
 			{
-				pDetails->PushFormat("  \"%s\" has \"%s\" value", pszKey, pszValue);
+				pDetails->PushFormat("\t\"%s\" has \"%s\" value", pszKey, pszValue);
 			}
 
 			pNewKeyValues->SetAttributeValue(pAttr, pszValue);
@@ -329,12 +287,12 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup, Lo
 				}
 				else if(pWarnings)
 				{
-					pWarnings->PushFormat("Empty entity \"%s\" key (queue number is %d)", aClassnameKey.m_pszName, i);
+					pWarnings->PushFormat("Empty entity \"%s\" key (queue number is %d)", aClassnameKey.GetString(), i);
 				}
 			}
 			else if(pWarnings)
 			{
-				pWarnings->PushFormat("Failed to get \"%s\" entity key (queue number is %d)", aClassnameKey.m_pszName, i);
+				pWarnings->PushFormat("Failed to get \"%s\" entity key (queue number is %d)", aClassnameKey.GetString(), i);
 			}
 		}
 	}
@@ -419,7 +377,7 @@ int EntityManager::ProviderAgent::DestroyQueued()
 	return iQueueLength;
 }
 
-bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput)
+bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput, Logger::Scope *paWarnings)
 {
 	const CEntityKeyValuesProvider *pProvider = (const CEntityKeyValuesProvider *)pKeyValues;
 
@@ -437,62 +395,85 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 
 			if(bResult)
 			{
-				static const char *pszOutputKeys[] = 
+				const KeyValues3 *pRoot = pProvider->Root();
+
+				bResult = pRoot != nullptr;
+
+				if(bResult)
 				{
-					"classname",
-					"model",
-					"origin",
-					"angles"
-				};
-
-				static const char *pszAttrFormat[] =
-				{
-					"\"%s\" is not found", 
-					"\"%s\" = \"%s\""
-				};
-
-				for(size_t n = 0; n < sizeof(pszOutputKeys) / sizeof(const char *); n++)
-				{
-					const char *pszCurAttr = pszOutputKeys[n];
-
-					CEntityKeyValuesAttributeProvider *pAttrProv = (CEntityKeyValuesAttributeProvider *)pProvider->GetAttribute(this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszCurAttr)));
-
-					if(pAttrProv)
+					for(int i = 0, iMemberCount = pRoot->GetMemberCount(); i < iMemberCount; i++)
 					{
-						const char *pszAttrValue = pAttrProv->GetValueString(NULL);
+						const char *pAttrName = pRoot->GetMemberName(i);
 
-						aOutput.PushFormat(pszAttrFormat[pszAttrValue != NULL], pszCurAttr, pszAttrValue);
-					}
-					else
-					{
-						aOutput.PushFormat("Failed to get \"%s\" key attribute", pszCurAttr);
+						KeyValues3 *pMember = pRoot->GetMember(i);
+
+						if(pMember)
+						{
+							const char *pDest = "unknown";
+
+							switch(pMember->GetTypeEx())
+							{
+								case KV3_TYPEEX_NULL:
+									aOutput.PushFormat("%s = null", pAttrName);
+									break;
+								case KV3_TYPEEX_BOOL:
+									aOutput.PushFormat("%s = %s", pAttrName, pMember->GetBool() ? "true" : "false");
+									break;
+								case KV3_TYPEEX_INT:
+									aOutput.PushFormat("%s = %lld", pAttrName, pMember->GetInt64());
+									break;
+								case KV3_TYPEEX_UINT:
+									aOutput.PushFormat("%s = %llu", pAttrName, pMember->GetUInt64());
+									break;
+								case KV3_TYPEEX_DOUBLE:
+									aOutput.PushFormat("%s = %g", pAttrName, pMember->GetDouble());
+									break;
+								case KV3_TYPEEX_STRING:
+								case KV3_TYPEEX_STRING_EXTERN:
+								case KV3_TYPEEX_STRING_SHORT:
+									aOutput.PushFormat("%s = \"%s\"", pAttrName, pMember->GetString());
+									break;
+								default:
+									Assert( 0 );
+									aOutput.PushFormat("%s = unknown", pAttrName, pMember->GetString());
+									break;
+							}
+						}
+						else if(paWarnings)
+						{
+							paWarnings->PushFormat("Failed to get \"%s\" key member", pAttrName);
+						}
 					}
 				}
+				else if(paWarnings)
+				{
+					paWarnings->Push("Entity key values hasn't table");
+				}
 			}
-			else
+			else if(paWarnings)
 			{
-				aOutput.PushFormat("Invalid entity key values. It is an uninitialized? (dest is %p, unknown type is %d)", pProvider, nType);
+				paWarnings->PushFormat(LOGGER_COLOR_ERROR, "Invalid entity key values. It is an uninitialized? (dest is %p, unknown type is %d)", pProvider, nType);
 			}
 		}
-		else
+		else if(paWarnings)
 		{
-			aOutput.PushFormat("Skip ref-empty entity key values (dest is %p)", pProvider);
+			paWarnings->PushFormat("Skip ref-empty entity key values (dest is %p)", pProvider);
 		}
 	}
-	else
+	else if(paWarnings)
 	{
-		aOutput.Push("Skip an entity without key values");
+		paWarnings->Push("Skip an entity without key values");
 	}
 
 	return bResult;
 }
 
-const EntityKey &EntityManager::ProviderAgent::GetCachedEntityKey(CacheMapOIndexType nElm)
+const EntityKeyId_t &EntityManager::ProviderAgent::GetCachedEntityKey(CacheMapOIndexType nElm)
 {
 	return this->m_mapCachedKeys[nElm];
 }
 
-const EntityKey &EntityManager::ProviderAgent::GetCachedClassnameKey()
+const EntityKeyId_t &EntityManager::ProviderAgent::GetCachedClassnameKey()
 {
 	return this->m_mapCachedKeys[this->m_nElmCachedClassnameKey];
 }
@@ -503,7 +484,7 @@ EntityManager::ProviderAgent::CacheMapOIndexType EntityManager::ProviderAgent::C
 
 	CacheMapOIndexType nFindElm = this->m_mapCachedKeys.Find(sName);
 
-	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, MakeEntityKey(pszName, sName.Get(), sName.Length())) : nFindElm;
+	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, MakeStringToken(sName)) : nFindElm;
 }
 
 EntityManager::ProviderAgent::SpawnData::SpawnData(CEntityKeyValues *pKeyValues)

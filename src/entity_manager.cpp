@@ -428,8 +428,6 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 
 	auto aDetails = this->m_aLogger.CreateDetailsScope();
 
-	aDetails.Push("-- Spawn (head) --");
-
 	{
 		for(int i = 0; i < iCount; i++)
 		{
@@ -443,12 +441,13 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 
 			const CEntityKeyValues *pKeyValues = pInfoOne.m_pKeyValues;
 
-			if(!s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aDetails))
-			{
-				aDetails.PushFormat("Instance data: classname is \"%s\", index is %d", pszClassname, iEntity);
-			}
+			aDetails.PushFormat("-- Spawn (%s, %d) --", pszClassname, iEntity);
 
-			aDetails.Push("-- Spawn --");
+			auto aEntityDetails = Logger::Scope(LOGGER_COLOR_DETAILED, "\t");
+
+			s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aEntityDetails, &aEntityDetails);
+
+			aDetails += aEntityDetails;
 		}
 	}
 

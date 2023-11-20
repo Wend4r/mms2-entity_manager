@@ -54,14 +54,14 @@ namespace EntityManager
 		int DestroyQueued();
 
 	public:
-		bool DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput);
+		bool DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
 
 	protected:
-		typedef CUtlMap<CUtlString, EntityKey> CacheMapType;
+		typedef CUtlMap<CUtlString, EntityKeyId_t> CacheMapType;
 		typedef CacheMapType::IndexType_t CacheMapOIndexType;
 
-		const EntityKey &GetCachedEntityKey(CacheMapOIndexType nElm);
-		const EntityKey &GetCachedClassnameKey();
+		const EntityKeyId_t &GetCachedEntityKey(CacheMapOIndexType nElm);
+		const EntityKeyId_t &GetCachedClassnameKey();
 		CacheMapOIndexType CacheOrGetEntityKey(const char *pszName);
 
 	private:
