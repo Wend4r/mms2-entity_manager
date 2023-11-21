@@ -28,6 +28,10 @@ EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
 		{
 			this->m_nLoadingMapSpawnInfoOffset = nOffset;
 		});
+		aCallbacks.Insert("CBaseSpawnGroup::m_pEntityFilterName", [this](const std::string &, const ptrdiff_t &nOffset)
+		{
+			this->m_nBaseSpawnGroupEntityFilterNameOffset = nOffset;
+		});
 
 		this->m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
 	}
@@ -46,6 +50,7 @@ void EntityManager::Provider::GameDataStorage::SpawnGroup::Reset()
 
 	this->m_nMgrGameSystemSpawnGroupsOffset = -1;
 	this->m_nLoadingMapSpawnInfoOffset = -1;
+	this->m_nBaseSpawnGroupEntityFilterNameOffset = -1;
 }
 
 CSpawnGroupMgrGameSystem **EntityManager::Provider::GameDataStorage::SpawnGroup::GetSpawnGroupMgrAddress() const
@@ -63,3 +68,7 @@ ptrdiff_t EntityManager::Provider::GameDataStorage::SpawnGroup::GetLoadingMapSpa
 	return this->m_nLoadingMapSpawnInfoOffset;
 }
 
+ptrdiff_t EntityManager::Provider::GameDataStorage::SpawnGroup::GetBaseSpawnGroupEntityFilterNameOffset() const
+{
+	return this->m_nBaseSpawnGroupEntityFilterNameOffset;
+}

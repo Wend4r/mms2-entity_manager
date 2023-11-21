@@ -96,6 +96,12 @@
 				"windows64"     "0"
 				"linux64"       "0"
 			}
+
+			"CBaseSpawnGroup::m_pEntityFilterName"
+			{
+				"windows64"     "128"
+				"linux64"       "128"
+			}
 		}
 	}
 }

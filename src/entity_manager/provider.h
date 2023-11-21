@@ -176,11 +176,13 @@ namespace EntityManager
 				CSpawnGroupMgrGameSystem **GetSpawnGroupMgrAddress() const;
 				ptrdiff_t GetMgrGameSystemSpawnGroupsOffset() const;
 				ptrdiff_t GetLoadingMapSpawnInfoOffset() const;
+				ptrdiff_t GetBaseSpawnGroupEntityFilterNameOffset() const;
 
 			private:
 				CSpawnGroupMgrGameSystem **m_ppSpawnGroupMgrAddress = nullptr;
 				ptrdiff_t m_nMgrGameSystemSpawnGroupsOffset = -1;
 				ptrdiff_t m_nLoadingMapSpawnInfoOffset = -1;
+				ptrdiff_t m_nBaseSpawnGroupEntityFilterNameOffset = -1;
 
 			private:
 				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;

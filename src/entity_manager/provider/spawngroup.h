@@ -30,6 +30,12 @@ namespace EntityManager
 	private:
 		CUtlVector<EntitySpawnInfo_t> *GetSpawnInfo();
 	};
+
+	class CBaseSpawnGroupProvider : public ISpawnGroup
+	{
+	public:
+		void SetEntityFilterName(const char *pNewValue);
+	};
 };
 
 #endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_SPAWNGROUP_PROVIDER_H_

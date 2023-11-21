@@ -84,3 +84,8 @@ CUtlVector<EntitySpawnInfo_t> *EntityManager::CLoadingSpawnGroupProvider::GetSpa
 {
 	return (CUtlVector<EntitySpawnInfo_t> *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetLoadingMapSpawnInfoOffset());
 }
+
+void EntityManager::CBaseSpawnGroupProvider::SetEntityFilterName(const char *pNewValue)
+{
+	*(const char **)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetBaseSpawnGroupEntityFilterNameOffset()) = pNewValue;
+}
