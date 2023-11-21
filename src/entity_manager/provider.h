@@ -110,7 +110,7 @@ namespace EntityManager
 				OnListenForEntityInSpawnGroupToFinishPtr ListenForEntityInSpawnGroupToFinishFunction() const;
 
 				ptrdiff_t GetCurrentManifestOffset() const;
-				ptrdiff_t GetKeyValuesMemoryPoolOffsetOffset() const;
+				ptrdiff_t GetKeyValuesClusterAllocatorOffset() const;
 
 			private:
 				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
@@ -127,7 +127,7 @@ namespace EntityManager
 
 			private: // Offsets.
 				ptrdiff_t m_nCurrentManifestOffset = -1;
-				ptrdiff_t m_nKeyValuesMemoryPoolOffset = -1;
+				ptrdiff_t m_nEntityKeyValuesAllocatorOffset = -1;
 			};
 
 			class GameResource

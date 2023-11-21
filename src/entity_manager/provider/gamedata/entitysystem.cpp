@@ -40,9 +40,9 @@ EntityManager::Provider::GameDataStorage::EntitySystem::EntitySystem()
 		{
 			this->m_nCurrentManifestOffset = nOffset;
 		});
-		aCallbacks.Insert("CEntitySystem::m_aKeyValuesMemoryPool", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert("CEntitySystem::m_aEntityKeyValuesAllocator", [this](const std::string &, const ptrdiff_t &nOffset)
 		{
-			this->m_nKeyValuesMemoryPoolOffset = nOffset;
+			this->m_nEntityKeyValuesAllocatorOffset = nOffset;
 		});
 
 		this->m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
@@ -63,7 +63,7 @@ void EntityManager::Provider::GameDataStorage::EntitySystem::Reset()
 	this->m_pfnExecuteQueuedCreation = nullptr;
 
 	this->m_nCurrentManifestOffset = -1;
-	this->m_nKeyValuesMemoryPoolOffset = -1;
+	this->m_nEntityKeyValuesAllocatorOffset = -1;
 }
 
 EntityManager::Provider::GameDataStorage::EntitySystem::OnCreateEntityPtr EntityManager::Provider::GameDataStorage::EntitySystem::CreateEntityFunction() const
@@ -101,7 +101,7 @@ ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetCurrentMani
 	return this->m_nCurrentManifestOffset;
 }
 
-ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetKeyValuesMemoryPoolOffsetOffset() const
+ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetKeyValuesClusterAllocatorOffset() const
 {
-	return this->m_nKeyValuesMemoryPoolOffset;
+	return this->m_nEntityKeyValuesAllocatorOffset;
 }

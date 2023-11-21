@@ -10,7 +10,7 @@ IEntityResourceManifest *EntityManager::CEntitySystemProvider::GetCurrentManifes
 
 CKeyValues3Cluster *EntityManager::CEntitySystemProvider::GetKeyValuesClusterAllocator()
 {
-	return (CKeyValues3Cluster *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().GetKeyValuesMemoryPoolOffsetOffset());
+	return (CKeyValues3Cluster *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetEntitySystem().GetKeyValuesClusterAllocatorOffset());
 }
 
 CEntityInstance *EntityManager::CEntitySystemProvider::CreateEntity(SpawnGroupHandle_t hSpawnGroup, const char *pszNameOrDesignName, EntityNetworkingMode_t eNetworkMode, CEntityIndex iForcedIndex, int iForcedSerial, bool bCreateInIsolatedPrecacheList)

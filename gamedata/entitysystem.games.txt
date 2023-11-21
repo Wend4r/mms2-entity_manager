@@ -155,7 +155,7 @@
 			}
 
 			// Passes to CEntityKeyValues::CEntityKeyValues() as argument.
-			"CEntitySystem::m_aKeyValuesMemoryPool"
+			"CEntitySystem::m_aEntityKeyValuesAllocator"
 			{
 				"windows64"     "3280"
 				"linux64"       "3304"
