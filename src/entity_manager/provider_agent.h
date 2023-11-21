@@ -13,7 +13,7 @@
 #include "provider/entitykeyvalues.h"
 #include "provider_agent/resourcemanifest.h"
 
-#define LOGGER_COLOR_ENTITY {255, 200, 200, 255}
+#define LOGGER_COLOR_ENTITY {0, 191, 255, 255}
 
 #define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
 
@@ -55,11 +55,11 @@ namespace EntityManager
 		void ReleaseDestroyQueued();
 		int DestroyQueued();
 
-	public:
+	public: // Dumps.
 		bool DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
 		int DumpEntityKeyValue(KeyValues3 *pMember, char *psBuffer, size_t nMaxLength);
 
-	protected:
+	protected: // Cache of entity keys.
 		typedef CUtlMap<CUtlString, EntityKeyId_t> CacheMapType;
 		typedef CacheMapType::IndexType_t CacheMapOIndexType;
 

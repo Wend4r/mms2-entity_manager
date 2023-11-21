@@ -410,7 +410,23 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 
 							if(this->DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
 							{
-								aOutput.PushFormat("%s = %s", pszName, sValue);
+								if(V_stristr(pszName, "color"))
+								{
+									Color rgba = pMember->GetColor();
+
+									// Setting an alpha channel.
+									if(!rgba[3])
+									{
+										// rgba[3] = 255;
+										rgba[3] = 127 + (127 * ((rgba[0] + rgba[1] + rgba[2]) / (255 * 3))); // Alpha.
+									}
+
+									aOutput.PushFormat(rgba, "%s = %s", pszName, sValue);
+								}
+								else
+								{
+									aOutput.PushFormat("%s = %s", pszName, sValue);
+								}
 							}
 							else
 							{
@@ -531,7 +547,7 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 
 					int iIndex = -1;
 
-					const char *pszClassname = "";
+					const char *pszClassname = nullptr;
 
 					if(aHandle.IsValid())
 					{
@@ -544,7 +560,7 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 						}
 					}
 
-					return V_snprintf(psBuffer, nMaxLength, "entity:%d:%s", iIndex, pszClassname);
+					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "entity:%d" : "entity:%d:%s", iIndex, pszClassname);
 				}
 				default:
 					AssertMsg1(0, "KV3: Unrealized uint subtype is %d\n", pMember->GetSubType());

@@ -459,10 +459,10 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 
 			if(s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aEntityDetails, &aEntityDetails))
 			{
-				aDetails.PushFormat("%s = ", pEntity->GetClassname());
-				aDetails.Push("{");
+				aDetails.PushFormat(LOGGER_COLOR_ENTITY, "%s = ", pEntity->GetClassname());
+				aDetails.Push(LOGGER_COLOR_ENTITY, "{");
 				aDetails += aEntityDetails;
-				aDetails.Push("}");
+				aDetails.Push(LOGGER_COLOR_ENTITY, "}");
 			}
 			else
 			{
@@ -548,10 +548,10 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 				if(s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aEntityDetails, &aEntityDetails))
 				{
-					aDetails.PushFormat("%s = ", aEntity.m_pEntity->GetClassname());
-					aDetails.Push("{");
+					aDetails.PushFormat(LOGGER_COLOR_ENTITY, "%s = ", aEntity.m_pEntity->GetClassname());
+					aDetails.Push(LOGGER_COLOR_ENTITY, "{");
 					aDetails += aEntityDetails;
-					aDetails.Push("}");
+					aDetails.Push(LOGGER_COLOR_ENTITY, "}");
 				}
 				else
 				{

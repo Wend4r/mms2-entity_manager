@@ -197,11 +197,13 @@ Logger::Scope &Logger::Scope::operator+=(const Scope &aTarget)
 	{
 		size_t n = 0;
 
+		bool bNextIsColorCollide = aTarget.m_vec[0].GetColor() == rgbaSave;
+
 		while(1)
 		{
 			const auto &aMsg = aTarget.m_vec[n];
 
-			if(aMsg.GetColor() == rgbaSave)
+			if(bNextIsColorCollide)
 			{
 				if(n)
 				{
@@ -227,7 +229,12 @@ Logger::Scope &Logger::Scope::operator+=(const Scope &aTarget)
 
 			if(n < nSize)
 			{
-				sResultContent += aTarget.m_aEnd;
+				bNextIsColorCollide = aTarget.m_vec[n].GetColor() == rgbaSave;
+
+				if(bNextIsColorCollide)
+				{
+					sResultContent += aTarget.m_aEnd;
+				}
 			}
 			else
 			{
@@ -374,8 +381,9 @@ size_t Logger::Scope::SendColor(SendColorFunc funcOn)
 	return nSize;
 }
 
-Logger::Scope::Message::Message(const Color &rgbaInit)
- :  m_aColor(rgbaInit)
+Logger::Scope::Message::Message(const Color &rgbaInit, const char *pszContent)
+ :  m_aColor(rgbaInit),
+    m_sContent(pszContent)
 {
 }
 

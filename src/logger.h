@@ -95,7 +95,7 @@ public:
 		class Message
 		{
 		public:
-			Message(const Color &rgbaInit);
+			Message(const Color &rgbaInit, const char *pszContent = "");
 
 			const Color &GetColor() const;
 			const std::string &Get() const;
