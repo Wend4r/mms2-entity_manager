@@ -16,7 +16,6 @@
 #include <ISmmPlugin.h>
 #include <igameevents.h>
 #include <iplayerinfo.h>
-#include <metamod_oslink.h>
 #include <sh_vector.h>
 
 #include <tier1/utlvector.h>
@@ -87,7 +86,7 @@ public:
 	const char *GetLogTag();
 
 private:
-	std::string m_sBasePath = "addons" PATH_SEP_STR META_PLUGIN_NAME;
+	std::string m_sBasePath = "addons" CORRECT_PATH_SEPARATOR_S META_PLUGIN_NAME;
 	std::string m_sCurrentMap = "\0";
 
 	EntityManager::Settings m_aSettings;

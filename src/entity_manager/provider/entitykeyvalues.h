@@ -18,7 +18,7 @@ class CEntityKeyValuesAttribute
 {
 };
 
-typedef CUtlStringToken EntityKeyId_t;
+typedef CKV3MemberName EntityKeyId_t;
 
 namespace EntityManager
 {

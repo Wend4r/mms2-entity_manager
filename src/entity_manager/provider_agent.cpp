@@ -33,7 +33,7 @@ EntityManager::ProviderAgent::ProviderAgent()
 	{
 		static const char szClassname[] = "classname";
 
-		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert(szClassname, szClassname);
+		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert(szClassname, {szClassname, (const char *)szClassname});
 	}
 }
 
@@ -91,7 +91,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 
 	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesClusterAllocator(), 3);
 
-	Color rgbaPrev = LOGGER_COLOR_MESSAGE;
+	Color rgbaPrev = LOGGER_COLOR_ENTITY;
 
 	if(pDetails)
 	{
@@ -243,9 +243,6 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup, Lo
 	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
 
 	auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
-
-	char psClassname[128] = "\0", 
-	     sEntityError[256];
 
 	const int iQueueLength = vecEntitySpawnQueue.Count();
 
@@ -403,45 +400,22 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 				{
 					for(int i = 0, iMemberCount = pRoot->GetMemberCount(); i < iMemberCount; i++)
 					{
-						const char *pAttrName = pRoot->GetMemberName(i);
+						const char *pszName = pRoot->GetMemberName(i);
 
 						KeyValues3 *pMember = pRoot->GetMember(i);
 
 						if(pMember)
 						{
-							const char *pDest = "unknown";
+							char sValue[512];
 
-							switch(pMember->GetTypeEx())
+							if(this->DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
 							{
-								case KV3_TYPEEX_NULL:
-									aOutput.PushFormat("%s = null", pAttrName);
-									break;
-								case KV3_TYPEEX_BOOL:
-									aOutput.PushFormat("%s = %s", pAttrName, pMember->GetBool() ? "true" : "false");
-									break;
-								case KV3_TYPEEX_INT:
-									aOutput.PushFormat("%s = %lld", pAttrName, pMember->GetInt64());
-									break;
-								case KV3_TYPEEX_UINT:
-									aOutput.PushFormat("%s = %llu", pAttrName, pMember->GetUInt64());
-									break;
-								case KV3_TYPEEX_DOUBLE:
-									aOutput.PushFormat("%s = %g", pAttrName, pMember->GetDouble());
-									break;
-								case KV3_TYPEEX_STRING:
-								case KV3_TYPEEX_STRING_EXTERN:
-								case KV3_TYPEEX_STRING_SHORT:
-									aOutput.PushFormat("%s = \"%s\"", pAttrName, pMember->GetString());
-									break;
-								default:
-									Assert( 0 );
-									aOutput.PushFormat("%s = unknown", pAttrName, pMember->GetString());
-									break;
+								aOutput.PushFormat("%s = %s", pszName, sValue);
 							}
 						}
 						else if(paWarnings)
 						{
-							paWarnings->PushFormat("Failed to get \"%s\" key member", pAttrName);
+							paWarnings->PushFormat("Failed to get \"%s\" key member", pszName);
 						}
 					}
 				}
@@ -468,6 +442,222 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 	return bResult;
 }
 
+int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *psBuffer, size_t nMaxLength)
+{
+	const char *pDest = "unknown";
+
+	switch(pMember->GetTypeEx())
+	{
+		case KV3_TYPEEX_NULL:
+		{
+			const char sNullable[] = "null";
+
+			V_strncpy(psBuffer, (const char *)sNullable, nMaxLength);
+
+			return sizeof(sNullable);
+		}
+
+		case KV3_TYPEEX_BOOL:
+		{
+			const char *sBoolean[] = 
+			{
+				"false",
+				"true"
+			};
+
+			bool b = pMember->GetBool();
+
+			V_strncpy(psBuffer, sBoolean[b], nMaxLength);
+
+			return sizeof(sBoolean[b]);
+		}
+
+		case KV3_TYPEEX_INT:
+			switch(pMember->GetSubType())
+			{
+				case KV3_SUBTYPE_INT8:
+					return V_snprintf(psBuffer, nMaxLength, "%hhd", pMember->GetInt8());
+				case KV3_SUBTYPE_INT16:
+					return V_snprintf(psBuffer, nMaxLength, "%hd", pMember->GetShort());
+				case KV3_SUBTYPE_INT32:
+					return V_snprintf(psBuffer, nMaxLength, "%d", pMember->GetInt());
+				case KV3_SUBTYPE_INT64:
+					return V_snprintf(psBuffer, nMaxLength, "%lld", pMember->GetInt64());
+				case KV3_SUBTYPE_EHANDLE:
+				{
+					const CEntityHandle &aHandle = pMember->GetEHandle();
+
+					if(aHandle.IsValid())
+					{
+						CEntityInstance *pEntity = static_cast<CEntityInstance *>(g_pGameEntitySystem->GetBaseEntity(aHandle));
+
+						if(pEntity)
+						{
+							return V_snprintf(psBuffer, nMaxLength, "\"entity:%d:%s\"", pEntity->GetEntityIndex().Get(), pEntity->GetClassname());
+						}
+					}
+
+					return V_snprintf(psBuffer, nMaxLength, "%d", aHandle.ToInt());
+				}
+				default:
+					AssertMsg1(0, "KV3: Unrealized int subtype is %d\n", pMember->GetSubType());
+					return 0;
+			}
+			break;
+		case KV3_TYPEEX_UINT:
+			switch(pMember->GetSubType())
+			{
+				case KV3_SUBTYPE_UINT8:
+					return V_snprintf(psBuffer, nMaxLength, "%hhu", pMember->GetUInt8());
+				case KV3_SUBTYPE_UINT16:
+					return V_snprintf(psBuffer, nMaxLength, "%hu", pMember->GetUShort());
+				case KV3_SUBTYPE_UINT32:
+					return V_snprintf(psBuffer, nMaxLength, "%u", pMember->GetUInt());
+				case KV3_SUBTYPE_UINT64:
+					return V_snprintf(psBuffer, nMaxLength, "%llu", pMember->GetUInt64());
+				case KV3_SUBTYPE_STRING_TOKEN:
+				{
+					const CUtlStringToken &aToken = pMember->GetStringToken();
+
+					return V_snprintf(psBuffer, nMaxLength, "\"string_token:0x%x:\"", aToken.GetHashCode());
+				}
+				case KV3_SUBTYPE_EHANDLE:
+				{
+					const CEntityHandle &aHandle = pMember->GetEHandle();
+
+					int iIndex = -1;
+
+					const char *pszClassname = "";
+
+					if(aHandle.IsValid())
+					{
+						CEntityInstance *pEntity = static_cast<CEntityInstance *>(g_pGameEntitySystem->GetBaseEntity(aHandle));
+
+						if(pEntity)
+						{
+							iIndex = pEntity->GetEntityIndex().Get();
+							pszClassname = pEntity->GetClassname();
+						}
+					}
+
+					return V_snprintf(psBuffer, nMaxLength, "entity:%d:%s", iIndex, pszClassname);
+				}
+				default:
+					AssertMsg1(0, "KV3: Unrealized uint subtype is %d\n", pMember->GetSubType());
+					return 0;
+			}
+			break;
+		case KV3_TYPEEX_DOUBLE:
+			switch(pMember->GetSubType())
+			{
+				case KV3_SUBTYPE_FLOAT32:
+					return V_snprintf(psBuffer, nMaxLength, "%f", pMember->GetFloat());
+				case KV3_SUBTYPE_FLOAT64:
+					return V_snprintf(psBuffer, nMaxLength, "%g", pMember->GetDouble());
+				default:
+				{
+					AssertMsg1(0, "KV3: Unrealized double subtype is %d\n", pMember->GetSubType());
+					return 0;
+				}
+			}
+			break;
+		case KV3_TYPEEX_STRING:
+		case KV3_TYPEEX_STRING_SHORT:
+		case KV3_TYPEEX_STRING_EXTERN:
+		case KV3_TYPEEX_BINARY_BLOB:
+		case KV3_TYPEEX_BINARY_BLOB_EXTERN:
+			return V_snprintf(psBuffer, nMaxLength, "\"%s\"", pMember->GetString());
+		case KV3_TYPEEX_ARRAY:
+		case KV3_TYPEEX_ARRAY_FLOAT32:
+		case KV3_TYPEEX_ARRAY_FLOAT64:
+		case KV3_TYPEEX_ARRAY_INT16:
+		case KV3_TYPEEX_ARRAY_INT32:
+		case KV3_TYPEEX_ARRAY_UINT8_SHORT:
+		case KV3_TYPEEX_ARRAY_INT16_SHORT:
+			switch(pMember->GetSubType())
+			{
+				case KV3_SUBTYPE_ARRAY:
+				{
+					int iBufCur = 0;
+
+					if(nMaxLength > 2)
+					{
+						KeyValues3 **pArray = pMember->GetArrayBase();
+
+						const int iArrayLength = pMember->GetArrayElementCount();
+
+						if(iArrayLength > 0)
+						{
+							psBuffer[0] = '[';
+							iBufCur = 1;
+
+							int i = 0;
+
+							char *pArrayBuf = (char *)stackalloc(nMaxLength);
+
+							do
+							{
+								if(this->DumpEntityKeyValue(pArray[i], pArrayBuf, nMaxLength))
+								{
+									iBufCur += V_snprintf(&psBuffer[iBufCur], nMaxLength - iBufCur, "%s, ", pArrayBuf);
+								}
+
+								i++;
+							}
+							while(i < iArrayLength);
+
+							iBufCur -= 2; // Strip ", " of end.
+							psBuffer[iBufCur++] = ']';
+							psBuffer[iBufCur] = '\0';
+						}
+					}
+
+					return iBufCur;
+				}
+
+				case KV3_SUBTYPE_VECTOR:
+				case KV3_SUBTYPE_ROTATION_VECTOR:
+				case KV3_SUBTYPE_QANGLE:
+				{
+					const Vector &aVec3 = pMember->GetVector();
+
+					return V_snprintf(psBuffer, nMaxLength, "\"%f %f %f\"", aVec3.x, aVec3.y, aVec3.z);
+				}
+				case KV3_SUBTYPE_VECTOR2D:
+				{
+					const Vector2D &aVec2 = pMember->GetVector2D();
+
+					return V_snprintf(psBuffer, nMaxLength, "\"%f %f\"", aVec2.x, aVec2.y);
+				}
+				case KV3_SUBTYPE_VECTOR4D:
+				case KV3_SUBTYPE_QUATERNION:
+				{
+					const Vector4D &aVec4 = pMember->GetVector4D();
+
+					return V_snprintf(psBuffer, nMaxLength, "\"%f %f %f %f\"", aVec4.x, aVec4.y, aVec4.z, aVec4.w);
+				}
+				case KV3_SUBTYPE_MATRIX3X4:
+				{
+					const matrix3x4_t &aMatrix3x4 = pMember->GetMatrix3x4();
+
+					return V_snprintf(psBuffer, nMaxLength, "[\"%f %f %f\", \"%f %f %f\", \"%f %f %f\", \"%f %f %f\"]",  
+					                                        aMatrix3x4.m_flMatVal[0][0], aMatrix3x4.m_flMatVal[0][1], aMatrix3x4.m_flMatVal[0][2], aMatrix3x4.m_flMatVal[0][3], 
+					                                        aMatrix3x4.m_flMatVal[1][0], aMatrix3x4.m_flMatVal[1][1], aMatrix3x4.m_flMatVal[1][2], aMatrix3x4.m_flMatVal[1][3], 
+					                                        aMatrix3x4.m_flMatVal[2][0], aMatrix3x4.m_flMatVal[2][1], aMatrix3x4.m_flMatVal[2][2], aMatrix3x4.m_flMatVal[2][3]);
+				}
+				default:
+					AssertMsg1(0, "KV3: Unrealized array subtype is %d", pMember->GetSubType());
+					return 0;
+			}
+			break;
+		default:
+			AssertMsg1(0, "KV3: Unrealized typeex is %d", pMember->GetTypeEx());
+			return 0;
+	}
+
+	return 0;
+}
+
 const EntityKeyId_t &EntityManager::ProviderAgent::GetCachedEntityKey(CacheMapOIndexType nElm)
 {
 	return this->m_mapCachedKeys[nElm];
@@ -484,7 +674,7 @@ EntityManager::ProviderAgent::CacheMapOIndexType EntityManager::ProviderAgent::C
 
 	CacheMapOIndexType nFindElm = this->m_mapCachedKeys.Find(sName);
 
-	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, MakeStringToken(sName)) : nFindElm;
+	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, sName) : nFindElm;
 }
 
 EntityManager::ProviderAgent::SpawnData::SpawnData(CEntityKeyValues *pKeyValues)

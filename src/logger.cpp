@@ -178,14 +178,6 @@ void Logger::DoTests()
 	this->ErrorFormat("LS_ERROR = %d\n", LS_ERROR);
 }
 
-Logger::Scope::Scope(const Color &rgba, const char *pszStartWith)
-{
-	this->m_aColor = rgba;
-
-	this->m_aStartWith = pszStartWith;
-	this->m_aEnd = "\n";
-}
-
 Logger::Scope::Scope(const Color &rgba, const char *pszStartWith, const char *pszEnd)
 {
 	this->m_aColor = rgba;
@@ -211,11 +203,21 @@ Logger::Scope &Logger::Scope::operator+=(const Scope &aTarget)
 
 			if(aMsg.GetColor() == rgbaSave)
 			{
+				if(n)
+				{
+					sResultContent += this->m_aStartWith;
+				}
+
 				sResultContent += aTarget.m_aStartWith + aMsg.Get();
 			}
 			else
 			{
 				this->Push(rgbaSave, sResultContent.c_str());
+
+				if(n)
+				{
+					sResultContent += this->m_aStartWith;
+				}
 
 				sResultContent = aTarget.m_aStartWith + aMsg.Get();
 				rgbaSave = aMsg.GetColor();
@@ -394,16 +396,23 @@ size_t Logger::Scope::Message::SetWithCopy(const char *pszContent)
 	return this->m_sContent.size();
 }
 
-Logger::Scope Logger::CreateDetailsScope()
+Logger::Scope Logger::CreateDetailsScope(const char *pszStartWith, const char *pszEnd)
 {
 #ifdef DEBUG
-	return {LOGGER_COLOR_DETAILED, LOGGER_FORMAT_DETAILED_STARTWITH};
+	char sDebugWith[32];
+
+	char *pDebugWithResult = strncpy((char *)sDebugWith, LOGGER_FORMAT_DETAILED_STARTWITH, sizeof(sDebugWith));
+	size_t nResultSize = strlen(pDebugWithResult);
+
+	strncpy(&pDebugWithResult[nResultSize], pszStartWith, sizeof(sDebugWith) - nResultSize);
+
+	return {LOGGER_COLOR_DETAILED, pDebugWithResult, pszEnd};
 #else
-	return {LOGGER_COLOR_DETAILED};
+	return {LOGGER_COLOR_DETAILED, pszStartWith, pszEnd};
 #endif
 }
 
-Logger::Scope Logger::CreateMessagesScope()
+Logger::Scope Logger::CreateMessagesScope(const char *pszStartWith, const char *pszEnd)
 {
 #ifdef DEBUG
 	return {LOGGER_COLOR_MESSAGE, LOGGER_FORMAT_MESSAGE_STARTWITH};
@@ -412,28 +421,49 @@ Logger::Scope Logger::CreateMessagesScope()
 #endif
 }
 
-Logger::Scope Logger::CreateWarningsScope()
+Logger::Scope Logger::CreateWarningsScope(const char *pszStartWith, const char *pszEnd)
 {
 #ifdef DEBUG
-	return {LOGGER_COLOR_WARNING, LOGGER_FORMAT_WARNING_STARTWITH};
+	char sDebugWith[32];
+
+	char *pDebugWithResult = strncpy((char *)sDebugWith, LOGGER_FORMAT_WARNING_STARTWITH, sizeof(sDebugWith));
+	size_t nResultSize = strlen(pDebugWithResult);
+
+	strncpy(&pDebugWithResult[nResultSize], pszStartWith, sizeof(sDebugWith) - nResultSize);
+
+	return {LOGGER_COLOR_WARNING, pDebugWithResult, pszEnd};
 #else
 	return {LOGGER_COLOR_WARNING};
 #endif
 }
 
-Logger::Scope Logger::CreateAssertScope()
+Logger::Scope Logger::CreateAssertScope(const char *pszStartWith, const char *pszEnd)
 {
 #ifdef DEBUG
-	return {LOGGER_COLOR_ASSERT, LOGGER_FORMAT_ASSERT_STARTWITH};
+	char sDebugWith[32];
+
+	char *pDebugWithResult = strncpy((char *)sDebugWith, LOGGER_FORMAT_ASSERT_STARTWITH, sizeof(sDebugWith));
+	size_t nResultSize = strlen(pDebugWithResult);
+
+	strncpy(&pDebugWithResult[nResultSize], pszStartWith, sizeof(sDebugWith) - nResultSize);
+
+	return {LOGGER_COLOR_ASSERT, pDebugWithResult, pszEnd};
 #else
 	return {LOGGER_COLOR_ASSERT};
 #endif
 }
 
-Logger::Scope Logger::CreateErrorsScope()
+Logger::Scope Logger::CreateErrorsScope(const char *pszStartWith, const char *pszEnd)
 {
 #ifdef DEBUG
-	return {LOGGER_COLOR_ERROR, LOGGER_FORMAT_ERROR_STARTWITH};
+	char sDebugWith[32];
+
+	char *pDebugWithResult = strncpy((char *)sDebugWith, LOGGER_FORMAT_ERROR_STARTWITH, sizeof(sDebugWith));
+	size_t nResultSize = strlen(pDebugWithResult);
+
+	strncpy(&pDebugWithResult[nResultSize], pszStartWith, sizeof(sDebugWith) - nResultSize);
+
+	return {LOGGER_COLOR_ERROR, pDebugWithResult, pszEnd};
 #else
 	return {LOGGER_COLOR_ERROR};
 #endif

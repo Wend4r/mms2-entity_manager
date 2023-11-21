@@ -13,9 +13,11 @@
 #include "tier0/utlscratchmemory.h"
 #include "tier1/utlvector.h"
 
+#define MAX_SPAWN_GROUP_WORLD_NAME_LENGTH 4096
+
 class matrix3x4a_t;
-class CEntityKeyValues;
 class CKeyValues3Cluster;
+class CEntityKeyValues;
 class CGameResourceManifest;
 class ISpawnGroupPrerequisiteRegistry;
 class IWorldReference;
@@ -104,7 +106,7 @@ public:
 	virtual void UnkIsManualFlag3() = 0;
 	virtual void UnkIsManualFlag4() = 0;
 	virtual void UnkIsManualFlag5() = 0;
-	virtual void UnkSetter(uint64_t n) = 0;
+	virtual void UnkSetter(uint64 n) = 0;
 	virtual void UnkIsManualFlag6() = 0;
 	virtual void UnkGetter() = 0;
 
@@ -272,4 +274,4 @@ class CLoadingSpawnGroup : public ILoadingSpawnGroup
 {
 };
 
-#endif // SPAWNGROUP_MANAGER_H	
+#endif // SPAWNGROUP_MANAGER_H

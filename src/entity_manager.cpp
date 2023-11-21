@@ -304,13 +304,17 @@ bool EntityManagerPlugin::LoadProvider(char *psError, size_t nMaxLength)
 
 bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, size_t nMaxLength)
 {
+#ifdef DEBUG
 	Logger::Scope aDetails = this->m_aLogger.CreateDetailsScope();
+#endif
 	Logger::Scope aWarnings = this->m_aLogger.CreateWarningsScope();
 
-	char sSpawnGroupPath[MAX_PATH];
+	char sSpawnGroupName[MAX_SPAWN_GROUP_WORLD_NAME_LENGTH], 
+	     sRootSpawnGroupName[MAX_SPAWN_GROUP_WORLD_NAME_LENGTH];
 
 	{
-		strncpy((char *)sSpawnGroupPath, pSpawnGroup->GetWorldName(), sizeof(sSpawnGroupPath));
+		V_strncpy((char *)sSpawnGroupName, pSpawnGroup->GetWorldName(), sizeof(sSpawnGroupName));
+		V_FixSlashes((char *)sSpawnGroupName);
 
 		SpawnGroupHandle_t hOwner;
 
@@ -318,19 +322,28 @@ bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, 
 
 		while((hOwner = pSpawnGroup->GetOwnerSpawnGroup()) != INVALID_SPAWN_GROUP && (pMap = ((EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr)->Get(hOwner)))
 		{
-			snprintf((char *)sSpawnGroupPath, sizeof(sSpawnGroupPath), "%s" PATH_SEP_STR "%s", pMap->GetWorldName(), sSpawnGroupPath);
-			pSpawnGroup = pMap->GetSpawnGroup();
+			V_strncpy((char *)sRootSpawnGroupName, pMap->GetWorldName(), sizeof(sRootSpawnGroupName));
+			V_FixSlashes((char *)sRootSpawnGroupName);
+			V_snprintf((char *)sSpawnGroupName, sizeof(sSpawnGroupName), "%s" CORRECT_PATH_SEPARATOR_S "%s", sRootSpawnGroupName, sSpawnGroupName);
 		}
 	}
 
-	bool bResult = this->m_aSettings.Load(pSpawnGroup->GetHandle(), this->m_sBasePath.c_str(), (const char *)sSpawnGroupPath, psError, nMaxLength, &aDetails, &aWarnings);
+	bool bResult = this->m_aSettings.Load(pSpawnGroup->GetHandle(), this->m_sBasePath.c_str(), (const char *)sSpawnGroupName, psError, nMaxLength,
+#ifdef DEBUG
+	                                      &aDetails,
+#else
+	                                      nullptr,
+#endif
+	                                      &aWarnings);
 
 	if(bResult)
 	{
+#ifdef DEBUG
 		aDetails.SendColor([this](const Color &rgba, const char *pszContent)
 		{
 			this->m_aLogger.Detailed(rgba, pszContent);
 		});
+#endif
 
 		aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
 		{
@@ -426,6 +439,7 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 {
 	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnEntitySystemSpawnHook(%d, %p)\n", iCount, pInfo);
 
+#ifdef DEBUG
 	auto aDetails = this->m_aLogger.CreateDetailsScope();
 
 	{
@@ -443,7 +457,7 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 
 			aDetails.PushFormat("-- Spawn (%s, %d) --", pszClassname, iEntity);
 
-			auto aEntityDetails = Logger::Scope(LOGGER_COLOR_DETAILED, "\t");
+			auto aEntityDetails = Logger::Scope(LOGGER_COLOR_ENTITY, "\t");
 
 			s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aEntityDetails, &aEntityDetails);
 
@@ -455,6 +469,7 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 	{
 		this->m_aLogger.Detailed(rgba, sContent.c_str());
 	});
+#endif
 
 	SET_META_RESULT(MRES_HANDLED);
 }
@@ -492,7 +507,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 	if(iCount)
 	{
 #ifdef DEBUG
-		auto aMessages = this->m_aLogger.CreateDetailsScope();
+		auto aDetails = this->m_aLogger.CreateDetailsScope();
 #endif
 
 		CUtlVector<EntitySpawnInfo_t> aMyEntities;
@@ -509,7 +524,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 				"My entity #%d:",
 			};
 
-			aMessages.Push("-----");
+			aDetails.Push("-- Loading entity --");
 #endif
 
 			do
@@ -519,9 +534,13 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 				bool bInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(aEntity.m_pKeyValues);
 
 #ifdef DEBUG
-				aMessages.PushFormat(pszMyEntityMessages[bInSpawnQueue], aEntity.m_pEntity->GetEntityIndex().Get());
-				s_aEntityManagerProviderAgent.DumpEntityKeyValues(aEntity.m_pKeyValues, aMessages);
-				aMessages.Push("-----");
+				aDetails.PushFormat(pszMyEntityMessages[bInSpawnQueue], aEntity.m_pEntity->GetEntityIndex().Get());
+
+				auto aEntityDetails = Logger::Scope(LOGGER_COLOR_ENTITY, "\t");
+
+				s_aEntityManagerProviderAgent.DumpEntityKeyValues(aEntity.m_pKeyValues, aEntityDetails, &aEntityDetails);
+
+				aDetails += aEntityDetails;
 #endif
 
 				if(bInSpawnQueue)
@@ -535,7 +554,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 		}
 
 #ifdef DEBUG
-		aMessages.SendColor([this](const Color &rgba, const char *pszContent)
+		aDetails.SendColor([this](const Color &rgba, const char *pszContent)
 		{
 			this->m_aLogger.Detailed(rgba, pszContent);
 		});

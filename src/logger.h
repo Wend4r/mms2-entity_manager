@@ -72,8 +72,7 @@ public:
 		typedef std::function<void (const char *)> SendFunc;
 		typedef std::function<void (const Color &, const char *)> SendColorFunc;
 
-		Scope(const Color &rgbaInit, const char *pszStartWith = "");
-		Scope(const Color &rgbaInit, const char *pszStartWith, const char *pszEnd);
+		Scope(const Color &rgbaInit, const char *pszStartWith = "", const char *pszEnd = "\n");
 
 		Scope &operator+=(const Scope &);
 
@@ -117,11 +116,11 @@ public:
 		std::string m_aEnd;
 	};
 
-	Scope CreateDetailsScope();
-	Scope CreateMessagesScope();
-	Scope CreateWarningsScope();
-	Scope CreateAssertScope();
-	Scope CreateErrorsScope();
+	Scope CreateDetailsScope(const char *pszStartWith = "", const char *pszEnd = "\n");
+	Scope CreateMessagesScope(const char *pszStartWith = "", const char *pszEnd = "\n");
+	Scope CreateWarningsScope(const char *pszStartWith = "", const char *pszEnd = "\n");
+	Scope CreateAssertScope(const char *pszStartWith = "", const char *pszEnd = "\n");
+	Scope CreateErrorsScope(const char *pszStartWith = "", const char *pszEnd = "\n");
 
 private:
 	char m_sFormatBuffer[MAX_LOGGING_MESSAGE_LENGTH];
