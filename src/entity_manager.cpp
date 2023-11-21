@@ -451,17 +451,23 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 
 			int iEntity = pEntity->GetEntityIndex().Get();
 
-			const char *pszClassname = pEntity->GetClassname();
-
 			const CEntityKeyValues *pKeyValues = pInfoOne.m_pKeyValues;
 
-			aDetails.PushFormat("-- Spawn (%s, %d) --", pszClassname, iEntity);
+			aDetails.PushFormat("-- Spawn entity (#%d) --", iEntity);
 
 			auto aEntityDetails = Logger::Scope(LOGGER_COLOR_ENTITY, "\t");
 
-			s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aEntityDetails, &aEntityDetails);
-
-			aDetails += aEntityDetails;
+			if(s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aEntityDetails, &aEntityDetails))
+			{
+				aDetails.PushFormat("%s = ", pEntity->GetClassname());
+				aDetails.Push("{");
+				aDetails += aEntityDetails;
+				aDetails.Push("}");
+			}
+			else
+			{
+				aDetails += aEntityDetails;
+			}
 		}
 	}
 
@@ -518,29 +524,39 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 			const EntitySpawnInfo_t *pEntities = pLoading->GetEntities();
 
 #ifdef DEBUG
+			aDetails.Push("- Loading entities -");
+
 			static const char *pszMyEntityMessages[] = 
 			{
-				"Map group entity #%d:",
-				"My entity #%d:",
+				"-- Map group entity --",
+				"-- My entity --",
 			};
-
-			aDetails.Push("-- Loading entity --");
 #endif
 
 			do
 			{
 				const auto &aEntity = pEntities[i];
 
-				bool bInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(aEntity.m_pKeyValues);
+				const CEntityKeyValues *pKeyValues = aEntity.m_pKeyValues;
+
+				bool bInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(pKeyValues);
 
 #ifdef DEBUG
-				aDetails.PushFormat(pszMyEntityMessages[bInSpawnQueue], aEntity.m_pEntity->GetEntityIndex().Get());
+				aDetails.Push(pszMyEntityMessages[bInSpawnQueue]);
 
 				auto aEntityDetails = Logger::Scope(LOGGER_COLOR_ENTITY, "\t");
 
-				s_aEntityManagerProviderAgent.DumpEntityKeyValues(aEntity.m_pKeyValues, aEntityDetails, &aEntityDetails);
-
-				aDetails += aEntityDetails;
+				if(s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aEntityDetails, &aEntityDetails))
+				{
+					aDetails.PushFormat("%s = ", aEntity.m_pEntity->GetClassname());
+					aDetails.Push("{");
+					aDetails += aEntityDetails;
+					aDetails.Push("}");
+				}
+				else
+				{
+					aDetails += aEntityDetails;
+				}
 #endif
 
 				if(bInSpawnQueue)

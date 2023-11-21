@@ -412,6 +412,10 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 							{
 								aOutput.PushFormat("%s = %s", pszName, sValue);
 							}
+							else
+							{
+								aOutput.PushFormat("// %s is empty", pszName);
+							}
 						}
 						else if(paWarnings)
 						{
