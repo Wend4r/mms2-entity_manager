@@ -13,7 +13,7 @@
 #include "provider/entitykeyvalues.h"
 #include "provider_agent/resourcemanifest.h"
 
-#define LOGGER_COLOR_ENTITY {0, 191, 255, 255}
+#define LOGGER_COLOR_ENTITY_KV3 {0, 191, 255, 255}
 
 #define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
 

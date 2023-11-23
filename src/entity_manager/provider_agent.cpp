@@ -91,7 +91,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 
 	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesClusterAllocator(), 3);
 
-	Color rgbaPrev = LOGGER_COLOR_ENTITY;
+	Color rgbaPrev = LOGGER_COLOR_ENTITY_KV3;
 
 	if(pDetails)
 	{
