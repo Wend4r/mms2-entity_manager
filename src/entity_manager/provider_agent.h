@@ -57,10 +57,10 @@ namespace EntityManager
 		int DestroyQueued();
 
 	public: // Dumps.
-		bool DumpOldKeyValues(KeyValues *pOldOne, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
-		bool DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
-		int DumpEntityKeyValue(KeyValues3 *pMember, char *psBuffer, size_t nMaxLength);
-		bool MakeDumpColorAlpha(Color &rgba);
+		static bool DumpOldKeyValues(KeyValues *pOldOne, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
+		static bool DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
+		static int DumpEntityKeyValue(KeyValues3 *pMember, char *psBuffer, size_t nMaxLength);
+		static bool MakeDumpColorAlpha(Color &rgba);
 
 	protected: // Cache of entity keys.
 		typedef CUtlMap<CUtlString, EntityKeyId_t> CacheMapType;

@@ -362,7 +362,7 @@ bool EntityManager::ProviderAgent::DumpOldKeyValues(KeyValues *pOldOne, Logger::
 		{
 			Color rgba = pKeyValue->GetColor();
 
-			this->MakeDumpColorAlpha(rgba);
+			ProviderAgent::MakeDumpColorAlpha(rgba);
 			aOutput.PushFormat(rgba, "\"%s\" \"%s\"", pszName, pszValue);
 		}
 		else
@@ -408,13 +408,13 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 						{
 							char sValue[512];
 
-							if(this->DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
+							if(ProviderAgent::DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
 							{
 								if(V_stristr(pszName, "color"))
 								{
 									Color rgba = pMember->GetColor();
 
-									this->MakeDumpColorAlpha(rgba);
+									ProviderAgent::MakeDumpColorAlpha(rgba);
 									aOutput.PushFormat(rgba, "%s = %s", pszName, sValue);
 								}
 								else
@@ -624,7 +624,7 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 
 							do
 							{
-								if(this->DumpEntityKeyValue(pArray[i], pArrayBuf, nMaxLength))
+								if(ProviderAgent::DumpEntityKeyValue(pArray[i], pArrayBuf, nMaxLength))
 								{
 									iBufCur += V_snprintf(&psBuffer[iBufCur], nMaxLength - iBufCur, "%s, ", pArrayBuf);
 								}
