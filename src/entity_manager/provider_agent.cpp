@@ -520,7 +520,7 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 						}
 					}
 
-					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "entity:%d:%s" : "entity:%d", iIndex, pszClassname);
+					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "\"entity:%d:%s\"" : "\"entity:%d\"", iIndex, pszClassname);
 				}
 				default:
 					AssertMsg1(0, "KV3: Unrealized int subtype is %d\n", pMember->GetSubType());
@@ -567,7 +567,7 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 						}
 					}
 
-					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "entity:%d:%s" : "entity:%d", iIndex, pszClassname);
+					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "\"entity:%d:%s\"" : "\"entity:%d\"", iIndex, pszClassname);
 				}
 				default:
 					AssertMsg1(0, "KV3: Unrealized uint subtype is %d\n", pMember->GetSubType());
