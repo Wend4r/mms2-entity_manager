@@ -507,17 +507,26 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 				{
 					const CEntityHandle &aHandle = pMember->GetEHandle();
 
+					int iIndex = -1;
+
+					const char *pszClassname = nullptr;
+
 					if(aHandle.IsValid())
 					{
 						CEntityInstance *pEntity = static_cast<CEntityInstance *>(g_pGameEntitySystem->GetBaseEntity(aHandle));
 
 						if(pEntity)
 						{
-							return V_snprintf(psBuffer, nMaxLength, "\"entity:%d:%s\"", pEntity->GetEntityIndex().Get(), pEntity->GetClassname());
+							iIndex = pEntity->GetEntityIndex().Get();
+							pszClassname = pEntity->GetClassname();
+						}
+						else
+						{
+							iIndex = aHandle.GetEntryIndex();
 						}
 					}
 
-					return V_snprintf(psBuffer, nMaxLength, "%d", aHandle.ToInt());
+					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "entity:%d:%s" : "entity:%d", iIndex, pszClassname);
 				}
 				default:
 					AssertMsg1(0, "KV3: Unrealized int subtype is %d\n", pMember->GetSubType());
@@ -539,7 +548,7 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 				{
 					const CUtlStringToken &aToken = pMember->GetStringToken();
 
-					return V_snprintf(psBuffer, nMaxLength, "\"string_token:0x%x:\"", aToken.GetHashCode());
+					return V_snprintf(psBuffer, nMaxLength, "\"string_token:0x%x\"", aToken.GetHashCode());
 				}
 				case KV3_SUBTYPE_EHANDLE:
 				{
@@ -558,9 +567,13 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 							iIndex = pEntity->GetEntityIndex().Get();
 							pszClassname = pEntity->GetClassname();
 						}
+						else
+						{
+							iIndex = aHandle.GetEntryIndex();
+						}
 					}
 
-					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "entity:%d" : "entity:%d:%s", iIndex, pszClassname);
+					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "entity:%d:%s" : "entity:%d", iIndex, pszClassname);
 				}
 				default:
 					AssertMsg1(0, "KV3: Unrealized uint subtype is %d\n", pMember->GetSubType());
