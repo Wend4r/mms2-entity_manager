@@ -13,6 +13,7 @@
 #include "provider/entitykeyvalues.h"
 #include "provider_agent/resourcemanifest.h"
 
+#define LOGGER_COLOR_KEYVALUES {241, 160, 50, 255}
 #define LOGGER_COLOR_ENTITY_KV3 {0, 191, 255, 255}
 
 #define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
@@ -41,7 +42,7 @@ namespace EntityManager
 		IEntityResourceManifest *GetMyEntityManifest();
 
 	public: // Spawn queue methods.
-		void PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
+		void PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pWarnings = nullptr);
 		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
 		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *&pvecTarget, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
 		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues);
@@ -56,8 +57,10 @@ namespace EntityManager
 		int DestroyQueued();
 
 	public: // Dumps.
+		bool DumpOldKeyValues(KeyValues *pOldOne, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
 		bool DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
 		int DumpEntityKeyValue(KeyValues3 *pMember, char *psBuffer, size_t nMaxLength);
+		bool MakeDumpColorAlpha(Color &rgba);
 
 	protected: // Cache of entity keys.
 		typedef CUtlMap<CUtlString, EntityKeyId_t> CacheMapType;

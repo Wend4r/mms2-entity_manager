@@ -85,22 +85,11 @@ IEntityResourceManifest *EntityManager::ProviderAgent::GetMyEntityManifest()
 	return this->m_aResourceManifest.GetEntityPart();
 }
 
-void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, SpawnGroupHandle_t hSpawnGroup, Logger::Scope *pDetails, Logger::Scope *pWarnings)
+void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup, Logger::Scope *pWarnings)
 {
-	int iNewIndex = this->m_vecEntitySpawnQueue.Count();
-
 	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesClusterAllocator(), 3);
 
-	Color rgbaPrev = LOGGER_COLOR_ENTITY_KV3;
-
-	if(pDetails)
-	{
-		rgbaPrev = pDetails->GetColor();
-		pDetails->SetColor(pOldKeyValues->GetColor("color", rgbaPrev));
-		pDetails->PushFormat("-- Queue entity #%d --", iNewIndex);
-	}
-
-	FOR_EACH_VALUE(pOldKeyValues, pKeyValue)
+	FOR_EACH_VALUE(pOldOne, pKeyValue)
 	{
 		const char *pszKey = pKeyValue->GetName();
 
@@ -108,24 +97,12 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldKeyValues, S
 
 		if(pAttr)
 		{
-			const char *pszValue = pKeyValue->GetString();
-
-			if(pDetails)
-			{
-				pDetails->PushFormat("\t\"%s\" has \"%s\" value", pszKey, pszValue);
-			}
-
-			pNewKeyValues->SetAttributeValue(pAttr, pszValue);
+			pNewKeyValues->SetAttributeValue(pAttr, pKeyValue->GetString());
 		}
 		else if(pWarnings)
 		{
 			pWarnings->PushFormat("Failed to get \"%s\" attribute", pszKey);
 		}
-	}
-
-	if(pDetails)
-	{
-		pDetails->SetColor(rgbaPrev);
 	}
 
 	this->PushSpawnQueue(pNewKeyValues, hSpawnGroup);
@@ -374,6 +351,29 @@ int EntityManager::ProviderAgent::DestroyQueued()
 	return iQueueLength;
 }
 
+bool EntityManager::ProviderAgent::DumpOldKeyValues(KeyValues *pOldOne, Logger::Scope &aOutput, Logger::Scope *paWarnings)
+{
+	FOR_EACH_VALUE(pOldOne, pKeyValue)
+	{
+		const char *pszName = pKeyValue->GetName(), 
+		           *pszValue = pKeyValue->GetString();
+
+		if(V_stristr(pszName, "color"))
+		{
+			Color rgba = pKeyValue->GetColor();
+
+			this->MakeDumpColorAlpha(rgba);
+			aOutput.PushFormat(rgba, "\"%s\" \"%s\"", pszName, pszValue);
+		}
+		else
+		{
+			aOutput.PushFormat("\"%s\" \"%s\"", pszName, pszValue);
+		}
+	}
+
+	return true;
+}
+
 bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput, Logger::Scope *paWarnings)
 {
 	const CEntityKeyValuesProvider *pProvider = (const CEntityKeyValuesProvider *)pKeyValues;
@@ -414,13 +414,7 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 								{
 									Color rgba = pMember->GetColor();
 
-									// Setting an alpha channel.
-									if(!rgba[3])
-									{
-										// rgba[3] = 255;
-										rgba[3] = 127 + (127 * ((rgba[0] + rgba[1] + rgba[2]) / (255 * 3))); // Alpha.
-									}
-
+									this->MakeDumpColorAlpha(rgba);
 									aOutput.PushFormat(rgba, "%s = %s", pszName, sValue);
 								}
 								else
@@ -689,6 +683,19 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 	}
 
 	return 0;
+}
+
+
+bool EntityManager::ProviderAgent::MakeDumpColorAlpha(Color &rgba)
+{
+	bool bResult = !rgba[3];
+
+	if(bResult)
+	{
+		rgba[3] = 127 + (127 * ((rgba[0] + rgba[1] + rgba[2]) / (255 * 3)));
+	}
+
+	return bResult;
 }
 
 const EntityKeyId_t &EntityManager::ProviderAgent::GetCachedEntityKey(CacheMapOIndexType nElm)
