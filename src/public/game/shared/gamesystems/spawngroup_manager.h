@@ -10,6 +10,7 @@
 #include "entity2/entitysystem.h"
 #include "entity2/entityidentity.h"
 #include "tier0/utlstring.h"
+#include "tier0/utlstringtoken.h"
 #include "tier0/utlscratchmemory.h"
 #include "tier1/utlvector.h"
 
@@ -20,7 +21,7 @@ class CKeyValues3Cluster;
 class CEntityKeyValues;
 class CGameResourceManifest;
 class ISpawnGroupPrerequisiteRegistry;
-class IWorldReference;
+class IWorldReference; // See worldrender/iworldreference.h
 
 struct EventGameInit_t;
 
@@ -35,6 +36,14 @@ struct EventServerPostEntityThink_t
 {
 	bool m_bFirstTick;
 	bool m_bLastTick;
+};
+
+enum ResourceStatus_t
+{
+	RESOURCE_STATUS_UNKNOWN = 0,
+	RESOURCE_STATUS_KNOWN_BUT_NOT_RESIDENT,
+	RESOURCE_STATUS_PARTIALLY_RESIDENT,
+	RESOURCE_STATUS_RESIDENT,
 };
 
 enum ResourceManifestLoadBehavior_t
@@ -108,7 +117,7 @@ public:
 	virtual void UnkIsManualFlag5() = 0;
 	virtual void UnkSetter(uint64 n) = 0;
 	virtual void UnkIsManualFlag6() = 0;
-	virtual void UnkGetter() = 0;
+	virtual WorldGroupId_t GetWorldGroupId() const = 0;
 
 	virtual void ComputeWorldOrigin(matrix3x4_t *retstrp) = 0;
 	virtual void Release() = 0;
