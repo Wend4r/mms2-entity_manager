@@ -466,24 +466,16 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 		{
 			const char sNullable[] = "null";
 
+			size_t nStoreSize = sizeof(sNullable);
+
 			V_strncpy(psBuffer, (const char *)sNullable, nMaxLength);
 
-			return sizeof(sNullable);
+			return nMaxLength < nStoreSize ? nMaxLength : nStoreSize;
 		}
 
 		case KV3_TYPEEX_BOOL:
 		{
-			const char *sBoolean[] = 
-			{
-				"false",
-				"true"
-			};
-
-			bool b = pMember->GetBool();
-
-			V_strncpy(psBuffer, sBoolean[b], nMaxLength);
-
-			return sizeof(sBoolean[b]);
+			return V_snprintf(psBuffer, nMaxLength, "%s", pMember->GetBool() ? "true" : "false");
 		}
 
 		case KV3_TYPEEX_INT:
