@@ -6,7 +6,7 @@
 #endif
 
 #include <tier0/platform.h>
-#include <tier1/utlstring.h>
+#include <tier0/utlstring.h>
 #include <tier1/utlvector.h>
 #include <mathlib/vector.h>
 #include <mathlib/vector2d.h>

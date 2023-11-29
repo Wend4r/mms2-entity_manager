@@ -20,7 +20,7 @@ class IWorld
 public:
 	// Loading
 	virtual void Init( ISceneWorld *pScene, bool b, int n ) = 0;
-	virtual void CreateAndDispatchLoadRequests( const Vector &vEye ) = 0;
+	virtual void CreateAndDispatchLoadRequests( const Vector &vEye, int n ) = 0;
 	virtual void Shutdown() = 0;
 
 	// Reflection
@@ -40,17 +40,17 @@ public:
 	virtual bool GetLoadSun() const = 0;
 
 	// Players
-	virtual bool IsFullyLoadedForPlayer( CSplitScreenSlot nSlot, uint32 nHighMask = 0 ) const = 0;
+	virtual bool IsFullyLoadedForPlayer( WorldGroupId_t hWorldGroupId, CSplitScreenSlot nSlot ) const = 0;
 	virtual void ClearOutstandingLoadRequests() = 0;
 
 	// Precache
 	virtual void PrecacheAllWorldNodes( WorldNodeFlags_t flags, int iCacheNodes = 1, bool bDoNotDeleteManifest = false ) = 0;
 
-	// Entities
-	virtual CUtlVector< const CEntityKeyValues * > *GetEntityList( const char *pSearchLump = NULL ) const = 0;
+	// Entities and lighting
+	virtual const CUtlVector< const CEntityKeyValues * > *GetEntityList( const char *pSearchLump = NULL ) const = 0; // Can be return NULL value.
 	virtual void FindEntitiesByTargetname( const char *pTargetname, const char *pSearchLump, CUtlVector< const CEntityKeyValues * > &res ) const = 0;
-	virtual bool IsWorldspaceTextureBlend() const = 0;
-	virtual bool IsDisabledInLowQuality() const = 0;
+	virtual bool HasLightmaps() const = 0;
+	virtual bool HasBakedLighting() const = 0;
 	virtual const BakedLightingInfo_t *GetBakedLightingInfo() const = 0;
 	virtual void FindEntitiesByClassname( const char *pClassname, const char *pSearchLump, CUtlVector< const CEntityKeyValues * > &res ) const = 0;
 };
