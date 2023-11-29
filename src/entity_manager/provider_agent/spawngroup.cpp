@@ -76,7 +76,7 @@ bool EntityManager::SpawnGroup::IsResidentOrStreaming(SpawnGroupHandle_t hSpawnG
 
 	if(pNewServer)
 	{
-		return pNewServer->GetSpawnGroupLoadingStatus(hSpawnGroup) > 0;
+		return pNewServer->GetSpawnGroupLoadingStatus(hSpawnGroup) != 2;
 	}
 
 	return false;
@@ -87,7 +87,7 @@ const Vector &EntityManager::SpawnGroup::GetLandmarkOffset()
 	return this->m_vecLandmarkOffset;
 }
 
-bool EntityManager::SpawnGroup::Start(const char *pLevelName, const char *pSpawnGroupFilterName, float flTimeoutInterval, const char *pLandmarkName, SpawnGroupHandle_t hOwner)
+bool EntityManager::SpawnGroup::Start(const char *pLevelName, const char *pEntityLumpName, const char *pSpawnGroupFilterName, const char *pWorldGroupname, float flTimeoutInterval, const char *pLandmarkName, SpawnGroupHandle_t hOwner)
 {
 	INetworkGameServer *pNewServer = g_pNetworkServerService->GetIGameServer();
 
@@ -114,7 +114,11 @@ bool EntityManager::SpawnGroup::Start(const char *pLevelName, const char *pSpawn
 	desc.m_hOwner = hOwner;
 	desc.m_pWorldOffsetCallback = this;
 	desc.m_sWorldName = this->m_sLevelName;
+	desc.m_sWorldMountName = this->m_sLevelName;
+	desc.m_sEntityLumpName = pEntityLumpName;
 	desc.m_sEntityFilterName = pSpawnGroupFilterName;
+	desc.m_sDescriptiveName = pLandmarkName;
+	desc.m_sWorldGroupname = pWorldGroupname;
 	desc.m_flTimeoutInterval = flTimeoutInterval;
 	desc.m_bCreateClientEntitiesOnLaterConnectingClients = true;
 

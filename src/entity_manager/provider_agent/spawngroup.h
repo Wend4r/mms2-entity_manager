@@ -17,7 +17,7 @@ namespace EntityManager
 		static bool IsResidentOrStreaming(SpawnGroupHandle_t hSpawnGroup);
 		const Vector &GetLandmarkOffset();
 
-		bool Start(const char *pLevelName, const char *pSpawnGroupFilterName = NULL, float flTimeoutInterval = 0.0f, const char *pLandmarkName = NULL, SpawnGroupHandle_t hOwner = INVALID_SPAWN_GROUP);
+		bool Start(const char *pLevelName, const char *pEntityLumpName = NULL, const char *pSpawnGroupFilterName = NULL, const char *pWorldGroupname = NULL, float flTimeoutInterval = 0.0f, const char *pLandmarkName = NULL, SpawnGroupHandle_t hOwner = INVALID_SPAWN_GROUP);
 
 	public: // IComputeWorldOriginCallback
 		matrix3x4_t ComputeWorldOrigin(const char *pWorldName, SpawnGroupHandle_t hSpawnGroup, IWorld *pWorld);
