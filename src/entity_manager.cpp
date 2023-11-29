@@ -325,6 +325,8 @@ bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, 
 			V_strncpy((char *)sRootSpawnGroupName, pMap->GetWorldName(), sizeof(sRootSpawnGroupName));
 			V_FixSlashes((char *)sRootSpawnGroupName);
 			V_snprintf((char *)sSpawnGroupName, sizeof(sSpawnGroupName), "%s" CORRECT_PATH_SEPARATOR_S "%s", sRootSpawnGroupName, sSpawnGroupName);
+
+			pSpawnGroup = pMap->GetSpawnGroup();
 		}
 	}
 
