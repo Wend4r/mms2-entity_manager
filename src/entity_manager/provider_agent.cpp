@@ -17,12 +17,12 @@ extern IGameResourceServiceServer *g_pGameResourceServiceServer;
 CGameEntitySystem *g_pGameEntitySystem = NULL;
 CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
-class CDefOpsString
+class CDefOpsStringBinaryBlock
 {
 public:
-	static bool LessFunc( const CUtlString &lhs, const CUtlString &rhs )
+	static bool LessFunc(const CUtlBinaryBlock &lhs, const CUtlBinaryBlock &rhs)
 	{
-		return StringLessThan(lhs.Get(), rhs.Get());
+		return StringLessThan((const char *)lhs.Get(), (const char *)rhs.Get());
 	}
 };
 
@@ -33,7 +33,7 @@ EntityManager::ProviderAgent::ProviderAgent()
 	{
 		static const char szClassname[] = "classname";
 
-		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert(szClassname, {szClassname, (const char *)szClassname});
+		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert({szClassname, sizeof(szClassname)}, {szClassname, (const char *)szClassname});
 	}
 }
 
@@ -702,11 +702,11 @@ const EntityKeyId_t &EntityManager::ProviderAgent::GetCachedClassnameKey()
 
 EntityManager::ProviderAgent::CacheMapOIndexType EntityManager::ProviderAgent::CacheOrGetEntityKey(const char *pszName)
 {
-	const CUtlString sName(pszName, V_strlen(pszName) + 1);
+	const CUtlBinaryBlock aName(pszName, V_strlen(pszName) + 1);
 
-	CacheMapOIndexType nFindElm = this->m_mapCachedKeys.Find(sName);
+	CacheMapOIndexType nFindElm = this->m_mapCachedKeys.Find(aName);
 
-	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, sName) : nFindElm;
+	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(aName, {(const char *)aName.Get()}) : nFindElm;
 }
 
 EntityManager::ProviderAgent::SpawnData::SpawnData(CEntityKeyValues *pKeyValues)

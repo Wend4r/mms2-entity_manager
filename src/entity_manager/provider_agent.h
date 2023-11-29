@@ -5,7 +5,7 @@
 
 #include <eiface.h>
 #include <tier1/utlmap.h>
-#include <tier0/utlstring.h>
+#include <tier0/utlbinaryblock.h>
 #include <tier1/utlvector.h>
 #include <entity2/entityidentity.h>
 
@@ -63,7 +63,7 @@ namespace EntityManager
 		static bool MakeDumpColorAlpha(Color &rgba);
 
 	protected: // Cache of entity keys.
-		typedef CUtlMap<CUtlString, EntityKeyId_t> CacheMapType;
+		typedef CUtlMap<CUtlBinaryBlock, EntityKeyId_t> CacheMapType;
 		typedef CacheMapType::IndexType_t CacheMapOIndexType;
 
 		const EntityKeyId_t &GetCachedEntityKey(CacheMapOIndexType nElm);
