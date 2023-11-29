@@ -187,10 +187,10 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 						// pMyLoading->SpawnEntities(); // Spawn created now.
 						// pMyLoading->Release(); // Free CLoadingSpawnGroup.
 
-						s_aEntityManagerProviderAgent.ErectResourceManifest(h, iEntityCount, pEntities, &pMap->GetWorldOffset());
 
 						this->ListenLoadingSpawnGroup(h, iEntityCount, pEntities);
 						pMap->SetLoadingSpawnGroup(pMyLoading); // To respawn in next rounds.
+						s_aEntityManagerProviderAgent.ErectResourceManifest(pMap->GetSpawnGroup(), iEntityCount, pEntities, &pMap->GetWorldOffset());
 
 						// pMap->LoadEntities();
 						// pMyLoading->SpawnEntities(); // Spawn created now.

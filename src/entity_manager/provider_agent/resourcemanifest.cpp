@@ -42,13 +42,14 @@ bool EntityManager::ResourceManifest::Destroy()
 	return bResult;
 }
 
-bool EntityManager::ResourceManifest::Erect(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset)
+bool EntityManager::ResourceManifest::Erect(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset)
 {
-	bool bResult = ((EntityManager::CGameResourceServiceProvider *)g_pGameResourceServiceServer)->AppendToAndCreateGameResourceManifest(this->m_pStorage, hSpawnGroup, nCount, pEntities, vWorldOffset);
+	// bool bResult = true;
+	bool bResult = ((EntityManager::CGameResourceServiceProvider *)g_pGameResourceServiceServer)->AppendToAndCreateGameResourceManifest(this->m_pStorage, pSpawnGroup->GetHandle(), nCount, pEntities, vWorldOffset);
 
 	if(bResult)
 	{
-		// pSpawnGroup->OnGameResourceManifestLoaded(this->m_pStorage, 0, NULL);
+		// pSpawnGroup->OnGameResourceManifestLoaded(NULL);
 	}
 
 	return bResult;

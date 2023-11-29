@@ -14,7 +14,7 @@ namespace EntityManager
 		bool Reinit(ResourceManifestLoadBehavior_t eBehavior = RESOURCE_MANIFEST_LOAD_DEFAULT, const char *pszAllocatorName = "EntityManager::ResourceManifest_ctor", ResourceManifestLoadPriority_t ePriority = RESOURCE_MANIFEST_LOAD_PRIORITY_DEFAULT);
 		bool Destroy();
 
-		bool Erect(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
+		bool Erect(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
 		IEntityResourceManifest *GetEntityPart();
 
 	private:

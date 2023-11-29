@@ -38,7 +38,7 @@ namespace EntityManager
 		virtual bool NotifySpawnGroupMgrUpdated();
 
 	public:
-		bool ErectResourceManifest(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
+		bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
 		IEntityResourceManifest *GetMyEntityManifest();
 
 	public: // Spawn queue methods.
