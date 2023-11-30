@@ -7,18 +7,7 @@ extern INetworkServerService *g_pNetworkServerService;
 
 EntityManager::SpawnGroup::~SpawnGroup()
 {
-	SpawnGroupHandle_t hSpawnGroup = this->m_hSpawnGroup;
-
-	if(hSpawnGroup != INVALID_SPAWN_GROUP)
-	{
-		// engine->UnloadSpawnGroup(hSpawnGroup, kSGUO_None);
-		INetworkGameServer *pNewServer = g_pNetworkServerService->GetIGameServer();
-
-		if(pNewServer)
-		{
-			pNewServer->AsyncUnloadSpawnGroup(hSpawnGroup, kSGUO_None);
-		}
-	}
+	this->Unload();
 }
 
 /*
@@ -60,7 +49,7 @@ int EntityManager::SpawnGroup::GetStatus()
 		}
 	}
 
-	return 0;
+	return 2;
 }
 
 /*
@@ -76,7 +65,7 @@ bool EntityManager::SpawnGroup::IsResidentOrStreaming(SpawnGroupHandle_t hSpawnG
 
 	if(pNewServer)
 	{
-		return pNewServer->GetSpawnGroupLoadingStatus(hSpawnGroup) != 2;
+		return pNewServer->GetSpawnGroupLoadingStatus(hSpawnGroup) < 2;
 	}
 
 	return false;
@@ -87,8 +76,15 @@ const Vector &EntityManager::SpawnGroup::GetLandmarkOffset()
 	return this->m_vecLandmarkOffset;
 }
 
-bool EntityManager::SpawnGroup::Start(const char *pLevelName, const char *pEntityLumpName, const char *pSpawnGroupFilterName, const char *pWorldGroupname, float flTimeoutInterval, const char *pLandmarkName, SpawnGroupHandle_t hOwner)
+bool EntityManager::SpawnGroup::Start(SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset)
 {
+	if(this->GetStatus() < 2)
+	{
+		AssertMsg4(0, "Accept to start an already existing spawn group: %s (%s) vs %s (%s)", this->m_sLevelName.Get(), this->m_sLandmarkName.Get(), aDesc.m_sWorldName.Get(), aDesc.m_sDescriptiveName.Get());
+
+		return false;
+	}
+
 	INetworkGameServer *pNewServer = g_pNetworkServerService->GetIGameServer();
 
 	if(!pNewServer)
@@ -96,39 +92,61 @@ bool EntityManager::SpawnGroup::Start(const char *pLevelName, const char *pEntit
 		return false;
 	}
 
-	this->m_sLevelName = pLevelName;
-	this->m_sLandmarkName = pLandmarkName;
-
-	if(pLevelName && pLevelName[0])
 	{
-		SpawnGroupHandle_t hSpawnGroup = pNewServer->FindSpawnGroupByName(pLevelName);
+		const char *pLevelName = aDesc.m_sWorldName.Get();
 
-		if(IsResidentOrStreaming(hSpawnGroup))
+		if(pLevelName && pLevelName[0])
 		{
-			return false;
+			SpawnGroupHandle_t hSpawnGroup = pNewServer->FindSpawnGroupByName(pLevelName);
+
+			if(IsResidentOrStreaming(hSpawnGroup))
+			{
+				return false;
+			}
 		}
 	}
 
-	SpawnGroupDesc_t desc;
+	this->m_sLevelName = aDesc.m_sWorldName;
+	this->m_sLandmarkName = aDesc.m_sDescriptiveName;
+	this->m_vecLandmarkOffset = vecLandmarkOffset;
 
-	desc.m_hOwner = hOwner;
-	desc.m_pWorldOffsetCallback = this;
-	desc.m_sWorldName = this->m_sLevelName;
-	desc.m_sWorldMountName = this->m_sLevelName;
-	desc.m_sEntityLumpName = pEntityLumpName;
-	desc.m_sEntityFilterName = pSpawnGroupFilterName;
-	desc.m_sDescriptiveName = pLandmarkName;
-	desc.m_sWorldGroupname = pWorldGroupname;
-	desc.m_flTimeoutInterval = flTimeoutInterval;
-	desc.m_bCreateClientEntitiesOnLaterConnectingClients = true;
+	aDesc.m_pWorldOffsetCallback = this;
 
-	pNewServer->LoadSpawnGroup(desc);
+	pNewServer->LoadSpawnGroup(aDesc);
 
 	return true;
 }
 
+bool EntityManager::SpawnGroup::Unload()
+{
+	SpawnGroupHandle_t hSpawnGroup = this->m_hSpawnGroup;
+
+	bool bResult = hSpawnGroup != INVALID_SPAWN_GROUP;
+
+	Msg("Unload hSpawnGroup = %d\n", hSpawnGroup);
+
+	if(bResult)
+	{
+		// engine->UnloadSpawnGroup(hSpawnGroup, kSGUO_None);
+		INetworkGameServer *pNewServer = g_pNetworkServerService->GetIGameServer();
+
+		bResult = pNewServer != NULL;
+
+		if(bResult)
+		{
+			Msg("pNewServer->AsyncUnloadSpawnGroup(%d)\n", hSpawnGroup);
+
+			pNewServer->AsyncUnloadSpawnGroup(hSpawnGroup, kSGUO_None);
+		}
+	}
+
+	return bResult;
+}
+
 matrix3x4_t EntityManager::SpawnGroup::ComputeWorldOrigin(const char *pWorldName, SpawnGroupHandle_t hSpawnGroup, IWorld *pWorld)
 {
+	this->m_hSpawnGroup = hSpawnGroup;
+
 	matrix3x4_t res;
 
 	res.SetToIdentity();
