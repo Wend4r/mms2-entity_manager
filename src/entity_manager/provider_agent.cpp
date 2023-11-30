@@ -75,9 +75,9 @@ bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()
 	return (g_pSpawnGroupMgr = *g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetSpawnGroupMgrAddress()) != NULL;
 }
 
-bool EntityManager::ProviderAgent::ErectResourceManifest(SpawnGroupHandle_t hSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset)
+bool EntityManager::ProviderAgent::ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset)
 {
-	return this->m_aResourceManifest.Erect(hSpawnGroup, nCount, pEntities, vWorldOffset);
+	return this->m_aResourceManifest.Erect(pSpawnGroup, nCount, pEntities, vWorldOffset);
 }
 
 IEntityResourceManifest *EntityManager::ProviderAgent::GetMyEntityManifest()
