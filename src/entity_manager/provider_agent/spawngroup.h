@@ -8,17 +8,31 @@
 
 namespace EntityManager
 {
-	class SpawnGroup : public IComputeWorldOriginCallback
+	class ISpawnGroupNotifications
+	{
+	public:
+		virtual void NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) = 0;
+		virtual void NotifyDestroySpawnGroup(SpawnGroupHandle_t handle) = 0;
+	};
+
+	class SpawnGroup : public ISpawnGroupNotifications, public IComputeWorldOriginCallback
 	{
 	public:
 		~SpawnGroup();
 
-		int GetStatus();
+		int GetStatus() const;
 		static bool IsResidentOrStreaming(SpawnGroupHandle_t hSpawnGroup);
-		const Vector &GetLandmarkOffset();
+		SpawnGroupHandle_t GetAllocatedSpawnGroup() const;
+		const char *GetLevelName() const;
+		const char *GetLandmarkName() const;
+		const Vector &GetLandmarkOffset() const;
 
 		bool Start(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset);
 		bool Unload();
+
+	public:
+		void NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
+		void NotifyDestroySpawnGroup(SpawnGroupHandle_t handle);
 
 	public: // IComputeWorldOriginCallback
 		matrix3x4_t ComputeWorldOrigin(const char *pWorldName, SpawnGroupHandle_t hSpawnGroup, IWorld *pWorld);

@@ -35,7 +35,7 @@ EntityManager::SpawnGroup::Status EntityManager::SpawnGroup::GetStatus()
 }
 */
 
-int EntityManager::SpawnGroup::GetStatus()
+int EntityManager::SpawnGroup::GetStatus() const
 {
 	SpawnGroupHandle_t hSpawnGroup = this->m_hSpawnGroup;
 
@@ -71,7 +71,22 @@ bool EntityManager::SpawnGroup::IsResidentOrStreaming(SpawnGroupHandle_t hSpawnG
 	return false;
 }
 
-const Vector &EntityManager::SpawnGroup::GetLandmarkOffset()
+SpawnGroupHandle_t EntityManager::SpawnGroup::GetAllocatedSpawnGroup() const
+{
+	return this->m_hSpawnGroup;
+}
+
+const char *EntityManager::SpawnGroup::GetLevelName() const
+{
+	return this->m_sLevelName.Get();
+}
+
+const char *EntityManager::SpawnGroup::GetLandmarkName() const
+{
+	return this->m_sLandmarkName.Get();
+}
+
+const Vector &EntityManager::SpawnGroup::GetLandmarkOffset() const
 {
 	return this->m_vecLandmarkOffset;
 }
@@ -141,10 +156,18 @@ bool EntityManager::SpawnGroup::Unload()
 	return bResult;
 }
 
+void EntityManager::SpawnGroup::NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
+{
+	this->m_hSpawnGroup = handle;
+}
+
+void EntityManager::SpawnGroup::NotifyDestroySpawnGroup(SpawnGroupHandle_t handle)
+{
+	// ...
+}
+
 matrix3x4_t EntityManager::SpawnGroup::ComputeWorldOrigin(const char *pWorldName, SpawnGroupHandle_t hSpawnGroup, IWorld *pWorld)
 {
-	this->m_hSpawnGroup = hSpawnGroup;
-
 	matrix3x4_t res;
 
 	res.SetToIdentity();
