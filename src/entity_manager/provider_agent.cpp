@@ -27,7 +27,7 @@ public:
 };
 
 EntityManager::ProviderAgent::ProviderAgent()
- :   m_mapCachedKeys(CDefOpsString::LessFunc)
+ :   m_mapCachedKeys(CDefOpsStringBinaryBlock::LessFunc)
 {
 	// Cache the classname.
 	{
