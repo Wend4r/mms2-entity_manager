@@ -123,8 +123,6 @@ bool EntityManager::SpawnGroup::Unload()
 
 	bool bResult = hSpawnGroup != INVALID_SPAWN_GROUP;
 
-	Msg("Unload hSpawnGroup = %d\n", hSpawnGroup);
-
 	if(bResult)
 	{
 		// engine->UnloadSpawnGroup(hSpawnGroup, kSGUO_None);
@@ -134,8 +132,6 @@ bool EntityManager::SpawnGroup::Unload()
 
 		if(bResult)
 		{
-			Msg("pNewServer->AsyncUnloadSpawnGroup(%d)\n", hSpawnGroup);
-
 			pNewServer->AsyncUnloadSpawnGroup(hSpawnGroup, kSGUO_None);
 		}
 	}
