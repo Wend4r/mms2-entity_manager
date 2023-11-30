@@ -12,18 +12,17 @@
 #include "logger.h"
 #include "provider/entitykeyvalues.h"
 #include "provider_agent/resourcemanifest.h"
+#include "provider_agent/spawngroup.h"
 
 #define LOGGER_COLOR_KEYVALUES {241, 160, 50, 255}
 #define LOGGER_COLOR_ENTITY_KV3 {0, 191, 255, 255}
-
-#define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
 
 class KeyValues;
 class CEntityKeyValues;
 
 namespace EntityManager
 {
-	class ProviderAgent
+	class ProviderAgent : public ISpawnGroupNotifications
 	{
 	public:
 		ProviderAgent();
@@ -40,6 +39,14 @@ namespace EntityManager
 	public:
 		bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
 		IEntityResourceManifest *GetMyEntityManifest();
+
+	public:
+		bool CreateSpawnGroup(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset);
+		void ReleaseSpawnGroups();
+
+	public: // ISpawnGroupNotifications
+		void NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
+		void NotifyDestroySpawnGroup(SpawnGroupHandle_t handle);
 
 	public: // Spawn queue methods.
 		void PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pWarnings = nullptr);
@@ -117,6 +124,7 @@ namespace EntityManager
 		CacheMapOIndexType m_nElmCachedClassnameKey;
 
 		ResourceManifest m_aResourceManifest;
+		CUtlVector<SpawnGroup *> m_vecSpawnGroups;
 	};
 };
 

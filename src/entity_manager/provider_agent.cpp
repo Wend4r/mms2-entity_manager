@@ -46,6 +46,7 @@ void EntityManager::ProviderAgent::Clear()
 {
 	this->ReleaseSpawnQueued();
 	this->ReleaseDestroyQueued();
+	this->ReleaseSpawnGroups();
 }
 
 void EntityManager::ProviderAgent::Destroy()
@@ -83,6 +84,61 @@ bool EntityManager::ProviderAgent::ErectResourceManifest(ISpawnGroup *pSpawnGrou
 IEntityResourceManifest *EntityManager::ProviderAgent::GetMyEntityManifest()
 {
 	return this->m_aResourceManifest.GetEntityPart();
+}
+
+bool EntityManager::ProviderAgent::CreateSpawnGroup(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset)
+{
+	SpawnGroup *aSpawnGroup = new SpawnGroup();
+
+	bool bResult = aSpawnGroup->Start(aDesc, vecLandmarkOffset);
+
+	if(bResult)
+	{
+		this->m_vecSpawnGroups.AddToTail(aSpawnGroup);
+	}
+
+	return bResult;
+}
+
+void EntityManager::ProviderAgent::ReleaseSpawnGroups()
+{
+	this->m_vecSpawnGroups.PurgeAndDeleteElements();
+}
+
+void EntityManager::ProviderAgent::NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
+{
+	const char *pWorldName = pSpawnGroup->GetWorldName();
+
+	if(pWorldName && pWorldName[0])
+	{
+		for(int i = 0; i < this->m_vecSpawnGroups.Count(); i++)
+		{
+			SpawnGroup *pSpawnGroupAgent = this->m_vecSpawnGroups[i];
+
+			const char *pLevelName = pSpawnGroupAgent->GetLevelName();
+
+			if(pLevelName && pLevelName[0] && !V_strcmp(pWorldName, pLevelName))
+			{
+				pSpawnGroupAgent->NotifyAllocateSpawnGroup(handle, pSpawnGroup);
+			}
+		}
+	}
+}
+
+void EntityManager::ProviderAgent::NotifyDestroySpawnGroup(SpawnGroupHandle_t handle)
+{
+	for(int i = 0; i < this->m_vecSpawnGroups.Count(); i++)
+	{
+		SpawnGroup *pSpawnGroupAgent = this->m_vecSpawnGroups[i];
+
+		if(handle == pSpawnGroupAgent->GetAllocatedSpawnGroup())
+		{
+			pSpawnGroupAgent->NotifyDestroySpawnGroup(handle);
+
+			delete pSpawnGroupAgent;
+			this->m_vecSpawnGroups.FastRemove(i);
+		}
+	}
 }
 
 void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup, Logger::Scope *pWarnings)
