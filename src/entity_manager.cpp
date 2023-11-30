@@ -309,26 +309,45 @@ bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, 
 #endif
 	Logger::Scope aWarnings = this->m_aLogger.CreateWarningsScope();
 
-	char sSpawnGroupName[MAX_SPAWN_GROUP_WORLD_NAME_LENGTH], 
-	     sRootSpawnGroupName[MAX_SPAWN_GROUP_WORLD_NAME_LENGTH];
+	char sSpawnGroupName[MAX_SPAWN_GROUP_WORLD_NAME_LENGTH];
 
 	{
-		V_strncpy((char *)sSpawnGroupName, pSpawnGroup->GetWorldName(), sizeof(sSpawnGroupName));
-		V_FixSlashes((char *)sSpawnGroupName);
-
 		SpawnGroupHandle_t hOwner;
+
+		ISpawnGroup *pOwnerSpawnGroup = pSpawnGroup;
 
 		CMapSpawnGroup *pMap;
 
-		while((hOwner = pSpawnGroup->GetOwnerSpawnGroup()) != INVALID_SPAWN_GROUP && (pMap = ((EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr)->Get(hOwner)))
-		{
-			V_strncpy((char *)sRootSpawnGroupName, pMap->GetWorldName(), sizeof(sRootSpawnGroupName));
-			V_FixSlashes((char *)sRootSpawnGroupName);
-			V_snprintf((char *)sSpawnGroupName, sizeof(sSpawnGroupName), "%s" CORRECT_PATH_SEPARATOR_S "%s", sRootSpawnGroupName, sSpawnGroupName);
+		CUtlVector<const char *> vecNamesByPedigree;
 
-			pSpawnGroup = pMap->GetSpawnGroup();
+		while((hOwner = pOwnerSpawnGroup->GetOwnerSpawnGroup()) != INVALID_SPAWN_GROUP && (pMap = ((EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr)->Get(hOwner)))
+		{
+			pOwnerSpawnGroup = pMap->GetSpawnGroup();
+
+			vecNamesByPedigree.AddToHead(pOwnerSpawnGroup->GetWorldName());
 		}
+
+		size_t nStoredLength = 0;
+
+		if(vecNamesByPedigree.Count())
+		{
+			FOR_EACH_VEC(vecNamesByPedigree, i)
+			{
+				V_strncpy(&sSpawnGroupName[nStoredLength], vecNamesByPedigree[i], sizeof(sSpawnGroupName) - nStoredLength);
+				nStoredLength += V_strlen(vecNamesByPedigree[i]);
+
+				if(nStoredLength + 1 < sizeof(sSpawnGroupName))
+				{
+					sSpawnGroupName[nStoredLength] = CORRECT_PATH_SEPARATOR;
+					nStoredLength++;
+				}
+			}
+		}
+
+		V_strncpy(&sSpawnGroupName[nStoredLength], pSpawnGroup->GetWorldName(), sizeof(sSpawnGroupName) - nStoredLength);
 	}
+
+	V_FixSlashes((char *)sSpawnGroupName);
 
 	bool bResult = this->m_aSettings.Load(pSpawnGroup->GetHandle(), this->m_sBasePath.c_str(), (const char *)sSpawnGroupName, psError, nMaxLength,
 #ifdef DEBUG
