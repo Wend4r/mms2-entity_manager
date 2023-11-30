@@ -171,7 +171,7 @@ void EntityManager::ProviderAgent::PushSpawnQueue(CEntityKeyValues *pKeyValues, 
 	this->m_vecEntitySpawnQueue.AddToTail({pKeyValues, hSpawnGroup});
 }
 
-int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *&pvecTarget, SpawnGroupHandle_t hSpawnGroup)
+int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup)
 {
 	const auto &vecEntitySpawnQueue = this->m_vecEntitySpawnQueue;
 
@@ -214,12 +214,7 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 		}
 	}
 
-	if(!pvecTarget)
-	{
-		pvecTarget = new CUtlVector<const CEntityKeyValues *>();
-	}
-
-	int iResult = pvecTarget->AddMultipleToTail(iQueueLength, ppKeyValuesArr);
+	int iResult = vecTarget.AddMultipleToTail(iQueueLength, ppKeyValuesArr);
 
 	MemAlloc_Free(ppKeyValuesArr);
 
@@ -347,7 +342,7 @@ void EntityManager::ProviderAgent::PushDestroyQueue(CEntityIdentity *pEntity)
 	this->m_vecEntityDestroyQueue.AddToTail(pEntity->m_pInstance);
 }
 
-int EntityManager::ProviderAgent::AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> *&pvecTarget)
+int EntityManager::ProviderAgent::AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> &vecTarget)
 {
 	const auto &vecEntityDestroyQueue = this->m_vecEntityDestroyQueue;
 
@@ -364,12 +359,7 @@ int EntityManager::ProviderAgent::AddDestroyQueueToTail(CUtlVector<const CEntity
 		pEntityCur++;
 	}
 
-	if(!pvecTarget)
-	{
-		pvecTarget = new CUtlVector<const CEntityIdentity *>();
-	}
-
-	int iResult = pvecTarget->AddMultipleToTail(((uintptr_t)pEntityCur - (uintptr_t)pEntityArr) / sizeof(decltype(pEntityArr)), pEntityArr);
+	int iResult = vecTarget.AddMultipleToTail(((uintptr_t)pEntityCur - (uintptr_t)pEntityArr) / sizeof(decltype(pEntityArr)), pEntityArr);
 
 	free(pEntityArr);
 

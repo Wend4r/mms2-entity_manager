@@ -51,7 +51,7 @@ namespace EntityManager
 	public: // Spawn queue methods.
 		void PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pWarnings = nullptr);
 		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
-		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> *&pvecTarget, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
+		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
 		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues);
 		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
 		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
@@ -59,7 +59,7 @@ namespace EntityManager
 	public: // Destroy queue methods.
 		void PushDestroyQueue(CEntityInstance *pEntity);
 		void PushDestroyQueue(CEntityIdentity *pEntity);
-		int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> *&pvecTarget);
+		int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> &vecTarget);
 		void ReleaseDestroyQueued();
 		int DestroyQueued();
 

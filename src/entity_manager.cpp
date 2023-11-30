@@ -19,12 +19,19 @@
 #include <iserver.h>
 #include <entity2/entitysystem.h>
 #include <gamesystems/spawngroup_manager.h>
+#include <worldrenderer/iworld.h>
+#include <worldrenderer/iworldrenderermgr.h>
 #include <tier0/dbg.h>
 #include <tier1/convar.h>
+
+#include <memory_utils/virtual.h>
 
 #include "entity_manager.h"
 #include "entity_manager/provider/gameresource.h"
 #include "entity_manager/provider/spawngroup.h"
+
+#define ENTITY_MANAGER_WORLD_ROOT "entity_manager"
+#define ENTITY_MANAGER_PROGENITOR_WORLD_NAME "progenitor_layer"
 
 const Color ENTITY_MANAGER_LOGGINING_COLOR = {125, 125, 125, 255};
 
@@ -89,6 +96,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 	GET_V_IFACE_CURRENT(GetEngineFactory, gameevents, IGameEventManager2, INTERFACEVERSION_SERVERGAMECLIENTS);
 	GET_V_IFACE_ANY(GetEngineFactory, g_pNetworkServerService, INetworkServerService, NETWORKSERVERSERVICE_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetEngineFactory, g_pGameResourceServiceServer, IGameResourceServiceServer, GAMERESOURCESERVICESERVER_INTERFACE_VERSION);
+	GET_V_IFACE_CURRENT(GetEngineFactory, g_pWorldRendererMgr, IWorldRendererMgr, WORLD_RENDERER_MGR_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetFileSystemFactory, filesystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetServerFactory, server, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL);
 
@@ -169,31 +177,38 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 				{
 					char sSettingsError[256];
 
-					if(this->LoadSettings(pMap->GetSpawnGroup(), (char *)sSettingsError, sizeof(sSettingsError)))
+					ISpawnGroup *pSpawnGroup = pMap->GetSpawnGroup();
+
+					if(this->LoadSettings(pSpawnGroup, (char *)sSettingsError, sizeof(sSettingsError)))
 					{
-						CUtlVector<CEntityKeyValues *> vecKeyValues;
+						SpawnGroupDesc_t aDesc;
 
-						ILoadingSpawnGroup *pMyLoading = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, false, false, (CUtlVector<const CEntityKeyValues *> *)&vecKeyValues);
+						aDesc.m_hOwner = h;
+						// aDesc.m_sWorldName = ENTITY_MANAGER_WORLD_ROOT CORRECT_PATH_SEPARATOR_S ENTITY_MANAGER_PROGENITOR_WORLD_NAME;
+						aDesc.m_sEntityLumpName = "main lump";
+						aDesc.m_sEntityFilterName = "mapload";
+						// aDesc.m_sParentNameFixup = pSpawnGroup->GetParentNameFixup();
+						aDesc.m_sLocalNameFixup = ENTITY_MANAGER_WORLD_ROOT;
 
-						int iEntityCount = pMyLoading->EntityCount();
+						{
+							char sDescriptiveName[256];
 
-						const EntitySpawnInfo_t *pEntities = pMyLoading->GetEntities();
+							V_snprintf(sDescriptiveName, sizeof(sDescriptiveName), "%s (Late Load JustInTime)", this->GetName());
+							aDesc.m_sDescriptiveName = (const char *)sDescriptiveName;
+						}
 
-						// g_pSpawnGroupMgr->SpawnGroupInit(h, ((EntityManager::CEntitySystemProvider *)g_pGameEntitySystem)->GetCurrentManifest(), NULL, NULL /* Require CNetworkClientSpawnGroup_WaitForAssetLoadPrerequisit (from engine2, *(uintptr_t *)this + 11 is ISpawnGroupPrerequisiteRegistry) now (@Wend4r: needs to restore lifecycle of CSequentialPrerequisite progenitor and CNetworkClientSpawnGroup slaves )*/);
-						// g_pSpawnGroupMgr->SpawnGroupSpawnEntities(h);
-						// ((EntityManager::CGameResourceServiceProvider *)g_pGameResourceServiceServer)->PrecacheEntitiesAndConfirmResourcesAreLoaded(h, pMyLoading->EntityCount(), pMyLoading->GetEntities(), &pMap->GetWorldOffset()); // Precache entities now.
-						// pMap->LoadEntities();
-						// pMyLoading->SpawnEntities(); // Spawn created now.
-						// pMyLoading->Release(); // Free CLoadingSpawnGroup.
+						aDesc.m_manifestLoadPriority = RESOURCE_MANIFEST_LOAD_PRIORITY_HIGH;
+						aDesc.m_bCreateClientEntitiesOnLaterConnectingClients = true;
+						aDesc.m_bBlockUntilLoaded = true;
 
+						const char *pOwnerWorldName = pSpawnGroup->GetWorldName();
 
-						this->ListenLoadingSpawnGroup(h, iEntityCount, pEntities);
-						pMap->SetLoadingSpawnGroup(pMyLoading); // To respawn in next rounds.
-						s_aEntityManagerProviderAgent.ErectResourceManifest(pMap->GetSpawnGroup(), iEntityCount, pEntities, &pMap->GetWorldOffset());
+						IWorldReference *pOwnerWorldRef = pSpawnGroup->GetWorldReference();
 
-						// pMap->LoadEntities();
-						// pMyLoading->SpawnEntities(); // Spawn created now.
-						// pMyLoading->Release(); // Free CLoadingSpawnGroup.
+						if(!s_aEntityManagerProviderAgent.CreateSpawnGroup(aDesc, pSpawnGroup->ComputeWorldOrigin(pOwnerWorldName, h, pOwnerWorldRef ? g_pWorldRendererMgr->GetGeomentryFromReference(pOwnerWorldRef) : NULL).GetOrigin()))
+						{
+							this->m_aLogger.WarningFormat("Failed to start creating JustInTime spawn group for \"%s\" world\n", pOwnerWorldName);
+						}
 					}
 					else
 					{
@@ -304,6 +319,15 @@ bool EntityManagerPlugin::LoadProvider(char *psError, size_t nMaxLength)
 
 bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, size_t nMaxLength)
 {
+	const char *pWorldName = pSpawnGroup->GetWorldName();
+
+	if(!pWorldName || !pWorldName[0])
+	{
+		strncpy(psError, "World name is empty", nMaxLength);
+
+		return false;
+	}
+
 #ifdef DEBUG
 	Logger::Scope aDetails = this->m_aLogger.CreateDetailsScope();
 #endif
@@ -344,7 +368,7 @@ bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, 
 			}
 		}
 
-		V_strncpy(&sSpawnGroupName[nStoredLength], pSpawnGroup->GetWorldName(), sizeof(sSpawnGroupName) - nStoredLength);
+		V_strncpy(&sSpawnGroupName[nStoredLength], pWorldName, sizeof(sSpawnGroupName) - nStoredLength);
 	}
 
 	V_FixSlashes((char *)sSpawnGroupName);
@@ -504,6 +528,8 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 			this->m_aLogger.WarningFormat(LOGGER_COLOR_WARNING, "Failed to load a settings: %s\n", sSettingsError);
 		}
 	}
+
+	s_aEntityManagerProviderAgent.NotifyAllocateSpawnGroup(handle, pSpawnGroup);
 }
 
 ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
@@ -515,9 +541,28 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 	SET_META_RESULT(MRES_HANDLED);
 	SH_GLOB_SHPTR->DoRecall();
 
-	s_aEntityManagerProviderAgent.AddSpawnQueueToTail(const_cast<CUtlVector<const CEntityKeyValues *> *&>(pKeyValues), handle);
+	EntityManager::CSpawnGroupMgrGameSystemProvider *pSpawnGroupMgr = reinterpret_cast<EntityManager::CSpawnGroupMgrGameSystemProvider *>(reinterpret_cast<CSpawnGroupMgrGameSystem *>(SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup)));
 
-	ILoadingSpawnGroup *pLoading = (SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup)->*(funcCreateLoadingSpawnGroup))(handle, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, pKeyValues);
+	CMapSpawnGroup *pMapSpawnGroup = pSpawnGroupMgr->Get(handle);
+
+	CUtlVector<const CEntityKeyValues *> vecLayerEntities; // pKeyValues stored it. Control the lifecycle.
+
+	if(pMapSpawnGroup)
+	{
+		if(!V_strncmp(pMapSpawnGroup->GetLocalNameFixup(), ENTITY_MANAGER_WORLD_ROOT, sizeof(ENTITY_MANAGER_WORLD_ROOT) - 1))
+		{
+			if(pKeyValues)
+			{
+				vecLayerEntities = *pKeyValues;
+				// vecLayerEntities.AddVectorToTail(*pKeyValues);
+			}
+
+			s_aEntityManagerProviderAgent.AddSpawnQueueToTail(vecLayerEntities, pMapSpawnGroup->GetOwnerSpawnGroup());
+			pKeyValues = &vecLayerEntities;
+		}
+	}
+
+	ILoadingSpawnGroup *pLoading = (pSpawnGroupMgr->*(funcCreateLoadingSpawnGroup))(handle, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, pKeyValues);
 
 	const int iCount = pLoading->EntityCount();
 
@@ -598,6 +643,8 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 void EntityManagerPlugin::OnSpawnGroupShutdownHook(SpawnGroupHandle_t handle)
 {
 	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", handle);
+
+	s_aEntityManagerProviderAgent.NotifyDestroySpawnGroup(handle);
 }
 
 void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, const int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener)
