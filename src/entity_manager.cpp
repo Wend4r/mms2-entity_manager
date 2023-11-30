@@ -97,7 +97,6 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 	META_CONPRINTF( "Starting %s plugin.\n", this->GetName());
 
-	// SH_ADD_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManagerPlugin::OnGameFrameHook, true);
 	SH_ADD_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManagerPlugin::OnStartupServerHook, true);
 
 	META_CONPRINTF( "All hooks started!\n" );
@@ -217,7 +216,6 @@ bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 {
 	this->m_aSettings.Destroy();
 
-	SH_REMOVE_HOOK_MEMFUNC(IServerGameDLL, GameFrame, server, this, &EntityManagerPlugin::OnGameFrameHook, true);
 	SH_REMOVE_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManagerPlugin::OnStartupServerHook, true);
 
 	this->DestroyEntitySystem();
@@ -411,16 +409,6 @@ void EntityManagerPlugin::OnSetBasePathCommand(const CCommandContext &context, c
 
 	this->OnBasePathChanged(args[1]);
 	Msg("Base path is \"%s\"\n", this->m_sBasePath.c_str());
-}
-
-void EntityManagerPlugin::OnGameFrameHook( bool simulating, bool bFirstTick, bool bLastTick )
-{
-	/**
-	 * simulating:
-	 * ***********
-	 * true  | game is ticking
-	 * false | game is not ticking
-	 */
 }
 
 void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *)
