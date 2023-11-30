@@ -215,6 +215,8 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 {
 	this->m_aSettings.Destroy();
+	s_aEntityManagerProvider.Destroy();
+	s_aEntityManagerProviderAgent.Destroy();
 
 	SH_REMOVE_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManagerPlugin::OnStartupServerHook, true);
 
