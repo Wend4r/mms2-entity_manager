@@ -17,7 +17,7 @@ namespace EntityManager
 		static bool IsResidentOrStreaming(SpawnGroupHandle_t hSpawnGroup);
 		const Vector &GetLandmarkOffset();
 
-		bool Start(SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset);
+		bool Start(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset);
 		bool Unload();
 
 	public: // IComputeWorldOriginCallback

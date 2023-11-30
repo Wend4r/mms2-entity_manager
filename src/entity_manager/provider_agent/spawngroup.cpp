@@ -76,7 +76,7 @@ const Vector &EntityManager::SpawnGroup::GetLandmarkOffset()
 	return this->m_vecLandmarkOffset;
 }
 
-bool EntityManager::SpawnGroup::Start(SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset)
+bool EntityManager::SpawnGroup::Start(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset)
 {
 	if(this->GetStatus() < 2)
 	{
@@ -110,9 +110,11 @@ bool EntityManager::SpawnGroup::Start(SpawnGroupDesc_t &aDesc, const Vector &vec
 	this->m_sLandmarkName = aDesc.m_sDescriptiveName;
 	this->m_vecLandmarkOffset = vecLandmarkOffset;
 
-	aDesc.m_pWorldOffsetCallback = this;
+	SpawnGroupDesc_t aOwnDesc = aDesc;
 
-	pNewServer->LoadSpawnGroup(aDesc);
+	aOwnDesc.m_pWorldOffsetCallback = this;
+
+	pNewServer->LoadSpawnGroup(aOwnDesc);
 
 	return true;
 }
