@@ -40,7 +40,7 @@ EntityManager::Provider::GameDataStorage::EntityKeyValues::EntityKeyValues()
 		{
 			this->m_nRefCountOffset = nOffset;
 		});
-		aCallbacks.Insert("CEntityKeyValues::m_eContainerType", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert("CEntityKeyValues::m_eContextType", [this](const std::string &, const ptrdiff_t &nOffset)
 		{
 			this->m_nContainerTypeOffset = nOffset;
 		});

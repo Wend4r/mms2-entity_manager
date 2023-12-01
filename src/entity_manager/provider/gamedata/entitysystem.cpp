@@ -101,7 +101,7 @@ ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetCurrentMani
 	return this->m_nCurrentManifestOffset;
 }
 
-ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetKeyValuesClusterAllocatorOffset() const
+ptrdiff_t EntityManager::Provider::GameDataStorage::EntitySystem::GetKeyValuesContextAllocatorOffset() const
 {
 	return this->m_nEntityKeyValuesAllocatorOffset;
 }

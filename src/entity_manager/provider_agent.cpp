@@ -143,7 +143,7 @@ void EntityManager::ProviderAgent::NotifyDestroySpawnGroup(SpawnGroupHandle_t ha
 
 void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup, Logger::Scope *pWarnings)
 {
-	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesClusterAllocator(), 3);
+	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesContextAllocator(), 3);
 
 	FOR_EACH_VALUE(pOldOne, pKeyValue)
 	{

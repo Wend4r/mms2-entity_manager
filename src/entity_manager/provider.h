@@ -51,7 +51,7 @@ namespace EntityManager
 				void Reset();
 
 			public:
-				typedef void (*OnEntityKeyValuesPtr)(CEntityKeyValues * const pThis, CKeyValues3Cluster *pClusterAllocator, char eContainerType);
+				typedef void (*OnEntityKeyValuesPtr)(CEntityKeyValues * const pThis, CKeyValues3Context *pClusterAllocator, char eContextType);
 				typedef CEntityKeyValuesAttribute *(*OnGetAttributePtr)(const CEntityKeyValues * const pThis, const EntityKeyId_t &key, char *psValue);
 				typedef const char *(*OnAttributeGetValueStringPtr)(const CEntityKeyValuesAttribute * const pThis, const char *pszDefaultValue);
 				typedef void (*OnSetAttributeValuePtr)(CEntityKeyValues * const pThis, CEntityKeyValuesAttribute *pAttribute, const char *pString);
@@ -110,7 +110,7 @@ namespace EntityManager
 				OnListenForEntityInSpawnGroupToFinishPtr ListenForEntityInSpawnGroupToFinishFunction() const;
 
 				ptrdiff_t GetCurrentManifestOffset() const;
-				ptrdiff_t GetKeyValuesClusterAllocatorOffset() const;
+				ptrdiff_t GetKeyValuesContextAllocatorOffset() const;
 
 			private:
 				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;

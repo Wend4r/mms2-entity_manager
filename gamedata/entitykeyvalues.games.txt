@@ -11,8 +11,8 @@
 			// Declaration:
 			// void CEntityKeyValues::CEntityKeyValues(
 			//         CEntityKeyValues *const this, 
-			//         CKeyValues3Cluster *pClusterAllocator, // Can be nullptr by 0 type.
-			//         char eContainerType) // Usually, 0 or 3
+			//         CKeyValues3Context *pEntityAllocator, // Can be nullptr by 0 type.
+			//         EntityKVContextType_t eContextType) // Usually, 0 or 3
 			"CEntityKeyValues::CEntityKeyValues"
 			{
 				"library"       "server"
@@ -101,7 +101,7 @@
 			}
 
 			// In ctor: see CEntityKeyValues::CEntityKeyValues()
-			"CEntityKeyValues::m_eContainerType"
+			"CEntityKeyValues::m_eContextType"
 			{
 				"windows64"     "37"
 				"linux64"       "37"

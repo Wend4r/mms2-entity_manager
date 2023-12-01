@@ -8,7 +8,7 @@ extern EntityManager::Provider *g_pEntityManagerProvider;
 
 extern CGameEntitySystem *g_pGameEntitySystem;
 
-CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(CKeyValues3Cluster *pClusterAllocator, char eContainerType)
+CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(CKeyValues3Context *pClusterAllocator, char eContextType)
 {
 	const auto &aGameData = g_pEntityManagerProvider->GetGameDataStorage().GetEntityKeyValues();
 
@@ -16,7 +16,7 @@ CEntityKeyValues *EntityManager::CEntityKeyValuesProvider::Create(CKeyValues3Clu
 
 	if(pNewKeyValues)
 	{
-		(aGameData.EntityKeyValuesFunction())(pNewKeyValues, pClusterAllocator, eContainerType);
+		(aGameData.EntityKeyValuesFunction())(pNewKeyValues, pClusterAllocator, eContextType);
 		++*(uint16 *)((uintptr_t)pNewKeyValues + aGameData.GetRefCountOffset());
 	}
 

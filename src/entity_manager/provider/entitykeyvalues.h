@@ -25,7 +25,7 @@ namespace EntityManager
 	class CEntityKeyValuesProvider : public CEntityKeyValues
 	{
 	public:
-		static CEntityKeyValues *Create(CKeyValues3Cluster *pClusterAllocator = nullptr, char eContainerType = 0);
+		static CEntityKeyValues *Create(CKeyValues3Context *pClusterAllocator = nullptr, char eContextType = 0);
 
 	public:
 		KeyValues3 *Root();
