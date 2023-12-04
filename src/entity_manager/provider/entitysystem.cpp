@@ -1,4 +1,5 @@
-#include "entitykeyvalues.h"
+#include <entity2/entitykeyvalues.h>
+
 #include "provider.h"
 
 extern EntityManager::Provider *g_pEntityManagerProvider;

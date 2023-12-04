@@ -20,11 +20,10 @@ for sdk_name in EntityManager.sdks:
     binary = EntityManager.HL2Library(builder, cxx, EntityManager.plugin_name, sdk)
 
     binary.sources += [
-      'entity_manager/provider/gamedata/entitykeyvalues.cpp',
+      'public/entity2/entitykeyvalues.cpp',
       'entity_manager/provider/gamedata/entitysystem.cpp',
       'entity_manager/provider/gamedata/gameresource.cpp',
       'entity_manager/provider/gamedata/spawngroup.cpp',
-      'entity_manager/provider/entitykeyvalues.cpp',
       'entity_manager/provider/entitysystem.cpp',
       'entity_manager/provider/gameresource.cpp',
       'entity_manager/provider/spawngroup.cpp',

@@ -8,8 +8,8 @@
 #include <tier0/platform.h>
 #include <tier0/utlscratchmemory.h>
 #include <tier1/utldelegateimpl.h>
+#include <entity2/entitykeyvalues.h>
 
-#include "provider/entitykeyvalues.h"
 #include "provider/entitysystem.h"
 
 #include "gamedata.h"
@@ -35,56 +35,11 @@ namespace EntityManager
 			bool Load(IGameData *pRoot, const char *pszBaseConfigDir, char *psError = NULL, size_t nMaxLength = 0);
 
 		protected:
-			bool LoadEntityKeyValues(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadEntitySystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadGameResource(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadEntitySpawnGroup(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 
 		public:
-			class EntityKeyValues
-			{
-			public:
-				EntityKeyValues();
-
-			public:
-				bool Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
-				void Reset();
-
-			public:
-				typedef void (*OnEntityKeyValuesPtr)(CEntityKeyValues * const pThis, CKeyValues3Context *pClusterAllocator, char eContextType);
-				typedef CEntityKeyValuesAttribute *(*OnGetAttributePtr)(const CEntityKeyValues * const pThis, const EntityKeyId_t &key, char *psValue);
-				typedef const char *(*OnAttributeGetValueStringPtr)(const CEntityKeyValuesAttribute * const pThis, const char *pszDefaultValue);
-				typedef void (*OnSetAttributeValuePtr)(CEntityKeyValues * const pThis, CEntityKeyValuesAttribute *pAttribute, const char *pString);
-
-				OnEntityKeyValuesPtr EntityKeyValuesFunction() const;
-				OnGetAttributePtr GetAttributeFunction() const;
-				OnAttributeGetValueStringPtr AttributeGetValueStringFunction() const;
-				OnSetAttributeValuePtr SetAttributeValueFunction() const;
-
-			public:
-				ptrdiff_t GetSizeof() const;
-				ptrdiff_t GetRootOffset() const;
-				ptrdiff_t GetRefCountOffset() const;
-				ptrdiff_t GetContainerTypeOffset() const;
-
-			private:
-				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
-				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
-				GameData::Config m_aGameConfig;
-
-			private: // Signatures.
-				OnEntityKeyValuesPtr m_pfnEntityKeyValues = nullptr;
-				OnGetAttributePtr m_pfnGetAttribute = nullptr;
-				OnAttributeGetValueStringPtr m_pfnAttributeGetValueString = nullptr;
-				OnSetAttributeValuePtr m_pfnSetAttributeValue = nullptr;
-
-			private: // Offsets.
-				ptrdiff_t m_nSizeof = -1;
-				ptrdiff_t m_nRootOffset = -1;
-				ptrdiff_t m_nRefCountOffset = -1;
-				ptrdiff_t m_nContainerTypeOffset = -1;
-			};
-
 			class EntitySystem
 			{
 			public:
@@ -190,13 +145,11 @@ namespace EntityManager
 				GameData::Config m_aGameConfig;
 			};
 
-			const EntityKeyValues &GetEntityKeyValues() const;
 			const EntitySystem &GetEntitySystem() const;
 			const GameResource &GetGameResource() const;
 			const SpawnGroup &GetSpawnGroup() const;
 
 		private:
-			EntityKeyValues m_aEntityKeyValues;
 			EntitySystem m_aEntitySystem;
 			GameResource m_aGameResource;
 			SpawnGroup m_aSpawnGroup;

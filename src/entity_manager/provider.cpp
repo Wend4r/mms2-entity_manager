@@ -4,10 +4,10 @@
 #include "provider_agent.h"
 
 #include <filesystem.h>
+#include <tier0/strtools.h>
 #include <entity2/entitysystem.h>
 
 #define GAMECONFIG_FOLDER_DIR "gamedata"
-#define GAMECONFIG_ENTITYKEYVALUES_FILENAME "entitykeyvalues.games.txt"
 #define GAMECONFIG_ENTITYSYSTEM_FILENAME "entitysystem.games.txt"
 #define GAMECONFIG_GAMERESOURCE_FILENAME "gameresource.games.txt"
 #define GAMECONFIG_SPAWNGROUP_FILENAME "spawngroup.games.txt"
@@ -51,13 +51,7 @@ bool EntityManager::Provider::LoadGameData(const char *pszBaseDir, char *psError
 {
 	char sBaseConfigDir[MAX_PATH];
 
-	snprintf((char *)sBaseConfigDir, sizeof(sBaseConfigDir), 
-#ifdef PLATFORM_WINDOWS
-		"%s\\%s", 
-#else
-		"%s/%s", 
-#endif
-		pszBaseDir, GAMECONFIG_FOLDER_DIR);
+	snprintf((char *)sBaseConfigDir, sizeof(sBaseConfigDir), "%s" CORRECT_PATH_SEPARATOR_S "%s", pszBaseDir, GAMECONFIG_FOLDER_DIR);
 
 	char sGameDataError[256];
 
@@ -86,10 +80,6 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 	} aConfigs[] =
 	{
 		{
-			GAMECONFIG_ENTITYKEYVALUES_FILENAME,
-			&GameDataStorage::LoadEntityKeyValues
-		},
-		{
 			GAMECONFIG_ENTITYSYSTEM_FILENAME,
 			&GameDataStorage::LoadEntitySystem
 		},
@@ -105,13 +95,7 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 
 	for(size_t n = 0, nSize = std::size(aConfigs); n < nSize; n++)
 	{
-		snprintf((char *)sConfigFile, sizeof(sConfigFile), 
-#ifdef PLATFORM_WINDOWS
-			"%s\\%s",
-#else
-			"%s/%s", 
-#endif
-			pszBaseConfigDir, aConfigs[n].pszFilename);
+		snprintf((char *)sConfigFile, sizeof(sConfigFile), "%s" CORRECT_PATH_SEPARATOR_S "%s", pszBaseConfigDir, aConfigs[n].pszFilename);
 
 		bResult = pGameConfig->LoadFromFile(filesystem, (const char *)sConfigFile);
 
@@ -141,11 +125,6 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 	return bResult;
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadEntityKeyValues(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
-{
-	return this->m_aEntityKeyValues.Load(pRoot, pGameConfig, psError, nMaxLength);
-}
-
 bool EntityManager::Provider::GameDataStorage::LoadEntitySystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
 {
 	return this->m_aEntitySystem.Load(pRoot, pGameConfig, psError, nMaxLength);
@@ -159,11 +138,6 @@ bool EntityManager::Provider::GameDataStorage::LoadGameResource(IGameData *pRoot
 bool EntityManager::Provider::GameDataStorage::LoadEntitySpawnGroup(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
 {
 	return this->m_aSpawnGroup.Load(pRoot, pGameConfig, psError, nMaxLength);
-}
-
-const EntityManager::Provider::GameDataStorage::EntityKeyValues &EntityManager::Provider::GameDataStorage::GetEntityKeyValues() const
-{
-	return this->m_aEntityKeyValues;
 }
 
 const EntityManager::Provider::GameDataStorage::EntitySystem &EntityManager::Provider::GameDataStorage::GetEntitySystem() const

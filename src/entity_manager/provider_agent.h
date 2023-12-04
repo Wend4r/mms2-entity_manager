@@ -4,13 +4,14 @@
 #include <stddef.h>
 
 #include <eiface.h>
-#include <tier1/utlmap.h>
 #include <tier0/utlbinaryblock.h>
+#include <tier1/utlmap.h>
 #include <tier1/utlvector.h>
+#include <tier1/keyvalues3.h>
 #include <entity2/entityidentity.h>
+#include <entity2/entitykeyvalues.h>
 
 #include "logger.h"
-#include "provider/entitykeyvalues.h"
 #include "provider_agent/resourcemanifest.h"
 #include "provider_agent/spawngroup.h"
 
@@ -88,7 +89,6 @@ namespace EntityManager
 			~SpawnData();
 
 			CEntityKeyValues *GetKeyValues() const;
-			CEntityKeyValuesProvider *GetKeyValuesProvider() const;
 
 			SpawnGroupHandle_t GetSpawnGroup() const;
 			static SpawnGroupHandle_t GetAnySpawnGroup();
@@ -117,6 +117,8 @@ namespace EntityManager
 		private:
 			CEntityIdentity *m_pIdentity;
 		};
+
+		CKeyValues3Context m_aEntityAllocator;
 
 		CUtlVector<DestoryData> m_vecEntityDestroyQueue;
 

@@ -14,6 +14,7 @@
 extern EntityManager::Provider *g_pEntityManagerProvider;
 
 extern IGameResourceServiceServer *g_pGameResourceServiceServer;
+CEntitySystem *g_pEntitySystem = NULL;
 CGameEntitySystem *g_pGameEntitySystem = NULL;
 CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
@@ -68,7 +69,7 @@ bool EntityManager::ProviderAgent::NotifyGameResourceUpdated()
 
 bool EntityManager::ProviderAgent::NotifyEntitySystemUpdated()
 {
-	return (g_pGameEntitySystem = *(CGameEntitySystem **)((uintptr_t)g_pGameResourceServiceServer + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntitySystemOffset())) != NULL;
+	return (g_pGameEntitySystem = (CGameEntitySystem *)(g_pEntitySystem = *(CEntitySystem **)((uintptr_t)g_pGameResourceServiceServer + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntitySystemOffset()))) != NULL;
 }
 
 bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()
@@ -143,21 +144,23 @@ void EntityManager::ProviderAgent::NotifyDestroySpawnGroup(SpawnGroupHandle_t ha
 
 void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup, Logger::Scope *pWarnings)
 {
-	CEntityKeyValuesProvider *pNewKeyValues = (CEntityKeyValuesProvider *)CEntityKeyValuesProvider::Create(((CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesContextAllocator(), 3);
+	CEntityKeyValues *pNewKeyValues = new CEntityKeyValues(/* (CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesContextAllocator(), ENTITY_KV_CTX_CUSTOM */ &this->m_aEntityAllocator, ENTITY_KV_CTX_CUSTOM);
 
 	FOR_EACH_VALUE(pOldOne, pKeyValue)
 	{
 		const char *pszKey = pKeyValue->GetName();
 
-		CEntityKeyValuesAttribute *pAttr = pNewKeyValues->GetAttribute(this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszKey)));
+		const EntityKeyId_t &aKey = this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszKey));
 
-		if(pAttr)
+		KeyValues3 *pValue = pNewKeyValues->GetValue(aKey);
+
+		if(pValue)
 		{
-			pNewKeyValues->SetAttributeValue(pAttr, pKeyValue->GetString());
+			pValue->SetString(pKeyValue->GetString());
 		}
 		else if(pWarnings)
 		{
-			pWarnings->PushFormat("Failed to get \"%s\" attribute", pszKey);
+			pWarnings->PushFormat("Failed to get \"%s\" value (key is 0x%08X:\"%s\")", pszKey, aKey.GetHashCode(), aKey.GetString());
 		}
 	}
 
@@ -166,7 +169,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 
 void EntityManager::ProviderAgent::PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup)
 {
-	((CEntityKeyValuesProvider *)pKeyValues)->AddRef();
+	g_pGameEntitySystem->AddRefKeyValues(pKeyValues);
 
 	this->m_vecEntitySpawnQueue.AddToTail({pKeyValues, hSpawnGroup});
 }
@@ -189,7 +192,7 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 			{
 				CEntityKeyValues *pKeyValues = vecEntitySpawnQueue[i].GetKeyValues();
 
-				((CEntityKeyValuesProvider *)pKeyValues)->AddRef();
+				g_pGameEntitySystem->AddRefKeyValues(pKeyValues);
 
 				*ppKeyValuesCur = pKeyValues;
 				ppKeyValuesCur++;
@@ -205,7 +208,7 @@ int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKe
 				{
 					CEntityKeyValues *pKeyValues = aSpawn.GetKeyValues();
 
-					((CEntityKeyValuesProvider *)pKeyValues)->AddRef();
+					g_pGameEntitySystem->AddRefKeyValues(pKeyValues);
 
 					*ppKeyValuesCur = pKeyValues;
 					ppKeyValuesCur++;
@@ -284,13 +287,13 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup, Lo
 
 		if(hSpawnGroup == SpawnData::GetAnySpawnGroup() || hSpawnGroup == aSpawn.GetSpawnGroup())
 		{
-			CEntityKeyValuesProvider *pKeyValues = aSpawn.GetKeyValuesProvider();
+			CEntityKeyValues *pKeyValues = aSpawn.GetKeyValues();
 
-			CEntityKeyValuesAttributeProvider *pAttr = (CEntityKeyValuesAttributeProvider *)pKeyValues->GetAttribute(aClassnameKey);
+			KeyValues3 *pValue = pKeyValues->GetValue(aClassnameKey);
 
-			if(pAttr)
+			if(pValue)
 			{
-				const char *pszClassname = pAttr->GetValueString();
+				const char *pszClassname = pValue->GetString();
 
 				if(pszClassname && pszClassname[0])
 				{
@@ -422,76 +425,50 @@ bool EntityManager::ProviderAgent::DumpOldKeyValues(KeyValues *pOldOne, Logger::
 
 bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput, Logger::Scope *paWarnings)
 {
-	const CEntityKeyValuesProvider *pProvider = (const CEntityKeyValuesProvider *)pKeyValues;
-
-	bool bResult = pProvider != nullptr;
+	bool bResult = pKeyValues != nullptr;
 
 	if(bResult)
 	{
-		bResult = pProvider->GetRefCount() != 0;
+		const KeyValues3 *pRoot = *(const KeyValues3 **)((uintptr_t)pKeyValues + /* offsetof(CEntityKeyValues, m_pKeyValues) */ 2 * sizeof(void *));
+
+		bResult = pRoot != nullptr;
 
 		if(bResult)
 		{
-			uint8 nType = pProvider->GetContainerType();
+			for(int i = 0, iMemberCount = pRoot->GetMemberCount(); i < iMemberCount; i++)
+			{ 
+				const char *pszName = pRoot->GetMemberName(i);
 
-			bResult = !nType || nType == 3;
+				KeyValues3 *pMember = pRoot->GetMember(i);
 
-			if(bResult)
-			{
-				const KeyValues3 *pRoot = pProvider->Root();
-
-				bResult = pRoot != nullptr;
-
-				if(bResult)
+				if(pMember)
 				{
-					for(int i = 0, iMemberCount = pRoot->GetMemberCount(); i < iMemberCount; i++)
+					char sValue[512];
+
+					if(DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
 					{
-						const char *pszName = pRoot->GetMemberName(i);
-
-						KeyValues3 *pMember = pRoot->GetMember(i);
-
-						if(pMember)
+						if(V_stristr(pszName, "color"))
 						{
-							char sValue[512];
+							Color rgba = pMember->GetColor();
 
-							if(ProviderAgent::DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
-							{
-								if(V_stristr(pszName, "color"))
-								{
-									Color rgba = pMember->GetColor();
-
-									ProviderAgent::MakeDumpColorAlpha(rgba);
-									aOutput.PushFormat(rgba, "%s = %s", pszName, sValue);
-								}
-								else
-								{
-									aOutput.PushFormat("%s = %s", pszName, sValue);
-								}
-							}
-							else
-							{
-								aOutput.PushFormat("// %s is empty", pszName);
-							}
+							MakeDumpColorAlpha(rgba);
+							aOutput.PushFormat(rgba, "%s = %s", pszName, sValue);
 						}
-						else if(paWarnings)
+						else
 						{
-							paWarnings->PushFormat("Failed to get \"%s\" key member", pszName);
+							aOutput.PushFormat("%s = %s", pszName, sValue);
 						}
+					}
+					else
+					{
+						aOutput.PushFormat("// %s is empty", pszName);
 					}
 				}
 				else if(paWarnings)
 				{
-					paWarnings->Push("Entity key values hasn't table");
+					paWarnings->PushFormat("Failed to get \"%s\" key member", pszName);
 				}
 			}
-			else if(paWarnings)
-			{
-				paWarnings->PushFormat(LOGGER_COLOR_ERROR, "Invalid entity key values. It is an uninitialized? (dest is %p, unknown type is %d)", pProvider, nType);
-			}
-		}
-		else if(paWarnings)
-		{
-			paWarnings->PushFormat("Skip ref-empty entity key values (dest is %p)", pProvider);
 		}
 	}
 	else if(paWarnings)
@@ -757,12 +734,14 @@ EntityManager::ProviderAgent::CacheMapOIndexType EntityManager::ProviderAgent::C
 
 EntityManager::ProviderAgent::SpawnData::SpawnData(CEntityKeyValues *pKeyValues)
 {
+	pKeyValues->AddRef();
 	this->m_pKeyValues = pKeyValues;
 	this->m_hSpawnGroup = ThisClass::GetAnySpawnGroup();
 }
 
 EntityManager::ProviderAgent::SpawnData::SpawnData(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup)
 {
+	pKeyValues->AddRef();
 	this->m_pKeyValues = pKeyValues;
 	this->m_hSpawnGroup = hSpawnGroup;
 }
@@ -775,11 +754,6 @@ EntityManager::ProviderAgent::SpawnData::~SpawnData()
 CEntityKeyValues *EntityManager::ProviderAgent::SpawnData::GetKeyValues() const
 {
 	return this->m_pKeyValues;
-}
-
-EntityManager::CEntityKeyValuesProvider *EntityManager::ProviderAgent::SpawnData::GetKeyValuesProvider() const
-{
-	return (CEntityKeyValuesProvider *)this->m_pKeyValues;
 }
 
 SpawnGroupHandle_t EntityManager::ProviderAgent::SpawnData::GetSpawnGroup() const
@@ -799,7 +773,7 @@ bool EntityManager::ProviderAgent::SpawnData::IsAnySpawnGroup() const
 
 void EntityManager::ProviderAgent::SpawnData::Release()
 {
-	this->GetKeyValuesProvider()->Release();
+	this->GetKeyValues()->Release();
 }
 
 EntityManager::ProviderAgent::DestoryData::DestoryData(CEntityInstance *pInstance)

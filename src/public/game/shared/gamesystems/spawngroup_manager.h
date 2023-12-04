@@ -192,7 +192,7 @@ public:
 public:
 	virtual void FlagManualCreation() = 0;
 	virtual bool HasManualCreation() = 0;
-	virtual void LoadAllGameResourceManifests(void *) = 0;
+	virtual void LoadAllGameResourceManifests(ISpawnGroup *, ESpawnGroupUnloadOption eUnloadOption) = 0;
 	virtual void AddSpawnGroupChild(SpawnGroupHandle_t hSpawnGroup) = 0;
 	virtual bool HasSetActivePostLoad() const = 0;
 	virtual bool HasUnk2() const = 0;

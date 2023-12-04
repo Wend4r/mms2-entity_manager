@@ -547,18 +547,25 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 	CUtlVector<const CEntityKeyValues *> vecLayerEntities; // pKeyValues stored it. Control the lifecycle.
 
-	if(pMapSpawnGroup)
 	{
-		if(!V_strncmp(pMapSpawnGroup->GetLocalNameFixup(), ENTITY_MANAGER_WORLD_ROOT, sizeof(ENTITY_MANAGER_WORLD_ROOT) - 1))
+		bool bIsMySpawnGroup = pMapSpawnGroup != NULL;
+
+		if(bIsMySpawnGroup)
+		{
+			bIsMySpawnGroup = !V_strncmp(pMapSpawnGroup->GetLocalNameFixup(), ENTITY_MANAGER_WORLD_ROOT, sizeof(ENTITY_MANAGER_WORLD_ROOT) - 1);
+		}
+
 		{
 			if(pKeyValues)
 			{
 				vecLayerEntities = *pKeyValues;
-				// vecLayerEntities.AddVectorToTail(*pKeyValues);
 			}
 
-			s_aEntityManagerProviderAgent.AddSpawnQueueToTail(vecLayerEntities, pMapSpawnGroup->GetOwnerSpawnGroup());
+			SpawnGroupHandle_t hTargetSpawnGroup = bIsMySpawnGroup ? pMapSpawnGroup->GetOwnerSpawnGroup() : handle;
+
+			s_aEntityManagerProviderAgent.AddSpawnQueueToTail(vecLayerEntities, hTargetSpawnGroup);
 			pKeyValues = &vecLayerEntities;
+			s_aEntityManagerProviderAgent.ReleaseSpawnQueued(hTargetSpawnGroup);
 		}
 	}
 
@@ -634,8 +641,6 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 		this->ListenLoadingSpawnGroup(handle, aMyEntities.Count(), aMyEntities.Base());
 	}
-
-	s_aEntityManagerProviderAgent.ReleaseSpawnQueued(handle);
 
 	RETURN_META_VALUE(MRES_SUPERCEDE, pLoading);
 }
