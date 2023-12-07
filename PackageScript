@@ -42,6 +42,7 @@ CopyFiles('gamedata', os.path.join('addons', EntityManager.plugin_name, 'gamedat
   [
     'entitysystem.games.txt',
     'gameresource.games.txt',
+    'source2server.games.txt',
     'spawngroup.games.txt',
   ]
 )

@@ -1,0 +1,14 @@
+"Games"
+{
+	"cs2"
+	{
+		"Offsets"
+		{
+			"CSource2Server::GetGameEventManager"
+			{
+				"windows64" "91"
+				"linux64"   "91"
+			}
+		}
+	}
+}

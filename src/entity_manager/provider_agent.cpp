@@ -2,6 +2,7 @@
 
 #include "provider.h"
 #include "provider/entitysystem.h"
+#include "provider/source2server.h"
 #include <logger.h>
 
 #include <tier0/dbg.h>
@@ -13,9 +14,12 @@
 
 extern EntityManager::Provider *g_pEntityManagerProvider;
 
+extern IServerGameDLL *server;
 extern IGameResourceServiceServer *g_pGameResourceServiceServer;
+
 CEntitySystem *g_pEntitySystem = NULL;
 CGameEntitySystem *g_pGameEntitySystem = NULL;
+IGameEventManager2 *g_pGameEventManager = NULL;
 CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
 class CDefOpsStringBinaryBlock
@@ -69,7 +73,12 @@ bool EntityManager::ProviderAgent::NotifyGameResourceUpdated()
 
 bool EntityManager::ProviderAgent::NotifyEntitySystemUpdated()
 {
-	return (g_pGameEntitySystem = (CGameEntitySystem *)(g_pEntitySystem = *(CEntitySystem **)((uintptr_t)g_pGameResourceServiceServer + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntitySystemOffset()))) != NULL;
+	return (g_pEntitySystem = (CEntitySystem *)(g_pGameEntitySystem = *(CGameEntitySystem **)((uintptr_t)g_pGameResourceServiceServer + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntitySystemOffset()))) != NULL;
+}
+
+bool EntityManager::ProviderAgent::NotifyGameEventsUpdated()
+{
+	return (g_pGameEventManager = (((CSource2ServerProvider *)server)->GetGameEventManager())) != NULL;
 }
 
 bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()
@@ -231,6 +240,21 @@ bool EntityManager::ProviderAgent::HasInSpawnQueue(const CEntityKeyValues *pKeyV
 		const auto &aSpawn = this->m_vecEntitySpawnQueue[i];
 
 		if(aSpawn.GetKeyValues() == pKeyValues)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool EntityManager::ProviderAgent::HasInSpawnQueue(SpawnGroupHandle_t hSpawnGroup)
+{
+	FOR_EACH_VEC(this->m_vecEntitySpawnQueue, i)
+	{
+		const auto &aSpawn = this->m_vecEntitySpawnQueue[i];
+
+		if(aSpawn.GetSpawnGroup() == hSpawnGroup)
 		{
 			return true;
 		}

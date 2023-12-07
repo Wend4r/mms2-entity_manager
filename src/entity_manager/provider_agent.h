@@ -35,6 +35,7 @@ namespace EntityManager
 	public:
 		virtual bool NotifyGameResourceUpdated();
 		virtual bool NotifyEntitySystemUpdated();
+		virtual bool NotifyGameEventsUpdated();
 		virtual bool NotifySpawnGroupMgrUpdated();
 
 	public:
@@ -54,6 +55,7 @@ namespace EntityManager
 		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
 		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
 		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues);
+		bool HasInSpawnQueue(SpawnGroupHandle_t hSpawnGroup);
 		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
 		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
 

@@ -43,19 +43,28 @@ public:
 	void AllPluginsLoaded();
 
 protected:
-	bool InitGameResource();
-	void DestroyGameResource();
-
 	bool InitEntitySystem();
 	void DestroyEntitySystem();
 
+	bool InitGameEvents();
+	void DestroyGameEvents();
+
+	bool InitGameResource();
+	void DestroyGameResource();
+
 	bool InitSpawnGroup();
 	void DestroySpawnGroup();
+
+	bool HookEvents(char *psError = NULL, size_t nMaxLength = 0);
+	void UnhookEvents();
 
 protected:
 	bool LoadProvider(char *psError = NULL, size_t nMaxLength = 0);
 	bool LoadSettings(ISpawnGroup *pSpawnGroup, char *psError = NULL, size_t nMaxLength = 0);
 	virtual void OnBasePathChanged(const char *pszNewOne);
+
+public:
+	void SpawnEntities();
 
 private: // Commands.
 	CON_COMMAND_MEMBER_F(EntityManagerPlugin, "mm_" PREFIX_ENTITY_MANAGER "_set_basepath", OnSetBasePathCommand, "Set base path for Entity Manager", FCVAR_LINKED_CONCOMMAND);
@@ -72,6 +81,37 @@ public:
 	void ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, const int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener = NULL);
 	void OnMyEntityFinish(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues);
 
+private:
+	class BaseEvent : public IGameEventListener2
+	{
+	public:
+		BaseEvent(const char *pszName);
+
+		bool Init(char *psError = NULL, size_t nMaxLength = 0);
+		void Destroy();
+
+		const char *GetName();
+
+	private:
+		const char *m_pszName;
+	};
+
+	class RoundPreStartEvent : public BaseEvent
+	{
+	public:
+		RoundPreStartEvent();
+
+		void FireGameEvent(IGameEvent *pEvent);
+	};
+
+	class RoundStartEvent : public BaseEvent
+	{
+	public:
+		RoundStartEvent();
+
+		void FireGameEvent(IGameEvent *pEvent);
+	};
+
 public:
 	const char *GetAuthor();
 	const char *GetName();
@@ -85,6 +125,10 @@ public:
 private:
 	std::string m_sBasePath = "addons" CORRECT_PATH_SEPARATOR_S META_PLUGIN_NAME;
 	std::string m_sCurrentMap = "\0";
+
+	RoundPreStartEvent m_aRoundPreStart;
+	RoundStartEvent m_aRoundStart;
+	bool m_bIsHookedEvents = false;
 
 	EntityManager::Settings m_aSettings;
 	Logger m_aLogger;

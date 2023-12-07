@@ -37,6 +37,7 @@ namespace EntityManager
 		protected:
 			bool LoadEntitySystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadGameResource(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+			bool LoadSource2Server(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadEntitySpawnGroup(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 
 		public:
@@ -118,6 +119,27 @@ namespace EntityManager
 				ptrdiff_t m_nEntityManifestVFTableOffset = -1;
 			};
 
+			class Source2Server
+			{
+			public:
+				Source2Server();
+
+			public:
+				bool Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+				void Reset();
+
+			public:
+				ptrdiff_t GetGameEventManagerOffset() const;
+
+			private:
+				// GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
+				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
+				GameData::Config m_aGameConfig;
+
+			private: // Offsets.
+				ptrdiff_t m_nGetterGameEventManager = -1;
+			};
+
 			class SpawnGroup
 			{
 			public:
@@ -147,11 +169,13 @@ namespace EntityManager
 
 			const EntitySystem &GetEntitySystem() const;
 			const GameResource &GetGameResource() const;
+			const Source2Server &GetSource2Server() const;
 			const SpawnGroup &GetSpawnGroup() const;
 
 		private:
 			EntitySystem m_aEntitySystem;
 			GameResource m_aGameResource;
+			Source2Server m_aSource2Server;
 			SpawnGroup m_aSpawnGroup;
 		};
 
