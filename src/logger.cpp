@@ -188,64 +188,67 @@ Logger::Scope::Scope(const Color &rgba, const char *pszStartWith, const char *ps
 
 Logger::Scope &Logger::Scope::operator+=(const Scope &aTarget)
 {
-	std::string sResultContent;
-
-	size_t nSize = aTarget.m_vec.size();
-
-	Color rgbaSave = aTarget.m_aColor;
-
+	if(aTarget.Count())
 	{
-		size_t n = 0;
+		std::string sResultContent;
 
-		bool bNextIsColorCollide = aTarget.m_vec[0].GetColor() == rgbaSave;
+		size_t nSize = aTarget.m_vec.size();
 
-		while(1)
+		Color rgbaSave = aTarget.m_aColor;
+
 		{
-			const auto &aMsg = aTarget.m_vec[n];
+			size_t n = 0;
 
-			if(bNextIsColorCollide)
+			bool bNextIsColorCollide = aTarget.m_vec[0].GetColor() == rgbaSave;
+
+			while(1)
 			{
-				if(n)
-				{
-					sResultContent += this->m_aStartWith;
-				}
-
-				sResultContent += aTarget.m_aStartWith + aMsg.Get();
-			}
-			else
-			{
-				this->Push(rgbaSave, sResultContent.c_str());
-
-				if(n)
-				{
-					sResultContent += this->m_aStartWith;
-				}
-
-				sResultContent = aTarget.m_aStartWith + aMsg.Get();
-				rgbaSave = aMsg.GetColor();
-			}
-
-			n++;
-
-			if(n < nSize)
-			{
-				bNextIsColorCollide = aTarget.m_vec[n].GetColor() == rgbaSave;
+				const auto &aMsg = aTarget.m_vec[n];
 
 				if(bNextIsColorCollide)
 				{
-					sResultContent += aTarget.m_aEnd;
+					if(n)
+					{
+						sResultContent += this->m_aStartWith;
+					}
+
+					sResultContent += aTarget.m_aStartWith + aMsg.Get();
+				}
+				else
+				{
+					this->Push(rgbaSave, sResultContent.c_str());
+
+					if(n)
+					{
+						sResultContent += this->m_aStartWith;
+					}
+
+					sResultContent = aTarget.m_aStartWith + aMsg.Get();
+					rgbaSave = aMsg.GetColor();
+				}
+
+				n++;
+
+				if(n < nSize)
+				{
+					bNextIsColorCollide = aTarget.m_vec[n].GetColor() == rgbaSave;
+
+					if(bNextIsColorCollide)
+					{
+						sResultContent += aTarget.m_aEnd;
+					}
+				}
+				else
+				{
+					break;
 				}
 			}
-			else
-			{
-				break;
-			}
 		}
-	}
 
-	if(sResultContent.size())
-	{
-		this->Push(rgbaSave, sResultContent.c_str());
+		if(sResultContent.size())
+		{
+			this->Push(rgbaSave, sResultContent.c_str());
+		}
 	}
 
 	return *this;
@@ -266,7 +269,7 @@ const char *Logger::Scope::GetEnd() const
 	return this->m_aEnd.c_str();
 }
 
-size_t Logger::Scope::Count()
+size_t Logger::Scope::Count() const
 {
 	return this->m_vec.size();
 }

@@ -79,7 +79,7 @@ public:
 		const Color &GetColor() const;
 		const char *GetStartWith() const;
 		const char *GetEnd() const;
-		size_t Count();
+		size_t Count() const;
 
 		void SetColor(const Color &rgba);
 
