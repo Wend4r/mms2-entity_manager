@@ -155,6 +155,36 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 {
 	CEntityKeyValues *pNewKeyValues = new CEntityKeyValues(/* (CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesContextAllocator(), ENTITY_KV_CTX_CUSTOM */ &this->m_aEntityAllocator, ENTITY_KV_CTX_CUSTOM);
 
+	// Parse attributes.
+	{
+		const char *pszAttrSectionKey = "attributes";
+
+		KeyValues *pAttributeValues = pOldOne->FindKey(pszAttrSectionKey, false);
+
+		if(pAttributeValues)
+		{
+			FOR_EACH_VALUE(pAttributeValues, pAttrKeyValue)
+			{
+				const char *pszAttrKey = pAttrKeyValue->GetName();
+
+				const EntityKeyId_t &aAttrKey = this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszAttrKey));
+
+				KeyValues3 *pAttrValue = pNewKeyValues->SetValue(aAttrKey, pszAttrKey);
+
+				if(pAttrValue)
+				{
+					pAttrValue->SetString(pAttrKeyValue->GetString());
+				}
+				else if(pWarnings)
+				{
+					pWarnings->PushFormat("Failed to get \"%s\" setter key (member is 0x%08X:\"%s\")", pszAttrKey, aAttrKey.GetHashCode(), aAttrKey.GetString());
+				}
+			}
+
+			pOldOne->RemoveSubKey(pAttributeValues, true /* bDelete */, true);
+		}
+	}
+
 	FOR_EACH_VALUE(pOldOne, pKeyValue)
 	{
 		const char *pszKey = pKeyValue->GetName();
@@ -167,7 +197,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 		{
 			if(pWarnings)
 			{
-				pWarnings->PushFormat("Dublicate entity key (source is \"%s\", member key is 0x%08X:\"%s\")", pszKey, aKey.GetHashCode(), aKey.GetString());
+				pWarnings->PushFormat("Dublicate entity key (source is \"%s\", member is 0x%08X:\"%s\")", pszKey, aKey.GetHashCode(), aKey.GetString());
 			}
 
 			pValue->SetString(pKeyValue->GetString());
@@ -182,7 +212,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 			}
 			else if(pWarnings)
 			{
-				pWarnings->PushFormat("Failed to set \"%s\" value (key is 0x%08X:\"%s\")", pszKey, aKey.GetHashCode(), aKey.GetString());
+				pWarnings->PushFormat("Failed to get \"%s\" setter key (member is 0x%08X:\"%s\")", pszKey, aKey.GetHashCode(), aKey.GetString());
 			}
 		}
 	}
@@ -499,12 +529,64 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 					}
 					else
 					{
-						aOutput.PushFormat("// %s is empty", pszName);
+						aOutput.PushFormat("// \"%s\" is empty", pszName);
 					}
 				}
 				else if(paWarnings)
 				{
 					paWarnings->PushFormat("Failed to get \"%s\" key member", pszName);
+				}
+			}
+
+			const KeyValues3 *pAttributes = *(const KeyValues3 **)((uintptr_t)pKeyValues + /* offsetof(CEntityKeyValues, m_pAttibutes) */ 3 * sizeof(void *));
+
+			if(pAttributes)
+			{
+				const int iMemberCount = pAttributes->GetMemberCount();
+				
+				if(iMemberCount)
+				{
+					auto aAttrOutput = Logger::Scope(LOGGER_COLOR_ENTITY_KV3, "\t");
+
+					for(int i = 0; i < iMemberCount; i++)
+					{ 
+						const char *pszAttrName = pAttributes->GetMemberName(i);
+
+						KeyValues3 *pMember = pAttributes->GetMember(i);
+
+						if(pMember)
+						{
+							char sValue[512];
+
+							if(DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
+							{
+								if(V_stristr(pszAttrName, "color"))
+								{
+									Color rgba = pMember->GetColor();
+
+									MakeDumpColorAlpha(rgba);
+									aAttrOutput.PushFormat(rgba, "%s = %s", pszAttrName, sValue);
+								}
+								else
+								{
+									aAttrOutput.PushFormat("%s = %s", pszAttrName, sValue);
+								}
+							}
+							else
+							{
+								aAttrOutput.PushFormat("// \"%s\" attribute is empty", pszAttrName);
+							}
+						}
+						else if(paWarnings)
+						{
+							paWarnings->PushFormat("Failed to get \"%s\" key member of attribute", pszAttrName);
+						}
+					}
+
+					aOutput.PushFormat(LOGGER_COLOR_ENTITY_KV3, "%s = ", "attributes");
+					aOutput.Push(LOGGER_COLOR_ENTITY_KV3, "{");
+					aOutput += aAttrOutput;
+					aOutput.Push(LOGGER_COLOR_ENTITY_KV3, "}");
 				}
 			}
 		}
