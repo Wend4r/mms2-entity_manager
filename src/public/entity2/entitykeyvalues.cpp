@@ -110,7 +110,7 @@ KeyValues3* CEntityKeyValues::GetValue( const EntityKeyId_t &key, bool* pIsAttri
 	if ( !m_pKV3Context )
 		return NULL;
 
-	KeyValues3* value = m_pKeyValues->FindOrCreateMember( key );
+	KeyValues3* value = m_pKeyValues->FindMember( key );
 
 	if ( value )
 	{
@@ -119,7 +119,7 @@ KeyValues3* CEntityKeyValues::GetValue( const EntityKeyId_t &key, bool* pIsAttri
 	}
 	else
 	{
-		value = m_pAttibutes->FindOrCreateMember( key );
+		value = m_pAttibutes->FindMember( key );
 
 		if ( value )
 		{

@@ -165,11 +165,25 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 
 		if(pValue)
 		{
+			if(pWarnings)
+			{
+				pWarnings->PushFormat("Dublicate entity key (source is \"%s\", member key is 0x%08X:\"%s\")", pszKey, aKey.GetHashCode(), aKey.GetString());
+			}
+
 			pValue->SetString(pKeyValue->GetString());
 		}
-		else if(pWarnings)
+		else
 		{
-			pWarnings->PushFormat("Failed to get \"%s\" value (key is 0x%08X:\"%s\")", pszKey, aKey.GetHashCode(), aKey.GetString());
+			pValue = pNewKeyValues->SetValue(aKey);
+
+			if(pValue)
+			{
+				pValue->SetString(pKeyValue->GetString());
+			}
+			else if(pWarnings)
+			{
+				pWarnings->PushFormat("Failed to set \"%s\" value (key is 0x%08X:\"%s\")", pszKey, aKey.GetHashCode(), aKey.GetString());
+			}
 		}
 	}
 
