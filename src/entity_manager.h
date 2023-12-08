@@ -64,7 +64,11 @@ protected:
 	virtual void OnBasePathChanged(const char *pszNewOne);
 
 public:
-	void SpawnEntities();
+	void SpawnMyEntities();
+	void DestroyMyEntities();
+
+protected:
+	bool EraseMyEntity(CEntityInstance *pEntityInst);
 
 private: // Commands.
 	CON_COMMAND_MEMBER_F(EntityManagerPlugin, "mm_" PREFIX_ENTITY_MANAGER "_set_basepath", OnSetBasePathCommand, "Set base path for Entity Manager", FCVAR_LINKED_CONCOMMAND);
@@ -72,6 +76,7 @@ private: // Commands.
 public: // SourceHooks.
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *);
 	void OnEntitySystemSpawnHook(int iCount, const EntitySpawnInfo_t *pInfo);
+	void OnEntitySystemUpdateOnRemoveHook(int iCount, const EntityDeletion_t *pInfo);
 	void OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
 	void OnSpawnGroupInitHook(SpawnGroupHandle_t handle, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry);
 	ILoadingSpawnGroup *OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues);
@@ -126,9 +131,12 @@ private:
 	std::string m_sBasePath = "addons" CORRECT_PATH_SEPARATOR_S META_PLUGIN_NAME;
 	std::string m_sCurrentMap = "\0";
 
+	bool m_bIsCurrentMySpawnOfEntities = false;
+	std::vector<CEntityInstance *> m_vecMyEntities;
+
+	bool m_bIsHookedEvents = false;
 	RoundPreStartEvent m_aRoundPreStart;
 	RoundStartEvent m_aRoundStart;
-	bool m_bIsHookedEvents = false;
 
 	EntityManager::Settings m_aSettings;
 	Logger m_aLogger;

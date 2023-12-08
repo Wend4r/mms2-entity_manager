@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string>
 #include <functional>
+#include <algorithm>
 
 // Game SDK.
 #include <eiface.h>
@@ -43,6 +44,7 @@ SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 SH_DECL_HOOK3_void(INetworkServerService, StartupServer, SH_NOATTRIB, 0, const GameSessionConfiguration_t &, ISource2WorldSession *, const char *);
 
 SH_DECL_HOOK2_void(CGameEntitySystem, Spawn, SH_NOATTRIB, 0, int, const EntitySpawnInfo_t *);
+SH_DECL_HOOK2_void(CGameEntitySystem, UpdateOnRemove, SH_NOATTRIB, 0, int, const EntityDeletion_t *);
 
 SH_DECL_HOOK2_void(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, SH_NOATTRIB, 0, SpawnGroupHandle_t, ISpawnGroup *);
 SH_DECL_HOOK4_void(CSpawnGroupMgrGameSystem, SpawnGroupInit, SH_NOATTRIB, 0, SpawnGroupHandle_t, IEntityResourceManifest *, IEntityPrecacheConfiguration *, ISpawnGroupPrerequisiteRegistry *);
@@ -240,6 +242,8 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 {
+	this->DestroyMyEntities();
+
 	this->UnhookEvents();
 
 	this->m_aSettings.Destroy();
@@ -270,6 +274,7 @@ bool EntityManagerPlugin::InitEntitySystem()
 	if(bResult)
 	{
 		SH_ADD_HOOK_MEMFUNC(CGameEntitySystem, Spawn, g_pGameEntitySystem, this, &EntityManagerPlugin::OnEntitySystemSpawnHook, false);
+		SH_ADD_HOOK_MEMFUNC(CGameEntitySystem, UpdateOnRemove, g_pGameEntitySystem, this, &EntityManagerPlugin::OnEntitySystemUpdateOnRemoveHook, false);
 	}
 
 	return bResult;
@@ -278,6 +283,7 @@ bool EntityManagerPlugin::InitEntitySystem()
 void EntityManagerPlugin::DestroyEntitySystem()
 {
 	SH_REMOVE_HOOK_MEMFUNC(CGameEntitySystem, Spawn, g_pGameEntitySystem, this, &EntityManagerPlugin::OnEntitySystemSpawnHook, false);
+	SH_REMOVE_HOOK_MEMFUNC(CGameEntitySystem, UpdateOnRemove, g_pGameEntitySystem, this, &EntityManagerPlugin::OnEntitySystemUpdateOnRemoveHook, false);
 }
 
 bool EntityManagerPlugin::InitGameResource()
@@ -476,7 +482,7 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 	}
 }
 
-void EntityManagerPlugin::SpawnEntities()
+void EntityManagerPlugin::SpawnMyEntities()
 {
 	auto aWarnings = this->m_aLogger.CreateWarningsScope();
 	
@@ -489,6 +495,7 @@ void EntityManagerPlugin::SpawnEntities()
 		ISpawnGroup *pSpawnGroup = pMap->GetSpawnGroup();
 
 		// if(this->LoadSettings(pSpawnGroup, (char *)sSettingsError, sizeof(sSettingsError)))
+		if(s_aEntityManagerProviderAgent.HasInSpawnQueue(h))
 		{
 			const char *pSaveFilterName = pMap->GetEntityFilterName();
 
@@ -496,14 +503,35 @@ void EntityManagerPlugin::SpawnEntities()
 
 			pSpawnGroupEx->SetEntityFilterName(ENTITY_FILTER_NAME_RESPAWN);
 
+			this->m_bIsCurrentMySpawnOfEntities = true;
+
 			{
 				ILoadingSpawnGroup *pLoading = g_pSpawnGroupMgr->CreateLoadingSpawnGroup(h, true, true, NULL);
 
+				// Spawn right now.
 				pLoading->SpawnEntities();
-				// pLoading->Release();
+				// pLoading->Release(); //FIXME: Maked a crash.
+
+				// Call callbacks manually by this->m_bIsCurrentMySpawnOfEntities scope.
+				{
+					const int iCount = pLoading->EntityCount();
+
+					const EntitySpawnInfo_t *pEntitites = pLoading->GetEntities();
+
+					this->m_aLogger.DetailedFormat("iCount = %d; pEntitites = %p\n", iCount, pEntitites);
+
+					for(int i = 0; i < iCount; i++)
+					{
+						const auto &aEntity = pEntitites[i];
+
+						this->OnMyEntityFinish(aEntity.m_pEntity->m_pInstance, aEntity.m_pKeyValues);
+					}
+				}
 
 				pSpawnGroup->SetLoadingSpawnGroup(pLoading);
 			}
+
+			this->m_bIsCurrentMySpawnOfEntities = false;
 
 			pSpawnGroupEx->SetEntityFilterName(pSaveFilterName);
 		}
@@ -513,6 +541,33 @@ void EntityManagerPlugin::SpawnEntities()
 	{
 		this->m_aLogger.Warning(rgba, pszContent);
 	});
+}
+
+void EntityManagerPlugin::DestroyMyEntities()
+{
+	for(const auto &it : this->m_vecMyEntities)
+	{
+		s_aEntityManagerProviderAgent.PushDestroyQueue(it);
+	}
+
+	s_aEntityManagerProviderAgent.DestroyQueued();
+}
+
+
+bool EntityManagerPlugin::EraseMyEntity(CEntityInstance *pEntity)
+{
+	const auto &itEnd = this->m_vecMyEntities.end();
+
+	const auto &itFound = std::find(this->m_vecMyEntities.begin(), itEnd, pEntity);
+
+	bool bResult = itFound != itEnd;
+
+	if(bResult)
+	{
+		this->m_vecMyEntities.erase(itFound);
+	}
+
+	return bResult;
 }
 
 void EntityManagerPlugin::OnSetBasePathCommand(const CCommandContext &context, const CCommand &args)
@@ -579,17 +634,19 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 
 #ifdef DEBUG
 	auto aDetails = this->m_aLogger.CreateDetailsScope();
+#endif
 
 	{
 		for(int i = 0; i < iCount; i++)
 		{
-			const EntitySpawnInfo_t &pInfoOne = pInfo[i];
+			const EntitySpawnInfo_t &aInfoOne = pInfo[i];
 
-			CEntityIdentity *pEntity = pInfoOne.m_pEntity;
+			CEntityIdentity *pEntity = aInfoOne.m_pEntity;
 
+#ifdef DEBUG
 			int iEntity = pEntity->GetEntityIndex().Get();
 
-			const CEntityKeyValues *pKeyValues = pInfoOne.m_pKeyValues;
+			const CEntityKeyValues *pKeyValues = aInfoOne.m_pKeyValues;
 
 			aDetails.PushFormat("-- Spawn entity (#%d) --", iEntity);
 
@@ -606,9 +663,15 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 			{
 				aDetails += aEntityDetails;
 			}
+#endif
+			if(this->m_bIsCurrentMySpawnOfEntities)
+			{
+				this->OnMyEntityFinish(pEntity->m_pInstance, aInfoOne.m_pKeyValues);
+			}
 		}
 	}
 
+#ifdef DEBUG
 	aDetails.SendColor([this](const Color &rgba, const std::string sContent)
 	{
 		this->m_aLogger.Detailed(rgba, sContent.c_str());
@@ -616,6 +679,16 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 #endif
 
 	SET_META_RESULT(MRES_HANDLED);
+}
+
+void EntityManagerPlugin::OnEntitySystemUpdateOnRemoveHook(int iCount, const EntityDeletion_t *pInfo)
+{
+	for(int i = 0; i < iCount; i++)
+	{
+		const auto &aInfoOne = pInfo[i];
+
+		this->EraseMyEntity(aInfoOne.m_pEntity->m_pInstance);
+	}
 }
 
 void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
@@ -744,7 +817,10 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 		});
 #endif
 
-		this->ListenLoadingSpawnGroup(handle, aMyEntities.Count(), aMyEntities.Base());
+		if(!this->m_bIsCurrentMySpawnOfEntities)
+		{
+			this->ListenLoadingSpawnGroup(handle, aMyEntities.Count(), aMyEntities.Base());
+		}
 	}
 
 	RETURN_META_VALUE(MRES_SUPERCEDE, pLoading);
@@ -780,6 +856,8 @@ void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup
 void EntityManagerPlugin::OnMyEntityFinish(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues)
 {
 	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnMyEntityFinish(%s (%d))\n", pEntity->GetClassname(), pEntity->GetEntityIndex().Get());
+
+	this->m_vecMyEntities.push_back(pEntity);
 }
 
 EntityManagerPlugin::BaseEvent::BaseEvent(const char *pszName)
@@ -818,8 +896,8 @@ EntityManagerPlugin::RoundPreStartEvent::RoundPreStartEvent()
 
 void EntityManagerPlugin::RoundPreStartEvent::FireGameEvent(IGameEvent *pEvent)
 {
-	// // It won't spawns.
-	// s_aEntityManager.SpawnEntities();
+	// // Won't spawns on current event.
+	// s_aEntityManager.SpawnMyEntities();
 }
 
 EntityManagerPlugin::RoundStartEvent::RoundStartEvent()
@@ -829,7 +907,7 @@ EntityManagerPlugin::RoundStartEvent::RoundStartEvent()
 
 void EntityManagerPlugin::RoundStartEvent::FireGameEvent(IGameEvent *pEvent)
 {
-	s_aEntityManager.SpawnEntities();
+	s_aEntityManager.SpawnMyEntities();
 }
 
 bool EntityManagerPlugin::Pause(char *error, size_t maxlen)
