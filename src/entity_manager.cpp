@@ -211,7 +211,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 						if(!s_aEntityManagerProviderAgent.CreateSpawnGroup(aDesc, pSpawnGroup->ComputeWorldOrigin(pOwnerWorldName, h, pOwnerWorldRef ? g_pWorldRendererMgr->GetGeomentryFromReference(pOwnerWorldRef) : NULL).GetOrigin()))
 						{
-							this->m_aLogger.WarningFormat("Failed to start creating JustInTime spawn group for \"%s\" world\n", pOwnerWorldName);
+							aWarnings.PushFormat("Failed to start creating JustInTime spawn group for \"%s\" world\n", pOwnerWorldName);
 						}
 					}
 					else
