@@ -512,22 +512,6 @@ void EntityManagerPlugin::SpawnMyEntities()
 				pLoading->SpawnEntities();
 				// pLoading->Release(); //FIXME: Maked a crash.
 
-				// Call callbacks manually by this->m_bIsCurrentMySpawnOfEntities scope.
-				{
-					const int iCount = pLoading->EntityCount();
-
-					const EntitySpawnInfo_t *pEntitites = pLoading->GetEntities();
-
-					this->m_aLogger.DetailedFormat("iCount = %d; pEntitites = %p\n", iCount, pEntitites);
-
-					for(int i = 0; i < iCount; i++)
-					{
-						const auto &aEntity = pEntitites[i];
-
-						this->OnMyEntityFinish(aEntity.m_pEntity->m_pInstance, aEntity.m_pKeyValues);
-					}
-				}
-
 				pSpawnGroup->SetLoadingSpawnGroup(pLoading);
 			}
 
