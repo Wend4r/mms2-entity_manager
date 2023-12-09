@@ -546,7 +546,8 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 				
 				if(iMemberCount)
 				{
-					auto aAttrOutput = Logger::Scope(LOGGER_COLOR_ENTITY_KV3, "\t");
+					aOutput.PushFormat("%s = ", "attributes");
+					aOutput.Push("{");
 
 					for(int i = 0; i < iMemberCount; i++)
 					{ 
@@ -565,16 +566,16 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 									Color rgba = pMember->GetColor();
 
 									MakeDumpColorAlpha(rgba);
-									aAttrOutput.PushFormat(rgba, "%s = %s", pszAttrName, sValue);
+									aOutput.PushFormat(rgba, "\t%s = %s", pszAttrName, sValue);
 								}
 								else
 								{
-									aAttrOutput.PushFormat("%s = %s", pszAttrName, sValue);
+									aOutput.PushFormat("\t%s = %s", pszAttrName, sValue);
 								}
 							}
 							else
 							{
-								aAttrOutput.PushFormat("// \"%s\" attribute is empty", pszAttrName);
+								aOutput.PushFormat("\t// \"%s\" attribute is empty", pszAttrName);
 							}
 						}
 						else if(paWarnings)
@@ -583,10 +584,7 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 						}
 					}
 
-					aOutput.PushFormat(LOGGER_COLOR_ENTITY_KV3, "%s = ", "attributes");
-					aOutput.Push(LOGGER_COLOR_ENTITY_KV3, "{");
-					aOutput += aAttrOutput;
-					aOutput.Push(LOGGER_COLOR_ENTITY_KV3, "}");
+					aOutput.Push("}");
 				}
 			}
 		}
