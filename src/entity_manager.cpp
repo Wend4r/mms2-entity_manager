@@ -471,14 +471,28 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 		}
 	}
 
-	// Load a settings.
+	// Refresh a settings.
 	{
-		// char sSettingsError[256];
+		auto aWarnings = this->m_aLogger.CreateWarningsScope();
 
-		// if(!this->LoadSettings(this->m_sCurrentMap.c_str(), (char *)sSettingsError, sizeof(sSettingsError)))
-		// {
-		// 	Warning("Failed to load a settings: %s\n", sSettingsError);
-		// }
+		auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+
+		pSpawnGroupMgr->LoopBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void
+		{
+			ISpawnGroup *pSpawnGroup = pMap->GetSpawnGroup();
+
+			char sSettingsError[256];
+
+			if(!this->LoadSettings(pSpawnGroup, (char *)sSettingsError, sizeof(sSettingsError)))
+			{
+				aWarnings.PushFormat("Failed to load a settings: %s", sSettingsError);
+			}
+		});
+
+		aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
+		{
+			this->m_aLogger.Warning(rgba, pszContent);
+		});
 	}
 }
 
