@@ -11,7 +11,7 @@
 #include <entity2/entityidentity.h>
 #include <entity2/entitykeyvalues.h>
 
-#include "logger.h"
+#include "logger.hpp"
 #include "provider_agent/resourcemanifest.h"
 #include "provider_agent/spawngroup.h"
 

@@ -1,4 +1,12 @@
-#include "gamedata.h"
+/**
+ * vim: set ts=4 sw=4 tw=99 noet :
+ * ======================================================
+ * Universal gamedata parser for Source2 games.
+ * Written by Wend4r (2023).
+ * ======================================================
+ */
+
+#include "gamedata.hpp"
 
 #include <stdlib.h>
 

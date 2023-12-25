@@ -3,7 +3,7 @@
 #include "provider.h"
 #include "provider/entitysystem.h"
 #include "provider/source2server.h"
-#include <logger.h>
+#include <logger.hpp>
 
 #include <tier0/dbg.h>
 #include <tier0/memalloc.h>

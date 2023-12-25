@@ -1,6 +1,6 @@
 #include "provider.h"
 
-#include "gamedata.h"
+#include "gamedata.hpp"
 #include "provider_agent.h"
 
 #include <filesystem.h>

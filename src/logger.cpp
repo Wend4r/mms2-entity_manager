@@ -1,6 +1,13 @@
-#include "logger.h"
+/**
+ * vim: set ts=4 sw=4 tw=99 noet :
+ * ======================================================
+ * Logger util for Source2 games.
+ * Written by Wend4r (2023).
+ * ======================================================
+ */
 
 #include "entity_manager.h"
+#include "logger.hpp"
 
 #include <stdarg.h>
 

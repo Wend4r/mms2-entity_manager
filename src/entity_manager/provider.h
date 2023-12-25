@@ -12,7 +12,7 @@
 
 #include "provider/entitysystem.h"
 
-#include "gamedata.h"
+#include "gamedata.hpp"
 
 class CSpawnGroupMgrGameSystem;
 

@@ -6,7 +6,7 @@
 #include <eiface.h>
 #include <entity2/entityidentity.h>
 
-#include <logger.h>
+#include <logger.hpp>
 
 class KeyValues;
 class CBaseEntity;

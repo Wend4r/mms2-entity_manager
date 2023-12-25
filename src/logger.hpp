@@ -1,5 +1,13 @@
-#ifndef _INCLUDE_LOGGER_H_
-#define _INCLUDE_LOGGER_H_
+/**
+ * vim: set ts=4 sw=4 tw=99 noet :
+ * ======================================================
+ * Logger util for Source2 games.
+ * Written by Wend4r (2023).
+ * ======================================================
+ */
+
+#ifndef _INCLUDE_LOGGER_HPP_
+#define _INCLUDE_LOGGER_HPP_
 
 #include <stddef.h>
 #include <functional>
@@ -128,4 +136,4 @@ private:
 	LoggingChannelID_t m_nChannelID;
 };
 
-#endif // _INCLUDE_LOGGER_H_
+#endif // _INCLUDE_LOGGER_HPP_

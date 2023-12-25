@@ -24,7 +24,7 @@
 #include "entity_manager/provider.h"
 #include "entity_manager/provider_agent.h"
 #include "entity_manager/settings.h"
-#include "logger.h"
+#include "logger.hpp"
 
 #define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
 

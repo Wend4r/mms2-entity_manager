@@ -1,5 +1,13 @@
-#ifndef _INCLUDE_GAMEDATA_H_
-#define _INCLUDE_GAMEDATA_H_
+/**
+ * vim: set ts=4 sw=4 tw=99 noet :
+ * ======================================================
+ * Universal gamedata parser for Source2 games.
+ * Written by Wend4r (2023).
+ * ======================================================
+ */
+
+#ifndef _INCLUDE_GAMEDATA_HPP_
+#define _INCLUDE_GAMEDATA_HPP_
 
 #include "memory_utils/module.h"
 #include "memory_utils/memaddr.h"
@@ -346,4 +354,4 @@ private:
 	std::map<std::string, const CModule *> m_aLibraryMap;
 };
 
-#endif //_INCLUDE_GAMEDATA_H_
+#endif //_INCLUDE_GAMEDATA_HPP_
