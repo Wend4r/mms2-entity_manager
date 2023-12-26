@@ -257,6 +257,8 @@ bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 	this->DestroyEntitySystem();
 	this->DestroyGameResource();
 
+	ConVar_Unregister();
+
 	return true;
 }
 

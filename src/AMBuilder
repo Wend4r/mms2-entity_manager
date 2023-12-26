@@ -37,7 +37,16 @@ for sdk_name in EntityManager.sdks:
       'memory_utils/memaddr.cpp',
       'memory_utils/module.cpp',
       'entity_manager.cpp',
+
+      # GameData tool
       'gamedata.cpp',
+
+      # Logger tool
+      'logger/detailed.cpp',
+      'logger/message.cpp',
+      'logger/warning.cpp',
+      'logger/throw_assert.cpp',
+      'logger/error.cpp',
       'logger.cpp',
     ]
 
