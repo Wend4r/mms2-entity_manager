@@ -20,7 +20,6 @@ for sdk_name in EntityManager.sdks:
     binary = EntityManager.HL2Library(builder, cxx, EntityManager.plugin_name, sdk)
 
     binary.sources += [
-      'public/entity2/entitykeyvalues.cpp',
       'entity_manager/provider/gamedata/entitysystem.cpp',
       'entity_manager/provider/gamedata/gameresource.cpp',
       'entity_manager/provider/gamedata/source2server.cpp',
@@ -55,7 +54,9 @@ for sdk_name in EntityManager.sdks:
         os.path.join(sdk.path, 'tier1', 'convar.cpp'),
         os.path.join(sdk.path, 'tier1', 'generichash.cpp'),
         os.path.join(sdk.path, 'public', 'tier0', 'memoverride.cpp'),
+        os.path.join(sdk.path, 'entity2', 'entityidentity.cpp'),
         os.path.join(sdk.path, 'entity2', 'entitysystem.cpp'),
+        os.path.join(sdk.path, 'entity2', 'entitykeyvalues.cpp'),
       ]
 
     if cxx.target.arch == 'x86':

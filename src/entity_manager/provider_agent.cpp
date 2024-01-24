@@ -153,7 +153,7 @@ void EntityManager::ProviderAgent::NotifyDestroySpawnGroup(SpawnGroupHandle_t ha
 
 void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup, Logger::Scope *pWarnings)
 {
-	CEntityKeyValues *pNewKeyValues = new CEntityKeyValues(/* (CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesContextAllocator(), ENTITY_KV_CTX_CUSTOM */ &this->m_aEntityAllocator, ENTITY_KV_CTX_CUSTOM);
+	CEntityKeyValues *pNewKeyValues = new CEntityKeyValues(/* (CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesContextAllocator(), EKV_ALLOCATOR_EXTERNAL */ &this->m_aEntityAllocator, EKV_ALLOCATOR_EXTERNAL);
 
 	// Parse attributes.
 	{
@@ -169,19 +169,10 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 
 				const EntityKeyId_t &aAttrKey = this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszAttrKey));
 
-				KeyValues3 *pAttrValue = pNewKeyValues->SetValue(aAttrKey, pszAttrKey);
-
-				if(pAttrValue)
-				{
-					pAttrValue->SetString(pAttrKeyValue->GetString());
-				}
-				else if(pWarnings)
-				{
-					pWarnings->PushFormat("Failed to get \"%s\" setter key (member is 0x%08X:\"%s\")", pszAttrKey, aAttrKey.GetHashCode(), aAttrKey.GetString());
-				}
+				pNewKeyValues->SetString(aAttrKey, pAttrKeyValue->GetString(), true);
 			}
 
-			pOldOne->RemoveSubKey(pAttributeValues, true /* bDelete */, true);
+			pOldOne->RemoveSubKey(pAttributeValues, true, true);
 		}
 	}
 
@@ -191,30 +182,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 
 		const EntityKeyId_t &aKey = this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszKey));
 
-		KeyValues3 *pValue = pNewKeyValues->GetValue(aKey);
-
-		if(pValue)
-		{
-			if(pWarnings)
-			{
-				pWarnings->PushFormat("Dublicate entity key (source is \"%s\", member is 0x%08X:\"%s\")", pszKey, aKey.GetHashCode(), aKey.GetString());
-			}
-
-			pValue->SetString(pKeyValue->GetString());
-		}
-		else
-		{
-			pValue = pNewKeyValues->SetValue(aKey);
-
-			if(pValue)
-			{
-				pValue->SetString(pKeyValue->GetString());
-			}
-			else if(pWarnings)
-			{
-				pWarnings->PushFormat("Failed to get \"%s\" setter key (member is 0x%08X:\"%s\")", pszKey, aKey.GetHashCode(), aKey.GetString());
-			}
-		}
+		pNewKeyValues->SetString(aKey, pKeyValue->GetString());
 	}
 
 	this->PushSpawnQueue(pNewKeyValues, hSpawnGroup);
@@ -357,11 +325,9 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup, Lo
 		{
 			CEntityKeyValues *pKeyValues = aSpawn.GetKeyValues();
 
-			KeyValues3 *pValue = pKeyValues->GetValue(aClassnameKey);
-
-			if(pValue)
+			if(pKeyValues)
 			{
-				const char *pszClassname = pValue->GetString();
+				const char *pszClassname = pKeyValues->GetString(aClassnameKey);
 
 				if(pszClassname && pszClassname[0])
 				{
@@ -507,7 +473,7 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 			{ 
 				const char *pszName = pRoot->GetMemberName(i);
 
-				KeyValues3 *pMember = pRoot->GetMember(i);
+				KeyValues3 *pMember = const_cast<KeyValues3 *>(pRoot->GetMember(i));
 
 				if(pMember)
 				{
@@ -553,7 +519,7 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 					{ 
 						const char *pszAttrName = pAttributes->GetMemberName(i);
 
-						KeyValues3 *pMember = pAttributes->GetMember(i);
+						KeyValues3 *pMember = const_cast<KeyValues3 *>(pAttributes->GetMember(i));
 
 						if(pMember)
 						{

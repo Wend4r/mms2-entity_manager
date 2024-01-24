@@ -69,6 +69,8 @@ extern CGameEntitySystem *g_pGameEntitySystem;
 extern IGameEventManager2 *g_pGameEventManager;
 extern CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
 
+extern CGameEntitySystem *GameEntitySystem();
+
 // Should only be called within the active game loop (i e map should be loaded and active)
 // otherwise that'll be nullptr!
 CGlobalVars *GetGameGlobals()
@@ -79,6 +81,11 @@ CGlobalVars *GetGameGlobals()
 		return nullptr;
 
 	return g_pNetworkServerService->GetIGameServer()->GetGlobals();
+}
+
+CGameEntitySystem *GameEntitySystem()
+{
+	return g_pGameEntitySystem;
 }
 
 PLUGIN_EXPOSE(EntityManagerPlugin, s_aEntityManager);
