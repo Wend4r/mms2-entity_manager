@@ -13,11 +13,13 @@ for sdk_name in EntityManager.sdks:
     if not cxx.target.arch in sdk.platformSpec[cxx.target.platform]:
       continue
 
+    dynlibutils_src = 'memory_utils'
     gamedata_src = 'gamedata'
     logger_src = 'logger'
 
     cxx.cxxincludes += [
       os.path.join(builder.currentSourcePath, 'entity_manager'),
+      os.path.join(builder.currentSourcePath, dynlibutils_src),
       os.path.join(builder.currentSourcePath, gamedata_src),
       os.path.join(builder.currentSourcePath, logger_src),
     ]
@@ -25,21 +27,23 @@ for sdk_name in EntityManager.sdks:
     binary = EntityManager.HL2Library(builder, cxx, EntityManager.plugin_name, sdk)
 
     binary.sources += [
-      'entity_manager/provider/gamedata/entitysystem.cpp',
-      'entity_manager/provider/gamedata/gameresource.cpp',
-      'entity_manager/provider/gamedata/source2server.cpp',
-      'entity_manager/provider/gamedata/spawngroup.cpp',
-      'entity_manager/provider/entitysystem.cpp',
-      'entity_manager/provider/source2server.cpp',
-      'entity_manager/provider/gameresource.cpp',
-      'entity_manager/provider/spawngroup.cpp',
-      'entity_manager/provider_agent/resourcemanifest.cpp',
-      'entity_manager/provider_agent/spawngroup.cpp',
-      'entity_manager/provider.cpp',
-      'entity_manager/provider_agent.cpp',
-      'entity_manager/settings.cpp',
-      'memory_utils/module.cpp',
-      'entity_manager.cpp',
+      os.path.join('entity_manager', 'provider', 'gamedata', 'entitysystem.cpp'),
+      os.path.join('entity_manager', 'provider', 'gamedata', 'gameresource.cpp'),
+      os.path.join('entity_manager', 'provider', 'gamedata', 'source2server.cpp'),
+      os.path.join('entity_manager', 'provider', 'gamedata', 'spawngroup.cpp'),
+      os.path.join('entity_manager', 'provider', 'entitysystem.cpp'),
+      os.path.join('entity_manager', 'provider', 'source2server.cpp'),
+      os.path.join('entity_manager', 'provider', 'gameresource.cpp'),
+      os.path.join('entity_manager', 'provider', 'spawngroup.cpp'),
+      os.path.join('entity_manager', 'provider_agent', 'resourcemanifest.cpp'),
+      os.path.join('entity_manager', 'provider_agent', 'spawngroup.cpp'),
+      os.path.join('entity_manager', 'provider.cpp'),
+      os.path.join('entity_manager', 'provider_agent.cpp'),
+      os.path.join('entity_manager', 'settings.cpp'),
+      os.path.join('entity_manager.cpp'),
+
+      # DynLibUtils tool
+      os.path.join(dynlibutils_src, 'module.cpp'),
 
       # GameData tool
       os.path.join(gamedata_src, 'gamedata.cpp'),
