@@ -19,6 +19,8 @@ for sdk_name in EntityManager.sdks:
 
     binary = EntityManager.HL2Library(builder, cxx, EntityManager.plugin_name, sdk)
 
+    logger_src = 'logger'
+
     binary.sources += [
       'entity_manager/provider/gamedata/entitysystem.cpp',
       'entity_manager/provider/gamedata/gameresource.cpp',
@@ -41,12 +43,12 @@ for sdk_name in EntityManager.sdks:
       'gamedata.cpp',
 
       # Logger tool
-      'logger/detailed.cpp',
-      'logger/message.cpp',
-      'logger/warning.cpp',
-      'logger/throw_assert.cpp',
-      'logger/error.cpp',
-      'logger.cpp',
+      os.path.join(logger_src, 'logger', 'detailed.cpp'),
+      os.path.join(logger_src, 'logger', 'message.cpp'),
+      os.path.join(logger_src, 'logger', 'warning.cpp'),
+      os.path.join(logger_src, 'logger', 'throw_assert.cpp'),
+      os.path.join(logger_src, 'logger', 'error.cpp'),
+      os.path.join(logger_src, 'logger.cpp'),
     ]
 
     if sdk_name in ['dota', 'cs2']:
