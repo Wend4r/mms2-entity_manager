@@ -9,7 +9,7 @@ extern EntityManager::Provider *g_pEntityManagerProvider;
 
 IGameEventManager2 *EntityManager::CSource2ServerProvider::GetGameEventManager()
 {
-	CGameEventManager *pEventManager = ((VirtualTable *)this)->CallMethod<CGameEventManager *>(g_pEntityManagerProvider->GetGameDataStorage().GetSource2Server().GetGameEventManagerOffset());
+	CGameEventManager *pEventManager = ((DynLibUtils::VirtualTable *)this)->CallMethod<CGameEventManager *>(g_pEntityManagerProvider->GetGameDataStorage().GetSource2Server().GetGameEventManagerOffset());
 
 	if(pEventManager)
 	{

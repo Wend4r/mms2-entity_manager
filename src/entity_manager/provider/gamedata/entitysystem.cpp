@@ -5,27 +5,27 @@ EntityManager::Provider::GameDataStorage::EntitySystem::EntitySystem()
 	{
 		auto &aCallbacks = this->m_aAddressCallbacks;
 
-		aCallbacks.Insert("CEntitySystem::CreateEntity", [this](const std::string &, const CMemory &pFucntion)
+		aCallbacks.Insert("CEntitySystem::CreateEntity", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
 		{
 			this->m_pfnCreateEntity = pFucntion.RCast<decltype(this->m_pfnCreateEntity)>();
 		});
-		aCallbacks.Insert("CEntitySystem::QueueSpawnEntity", [this](const std::string &, const CMemory &pFucntion)
+		aCallbacks.Insert("CEntitySystem::QueueSpawnEntity", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
 		{
 			this->m_pfnQueueSpawnEntity = pFucntion.RCast<decltype(this->m_pfnQueueSpawnEntity)>();
 		});
-		aCallbacks.Insert("CEntitySystem::QueueDestroyEntity", [this](const std::string &, const CMemory &pFucntion)
+		aCallbacks.Insert("CEntitySystem::QueueDestroyEntity", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
 		{
 			this->m_pfnQueueDestroyEntity = pFucntion.RCast<decltype(this->m_pfnQueueDestroyEntity)>();
 		});
-		aCallbacks.Insert("CEntitySystem::ExecuteQueuedCreation", [this](const std::string &, const CMemory &pFucntion)
+		aCallbacks.Insert("CEntitySystem::ExecuteQueuedCreation", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
 		{
 			this->m_pfnExecuteQueuedCreation = pFucntion.RCast<decltype(this->m_pfnExecuteQueuedCreation)>();
 		});
-		aCallbacks.Insert("CEntitySystem::ExecuteQueuedDeletion", [this](const std::string &, const CMemory &pFucntion)
+		aCallbacks.Insert("CEntitySystem::ExecuteQueuedDeletion", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
 		{
 			this->m_pfnExecuteQueuedDeletion = pFucntion.RCast<decltype(this->m_pfnExecuteQueuedDeletion)>();
 		});
-		aCallbacks.Insert("CGameEntitySystem::ListenForEntityInSpawnGroupToFinish", [this](const std::string &, const CMemory &pFucntion)
+		aCallbacks.Insert("CGameEntitySystem::ListenForEntityInSpawnGroupToFinish", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
 		{
 			this->m_pfnListenForEntityInSpawnGroupToFinish = pFucntion.RCast<decltype(this->m_pfnListenForEntityInSpawnGroupToFinish)>();
 		});

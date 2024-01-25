@@ -8,7 +8,7 @@ EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
 	{
 		auto &aCallbacks = this->m_aAddressCallbacks;
 
-		aCallbacks.Insert("&g_pSpawnGroupMgr", [this](const std::string &, const CMemory &pFucntion)
+		aCallbacks.Insert("&g_pSpawnGroupMgr", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
 		{
 			this->m_ppSpawnGroupMgrAddress = pFucntion.RCast<decltype(this->m_ppSpawnGroupMgrAddress)>();
 			g_pEntityManagerProviderAgent->NotifySpawnGroupMgrUpdated();

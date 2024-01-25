@@ -13,13 +13,16 @@ for sdk_name in EntityManager.sdks:
     if not cxx.target.arch in sdk.platformSpec[cxx.target.platform]:
       continue
 
+    gamedata_src = 'gamedata'
+    logger_src = 'logger'
+
     cxx.cxxincludes += [
-      os.path.join(builder.currentSourcePath, 'entity_manager')
+      os.path.join(builder.currentSourcePath, 'entity_manager'),
+      os.path.join(builder.currentSourcePath, gamedata_src),
+      os.path.join(builder.currentSourcePath, logger_src),
     ]
 
     binary = EntityManager.HL2Library(builder, cxx, EntityManager.plugin_name, sdk)
-
-    logger_src = 'logger'
 
     binary.sources += [
       'entity_manager/provider/gamedata/entitysystem.cpp',
@@ -35,12 +38,11 @@ for sdk_name in EntityManager.sdks:
       'entity_manager/provider.cpp',
       'entity_manager/provider_agent.cpp',
       'entity_manager/settings.cpp',
-      'memory_utils/memaddr.cpp',
       'memory_utils/module.cpp',
       'entity_manager.cpp',
 
       # GameData tool
-      'gamedata.cpp',
+      os.path.join(gamedata_src, 'gamedata.cpp'),
 
       # Logger tool
       os.path.join(logger_src, 'logger', 'detailed.cpp'),

@@ -4,3 +4,6 @@
 [submodule "src/logger"]
 	path = src/logger
 	url = https://github.com/Wend4r/s2u-logger.git
+[submodule "src/gamedata"]
+	path = src/gamedata
+	url = https://github.com/Wend4r/s2u-gamedata.git
