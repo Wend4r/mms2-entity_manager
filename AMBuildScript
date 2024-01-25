@@ -206,6 +206,7 @@ class EntityManagerConfig(object):
         '-Wno-uninitialized',
         '-Wno-unused',
         '-Wno-switch',
+        '-Wno-vla-extension-static-assert',
         '-msse',
         '-fPIC',
       ]
@@ -223,6 +224,7 @@ class EntityManagerConfig(object):
         '-Wno-overloaded-virtual',
         '-Wno-mismatched-tags',
         '-Wno-register',
+        '-Wno-vla-extension-static-assert',
       ]
       if (cxx.version >= 'gcc-4.7' or cxx.family == 'clang'):
         cxx.cxxflags += ['-Wno-delete-non-virtual-dtor']
