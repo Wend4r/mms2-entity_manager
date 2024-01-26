@@ -24,6 +24,13 @@ for sdk_name in EntityManager.sdks:
       os.path.join(builder.currentSourcePath, logger_src),
     ]
 
+    sdk_path_tp = os.path.join(sdk.path, 'thirdparty')
+    for obj in os.listdir(sdk_path_tp):
+        if obj.startswith('protobuf'):
+          cxx.cxxincludes += [
+            os.path.join(sdk_path_tp, obj, 'src')
+          ]
+
     binary = EntityManager.HL2Library(builder, cxx, EntityManager.plugin_name, sdk)
 
     binary.sources += [
