@@ -61,6 +61,7 @@ for sdk_name in EntityManager.sdks:
       os.path.join(logger_src, 'logger', 'warning.cpp'),
       os.path.join(logger_src, 'logger', 'throw_assert.cpp'),
       os.path.join(logger_src, 'logger', 'error.cpp'),
+      os.path.join(logger_src, 'logger', 'scope.cpp'),
       os.path.join(logger_src, 'logger.cpp'),
     ]
 
