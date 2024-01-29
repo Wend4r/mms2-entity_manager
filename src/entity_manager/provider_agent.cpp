@@ -479,7 +479,7 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 				{
 					char sValue[512];
 
-					if(DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
+					if(This::DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
 					{
 						if(V_stristr(pszName, "color"))
 						{
@@ -525,7 +525,7 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 						{
 							char sValue[512];
 
-							if(DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
+							if(This::DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
 							{
 								if(V_stristr(pszAttrName, "color"))
 								{

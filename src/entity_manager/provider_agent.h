@@ -25,6 +25,8 @@ namespace EntityManager
 {
 	class ProviderAgent : public ISpawnGroupNotifications
 	{
+		using This = ProviderAgent;
+
 	public:
 		ProviderAgent();
 
