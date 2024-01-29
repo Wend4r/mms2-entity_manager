@@ -69,8 +69,17 @@ namespace EntityManager
 		int DestroyQueued();
 
 	public: // Dumps.
+		enum DumpEntityKeyValuesFlags_t : uint8
+		{
+			DEKVF_NONE = 0,
+			DEKVF_TYPE = (1 << 2),
+			DEKVF_SUBTYPE = (1 << 3),
+		};
+
+		static const DumpEntityKeyValuesFlags_t s_eDefaultDEKVFlags = DEKVF_NONE;
+
 		static bool DumpOldKeyValues(KeyValues *pOldOne, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
-		static bool DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
+		static bool DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, DumpEntityKeyValuesFlags_t eFlags, Logger::Scope &aOutput, Logger::Scope *paWarnings = nullptr);
 		static int DumpEntityKeyValue(KeyValues3 *pMember, char *psBuffer, size_t nMaxLength);
 		static bool MakeDumpColorAlpha(Color &rgba);
 

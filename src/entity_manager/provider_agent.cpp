@@ -457,7 +457,7 @@ bool EntityManager::ProviderAgent::DumpOldKeyValues(KeyValues *pOldOne, Logger::
 	return true;
 }
 
-bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, Logger::Scope &aOutput, Logger::Scope *paWarnings)
+bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *pKeyValues, DumpEntityKeyValuesFlags_t eFlags, Logger::Scope &aOutput, Logger::Scope *paWarnings)
 {
 	bool bResult = pKeyValues != nullptr;
 
@@ -479,8 +479,23 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 				{
 					char sValue[512];
 
-					if(This::DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
+					int iStoredLength = This::DumpEntityKeyValue(pMember, sValue, sizeof(sValue));
+
+					if(iStoredLength)
 					{
+						if(eFlags)
+						{
+							if(eFlags & This::DEKVF_TYPE)
+							{
+								V_snprintf(&sValue[iStoredLength], sizeof(sValue) - iStoredLength, " // Type is #%d", pMember->GetTypeEx());
+							}
+
+							if(eFlags & This::DEKVF_SUBTYPE)
+							{
+								V_snprintf(&sValue[iStoredLength], sizeof(sValue) - iStoredLength, " // SubType is #%d", pMember->GetSubType());
+							}
+						}
+
 						if(V_stristr(pszName, "color"))
 						{
 							Color rgba = pMember->GetColor();
@@ -525,8 +540,12 @@ bool EntityManager::ProviderAgent::DumpEntityKeyValues(const CEntityKeyValues *p
 						{
 							char sValue[512];
 
-							if(This::DumpEntityKeyValue(pMember, sValue, sizeof(sValue)))
+							int iStoredLength = This::DumpEntityKeyValue(pMember, sValue, sizeof(sValue));
+
+							if(iStoredLength)
 							{
+								V_snprintf(&sValue[iStoredLength], sizeof(sValue) - iStoredLength, " // Type is #%d | SubType is #%d", pMember->GetTypeEx(), pMember->GetSubType());
+
 								if(V_stristr(pszAttrName, "color"))
 								{
 									Color rgba = pMember->GetColor();

@@ -659,7 +659,7 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 
 			auto aEntityDetails = Logger::Scope(LOGGER_COLOR_ENTITY_KV3, "\t");
 
-			if(s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aEntityDetails, &aEntityDetails))
+			if(s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, EntityManager::ProviderAgent::s_eDefaultDEKVFlags, aEntityDetails, &aEntityDetails))
 			{
 				aDetails.PushFormat(LOGGER_COLOR_ENTITY_KV3, "%s = ", pEntity->GetClassname());
 				aDetails.Push(LOGGER_COLOR_ENTITY_KV3, "{");
@@ -794,7 +794,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 				auto aEntityDetails = Logger::Scope(LOGGER_COLOR_ENTITY_KV3, "\t");
 
-				if(s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, aEntityDetails, &aEntityDetails))
+				if(s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, EntityManager::ProviderAgent::s_eDefaultDEKVFlags, aEntityDetails, &aEntityDetails))
 				{
 					aDetails.PushFormat(LOGGER_COLOR_ENTITY_KV3, "%s = ", aEntity.m_pEntity->GetClassname());
 					aDetails.Push(LOGGER_COLOR_ENTITY_KV3, "{");
