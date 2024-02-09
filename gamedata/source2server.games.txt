@@ -6,8 +6,8 @@
 		{
 			"CSource2Server::GetGameEventManager"
 			{
-				"windows64" "91"
-				"linux64"   "91"
+				"windows64" "93"
+				"linux64"   "93"
 			}
 		}
 	}
