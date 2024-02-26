@@ -5,29 +5,29 @@ EntityManager::Provider::GameDataStorage::EntitySystem::EntitySystem()
 	{
 		auto &aCallbacks = this->m_aAddressCallbacks;
 
-		aCallbacks.Insert("CEntitySystem::CreateEntity", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
+		aCallbacks.Insert("CEntitySystem::CreateEntity", [this](const std::string &, const DynLibUtils::CMemory &pFunction)
 		{
-			this->m_pfnCreateEntity = pFucntion.RCast<decltype(this->m_pfnCreateEntity)>();
+			this->m_pfnCreateEntity = pFunction.RCast<decltype(this->m_pfnCreateEntity)>();
 		});
-		aCallbacks.Insert("CEntitySystem::QueueSpawnEntity", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
+		aCallbacks.Insert("CEntitySystem::QueueSpawnEntity", [this](const std::string &, const DynLibUtils::CMemory &pFunction)
 		{
-			this->m_pfnQueueSpawnEntity = pFucntion.RCast<decltype(this->m_pfnQueueSpawnEntity)>();
+			this->m_pfnQueueSpawnEntity = pFunction.RCast<decltype(this->m_pfnQueueSpawnEntity)>();
 		});
-		aCallbacks.Insert("CEntitySystem::QueueDestroyEntity", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
+		aCallbacks.Insert("CEntitySystem::QueueDestroyEntity", [this](const std::string &, const DynLibUtils::CMemory &pFunction)
 		{
-			this->m_pfnQueueDestroyEntity = pFucntion.RCast<decltype(this->m_pfnQueueDestroyEntity)>();
+			this->m_pfnQueueDestroyEntity = pFunction.RCast<decltype(this->m_pfnQueueDestroyEntity)>();
 		});
-		aCallbacks.Insert("CEntitySystem::ExecuteQueuedCreation", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
+		aCallbacks.Insert("CEntitySystem::ExecuteQueuedCreation", [this](const std::string &, const DynLibUtils::CMemory &pFunction)
 		{
-			this->m_pfnExecuteQueuedCreation = pFucntion.RCast<decltype(this->m_pfnExecuteQueuedCreation)>();
+			this->m_pfnExecuteQueuedCreation = pFunction.RCast<decltype(this->m_pfnExecuteQueuedCreation)>();
 		});
-		aCallbacks.Insert("CEntitySystem::ExecuteQueuedDeletion", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
+		aCallbacks.Insert("CEntitySystem::ExecuteQueuedDeletion", [this](const std::string &, const DynLibUtils::CMemory &pFunction)
 		{
-			this->m_pfnExecuteQueuedDeletion = pFucntion.RCast<decltype(this->m_pfnExecuteQueuedDeletion)>();
+			this->m_pfnExecuteQueuedDeletion = pFunction.RCast<decltype(this->m_pfnExecuteQueuedDeletion)>();
 		});
-		aCallbacks.Insert("CGameEntitySystem::ListenForEntityInSpawnGroupToFinish", [this](const std::string &, const DynLibUtils::CMemory &pFucntion)
+		aCallbacks.Insert("CGameEntitySystem::ListenForEntityInSpawnGroupToFinish", [this](const std::string &, const DynLibUtils::CMemory &pFunction)
 		{
-			this->m_pfnListenForEntityInSpawnGroupToFinish = pFucntion.RCast<decltype(this->m_pfnListenForEntityInSpawnGroupToFinish)>();
+			this->m_pfnListenForEntityInSpawnGroupToFinish = pFunction.RCast<decltype(this->m_pfnListenForEntityInSpawnGroupToFinish)>();
 		});
 
 		this->m_aGameConfig.GetAddresses().AddListener(&aCallbacks);
