@@ -1,5 +1,5 @@
-#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_AGENT_
-#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_AGENT_
+#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_AGENT_HPP_
+#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_AGENT_HPP_
 
 #include <stddef.h>
 
@@ -12,8 +12,8 @@
 #include <entity2/entitykeyvalues.h>
 
 #include "logger.hpp"
-#include "provider_agent/resourcemanifest.h"
-#include "provider_agent/spawngroup.h"
+#include "provider_agent/resourcemanifest.hpp"
+#include "provider_agent/spawngroup.hpp"
 
 #define LOGGER_COLOR_KEYVALUES {241, 160, 50, 255}
 #define LOGGER_COLOR_ENTITY_KV3 {0, 191, 255, 255}
@@ -143,4 +143,4 @@ namespace EntityManager
 	};
 };
 
-#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_AGENT_
+#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_AGENT_HPP_

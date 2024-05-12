@@ -1,6 +1,7 @@
 #include <entity2/entitykeyvalues.h>
 
-#include "provider.h"
+#include "entitysystem.hpp"
+#include "provider.hpp"
 
 DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 

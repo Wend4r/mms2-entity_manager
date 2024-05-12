@@ -1,8 +1,8 @@
-#include "provider_agent.h"
+#include "provider_agent.hpp"
 
-#include "provider.h"
-#include "provider/entitysystem.h"
-#include "provider/source2server.h"
+#include "provider.hpp"
+#include "provider/entitysystem.hpp"
+#include "provider/source2server.hpp"
 #include <logger.hpp>
 
 #include <tier0/dbg.h>

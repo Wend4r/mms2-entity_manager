@@ -1,4 +1,4 @@
-#include "spawngroup.h"
+#include "spawngroup.hpp"
 
 #include <iserver.h>
 #include <mathlib/mathlib.h>

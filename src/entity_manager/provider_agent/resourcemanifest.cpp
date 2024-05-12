@@ -1,6 +1,6 @@
-#include "resourcemanifest.h"
+#include "resourcemanifest.hpp"
 
-#include <entity_manager/provider/gameresource.h>
+#include "provider/gameresource.hpp"
 
 EntityManager::ResourceManifest::~ResourceManifest()
 {

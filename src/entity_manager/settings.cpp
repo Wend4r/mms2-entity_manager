@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "settings.h"
+#include "settings.hpp"
 
 #include <tier0/dbg.h>
 #include <tier0/platform.h>
@@ -10,7 +10,7 @@
 #include <tier1/utlvector.h>
 #include <filesystem.h>
 
-#include "provider_agent.h"
+#include "provider_agent.hpp"
 
 #define ENTITY_MANAGER_MAP_CONFIG_DIR "configs"
 #define ENTITY_MANAGER_MAP_CONFIG_SPAWNGROUPS_DIR "spawngroups"

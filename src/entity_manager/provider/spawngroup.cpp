@@ -1,5 +1,5 @@
-#include "spawngroup.h"
-#include "provider.h"
+#include "spawngroup.hpp"
+#include "provider.hpp"
 
 #include <tier1/utlmap.h>
 

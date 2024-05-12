@@ -27,9 +27,9 @@
 
 #include <dynlibutils/virtual.hpp>
 
-#include "entity_manager.h"
-#include "entity_manager/provider/gameresource.h"
-#include "entity_manager/provider/spawngroup.h"
+#include "entity_manager.hpp"
+#include "entity_manager/provider/gameresource.hpp"
+#include "entity_manager/provider/spawngroup.hpp"
 
 #define ENTITY_MANAGER_WORLD_ROOT "entity_manager"
 #define ENTITY_MANAGER_PROGENITOR_WORLD_NAME "progenitor_layer"

@@ -10,8 +10,8 @@
  * the use of this software.
  */
 
-#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_H_
-#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_H_
+#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_HPP_
+#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_HPP_
 
 #include <ISmmPlugin.h>
 #include <igameevents.h>
@@ -21,9 +21,9 @@
 #include <tier1/utlvector.h>
 #include <entity2/entityidentity.h>
 
-#include "entity_manager/provider.h"
-#include "entity_manager/provider_agent.h"
-#include "entity_manager/settings.h"
+#include "entity_manager/provider.hpp"
+#include "entity_manager/provider_agent.hpp"
+#include "entity_manager/settings.hpp"
 #include "logger.hpp"
 
 #define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
@@ -148,4 +148,4 @@ DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 PLUGIN_GLOBALVARS();
 
-#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_H_
+#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_HPP_

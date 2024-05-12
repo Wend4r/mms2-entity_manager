@@ -1,7 +1,7 @@
-#include "provider.h"
+#include "provider.hpp"
 
 #include "gamedata.hpp"
-#include "provider_agent.h"
+#include "provider_agent.hpp"
 
 #include <filesystem.h>
 #include <tier0/strtools.h>

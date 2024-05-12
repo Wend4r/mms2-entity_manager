@@ -1,5 +1,5 @@
-#include "gameresource.h"
-#include "provider.h"
+#include "gameresource.hpp"
+#include "provider.hpp"
 
 #include <dynlibutils/virtual.hpp>
 
