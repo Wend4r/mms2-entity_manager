@@ -15,7 +15,7 @@
 extern EntityManager::Provider *g_pEntityManagerProvider;
 
 extern IServerGameDLL *server;
-extern IGameResourceServiceServer *g_pGameResourceServiceServer;
+extern IGameResourceService *g_pGameResourceServiceServer;
 
 CEntitySystem *g_pEntitySystem = NULL;
 CGameEntitySystem *g_pGameEntitySystem = NULL;

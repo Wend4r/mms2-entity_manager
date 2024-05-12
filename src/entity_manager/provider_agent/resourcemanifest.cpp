@@ -2,7 +2,7 @@
 
 #include <entity_manager/provider/gameresource.h>
 
-extern IGameResourceServiceServer *g_pGameResourceServiceServer;
+extern IGameResourceService *g_pGameResourceServiceServer;
 
 EntityManager::ResourceManifest::~ResourceManifest()
 {
