@@ -2,8 +2,6 @@
 
 #include <entity_manager/provider/gameresource.h>
 
-extern IGameResourceService *g_pGameResourceServiceServer;
-
 EntityManager::ResourceManifest::~ResourceManifest()
 {
 	this->Destroy();

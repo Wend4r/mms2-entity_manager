@@ -3,7 +3,7 @@
 
 #include <tier1/utlmap.h>
 
-extern EntityManager::Provider *g_pEntityManagerProvider;
+DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 
 CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupHandle_t h)
 {

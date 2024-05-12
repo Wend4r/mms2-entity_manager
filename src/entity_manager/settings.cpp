@@ -16,9 +16,9 @@
 #define ENTITY_MANAGER_MAP_CONFIG_SPAWNGROUPS_DIR "spawngroups"
 #define ENTITY_MANAGER_MAP_CONFIG_WORLD_FILE "world.vdf"
 
-extern IFileSystem *filesystem;
+DLL_IMPORT IFileSystem *filesystem;
 
-extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
+DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 bool EntityManager::Settings::Init(char *psError, size_t nMaxLength)
 {

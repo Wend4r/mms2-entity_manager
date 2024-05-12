@@ -3,8 +3,6 @@
 #include <iserver.h>
 #include <mathlib/mathlib.h>
 
-extern INetworkServerService *g_pNetworkServerService;
-
 EntityManager::SpawnGroup::~SpawnGroup()
 {
 	this->Unload();

@@ -142,9 +142,9 @@ private:
 	Logger m_aLogger;
 };
 
-extern EntityManagerPlugin *g_pEntityManager;
-extern EntityManager::Provider *g_pEntityManagerProvider;
-extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
+DLL_IMPORT EntityManagerPlugin *g_pEntityManager;
+DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
+DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 PLUGIN_GLOBALVARS();
 

@@ -52,24 +52,22 @@ SH_DECL_HOOK4(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, SH_NOATTRIB, 0,
 SH_DECL_HOOK1_void(CSpawnGroupMgrGameSystem, SpawnGroupShutdown, SH_NOATTRIB, 0, SpawnGroupHandle_t);
 
 static EntityManagerPlugin s_aEntityManager;
-EntityManagerPlugin *g_pEntityManager = &s_aEntityManager;  // To extern usage.
+DLL_EXPORT EntityManagerPlugin *g_pEntityManager = &s_aEntityManager;  // To extern usage.
 
 static EntityManager::Provider s_aEntityManagerProvider;
-EntityManager::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
+DLL_EXPORT EntityManager::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
 
 static EntityManager::ProviderAgent s_aEntityManagerProviderAgent;
-EntityManager::ProviderAgent *g_pEntityManagerProviderAgent = &s_aEntityManagerProviderAgent;
+DLL_EXPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent = &s_aEntityManagerProviderAgent;
 
-IVEngineServer *engine = NULL;
-ICvar *icvar = NULL;
-IFileSystem *filesystem = NULL;
-IServerGameDLL *server = NULL;
+DLL_EXPORT IVEngineServer *engine = NULL;
+DLL_EXPORT ICvar *icvar = NULL;
+DLL_EXPORT IFileSystem *filesystem = NULL;
+DLL_EXPORT IServerGameDLL *server = NULL;
 
-extern CGameEntitySystem *g_pGameEntitySystem;
-extern IGameEventManager2 *g_pGameEventManager;
-extern CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
-
-extern CGameEntitySystem *GameEntitySystem();
+DLL_IMPORT CGameEntitySystem *g_pGameEntitySystem;
+DLL_IMPORT IGameEventManager2 *g_pGameEventManager;
+DLL_IMPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
 // otherwise that'll be nullptr!

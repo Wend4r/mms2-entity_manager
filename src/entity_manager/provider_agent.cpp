@@ -12,15 +12,14 @@
 #include <tier1/generichash.h>
 #include <tier1/keyvalues3.h>
 
-extern EntityManager::Provider *g_pEntityManagerProvider;
+DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 
-extern IServerGameDLL *server;
-extern IGameResourceService *g_pGameResourceServiceServer;
+DLL_IMPORT IServerGameDLL *server;
 
-CEntitySystem *g_pEntitySystem = NULL;
-CGameEntitySystem *g_pGameEntitySystem = NULL;
-IGameEventManager2 *g_pGameEventManager = NULL;
-CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
+DLL_EXPORT CEntitySystem *g_pEntitySystem = NULL;
+DLL_EXPORT CGameEntitySystem *g_pGameEntitySystem = NULL;
+DLL_EXPORT IGameEventManager2 *g_pGameEventManager = NULL;
+DLL_EXPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
 class CDefOpsStringBinaryBlock
 {
