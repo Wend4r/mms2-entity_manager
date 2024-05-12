@@ -1,5 +1,5 @@
-#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_H_
-#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_H_
+#ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_HPP_
+#define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_HPP_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -10,7 +10,7 @@
 #include <tier1/utldelegateimpl.h>
 #include <entity2/entitykeyvalues.h>
 
-#include "provider/entitysystem.h"
+#include "provider/entitysystem.hpp"
 
 #include "gamedata.hpp"
 
@@ -187,4 +187,4 @@ namespace EntityManager
 	};
 };
 
-#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_H_
+#endif //_INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_HPP_

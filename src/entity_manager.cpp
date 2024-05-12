@@ -25,11 +25,11 @@
 #include <tier0/dbg.h>
 #include <tier1/convar.h>
 
-#include <memory_utils/virtual.h>
+#include <dynlibutils/virtual.hpp>
 
-#include "entity_manager.h"
-#include "entity_manager/provider/gameresource.h"
-#include "entity_manager/provider/spawngroup.h"
+#include "entity_manager.hpp"
+#include "entity_manager/provider/gameresource.hpp"
+#include "entity_manager/provider/spawngroup.hpp"
 
 #define ENTITY_MANAGER_WORLD_ROOT "entity_manager"
 #define ENTITY_MANAGER_PROGENITOR_WORLD_NAME "progenitor_layer"
@@ -52,24 +52,22 @@ SH_DECL_HOOK4(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, SH_NOATTRIB, 0,
 SH_DECL_HOOK1_void(CSpawnGroupMgrGameSystem, SpawnGroupShutdown, SH_NOATTRIB, 0, SpawnGroupHandle_t);
 
 static EntityManagerPlugin s_aEntityManager;
-EntityManagerPlugin *g_pEntityManager = &s_aEntityManager;  // To extern usage.
+DLL_EXPORT EntityManagerPlugin *g_pEntityManager = &s_aEntityManager;  // To extern usage.
 
 static EntityManager::Provider s_aEntityManagerProvider;
-EntityManager::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
+DLL_EXPORT EntityManager::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
 
 static EntityManager::ProviderAgent s_aEntityManagerProviderAgent;
-EntityManager::ProviderAgent *g_pEntityManagerProviderAgent = &s_aEntityManagerProviderAgent;
+DLL_EXPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent = &s_aEntityManagerProviderAgent;
 
-IVEngineServer *engine = NULL;
-ICvar *icvar = NULL;
-IFileSystem *filesystem = NULL;
-IServerGameDLL *server = NULL;
+DLL_EXPORT IVEngineServer *engine = NULL;
+DLL_EXPORT ICvar *icvar = NULL;
+DLL_EXPORT IFileSystem *filesystem = NULL;
+DLL_EXPORT IServerGameDLL *server = NULL;
 
-extern CGameEntitySystem *g_pGameEntitySystem;
-extern IGameEventManager2 *g_pGameEventManager;
-extern CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
-
-extern CGameEntitySystem *GameEntitySystem();
+DLL_IMPORT CGameEntitySystem *g_pGameEntitySystem;
+DLL_IMPORT IGameEventManager2 *g_pGameEventManager;
+DLL_IMPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
 // otherwise that'll be nullptr!
@@ -105,7 +103,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 	GET_V_IFACE_CURRENT(GetEngineFactory, engine, IVEngineServer, INTERFACEVERSION_VENGINESERVER);
 	GET_V_IFACE_CURRENT(GetEngineFactory, icvar, ICvar, CVAR_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetEngineFactory, g_pNetworkServerService, INetworkServerService, NETWORKSERVERSERVICE_INTERFACE_VERSION);
-	GET_V_IFACE_CURRENT(GetEngineFactory, g_pGameResourceServiceServer, IGameResourceServiceServer, GAMERESOURCESERVICESERVER_INTERFACE_VERSION);
+	GET_V_IFACE_CURRENT(GetEngineFactory, g_pGameResourceServiceServer, IGameResourceService, GAMERESOURCESERVICESERVER_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetEngineFactory, g_pWorldRendererMgr, IWorldRendererMgr, WORLD_RENDERER_MGR_INTERFACE_VERSION);
 	GET_V_IFACE_CURRENT(GetFileSystemFactory, filesystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetServerFactory, server, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL);

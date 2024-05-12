@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "settings.h"
+#include "settings.hpp"
 
 #include <tier0/dbg.h>
 #include <tier0/platform.h>
@@ -10,15 +10,15 @@
 #include <tier1/utlvector.h>
 #include <filesystem.h>
 
-#include "provider_agent.h"
+#include "provider_agent.hpp"
 
 #define ENTITY_MANAGER_MAP_CONFIG_DIR "configs"
 #define ENTITY_MANAGER_MAP_CONFIG_SPAWNGROUPS_DIR "spawngroups"
 #define ENTITY_MANAGER_MAP_CONFIG_WORLD_FILE "world.vdf"
 
-extern IFileSystem *filesystem;
+DLL_IMPORT IFileSystem *filesystem;
 
-extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
+DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 bool EntityManager::Settings::Init(char *psError, size_t nMaxLength)
 {

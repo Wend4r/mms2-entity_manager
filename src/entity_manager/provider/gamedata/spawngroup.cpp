@@ -1,7 +1,7 @@
-#include "provider.h"
-#include "provider_agent.h"
+#include "provider.hpp"
+#include "provider_agent.hpp"
 
-extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
+DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
 {

@@ -1,8 +1,9 @@
 #include <entity2/entitykeyvalues.h>
 
-#include "provider.h"
+#include "entitysystem.hpp"
+#include "provider.hpp"
 
-extern EntityManager::Provider *g_pEntityManagerProvider;
+DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 
 IEntityResourceManifest *EntityManager::CEntitySystemProvider::GetCurrentManifest()
 {

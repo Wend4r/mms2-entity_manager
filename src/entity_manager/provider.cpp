@@ -1,7 +1,7 @@
-#include "provider.h"
+#include "provider.hpp"
 
 #include "gamedata.hpp"
-#include "provider_agent.h"
+#include "provider_agent.hpp"
 
 #include <filesystem.h>
 #include <tier0/strtools.h>
@@ -13,9 +13,9 @@
 #define GAMECONFIG_SOURCE2SERVER_FILENAME "source2server.games.txt"
 #define GAMECONFIG_SPAWNGROUP_FILENAME "spawngroup.games.txt"
 
-extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
+DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
-extern IFileSystem *filesystem;
+DLL_IMPORT IFileSystem *filesystem;
 
 bool EntityManager::Provider::Init(char *psError, size_t nMaxLength)
 {

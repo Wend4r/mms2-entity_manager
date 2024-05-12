@@ -1,11 +1,11 @@
-#include "source2server.h"
-#include "provider.h"
+#include "source2server.hpp"
+#include "provider.hpp"
 
-#include <memory_utils/virtual.h>
+#include <dynlibutils/virtual.hpp>
 
 class CGameEventManager;
 
-extern EntityManager::Provider *g_pEntityManagerProvider;
+DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 
 IGameEventManager2 *EntityManager::CSource2ServerProvider::GetGameEventManager()
 {

@@ -1,9 +1,9 @@
-#include "gameresource.h"
-#include "provider.h"
+#include "gameresource.hpp"
+#include "provider.hpp"
 
-#include <memory_utils/virtual.h>
+#include <dynlibutils/virtual.hpp>
 
-extern EntityManager::Provider *g_pEntityManagerProvider;
+DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 
 void EntityManager::CGameResourceServiceProvider::DestroyResourceManifest(CGameResourceManifest *pTarget)
 {
