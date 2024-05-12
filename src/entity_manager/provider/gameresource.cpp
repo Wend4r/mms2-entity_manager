@@ -1,7 +1,7 @@
 #include "gameresource.h"
 #include "provider.h"
 
-#include <memory_utils/virtual.h>
+#include <dynlibutils/virtual.hpp>
 
 extern EntityManager::Provider *g_pEntityManagerProvider;
 

@@ -1,7 +1,7 @@
 #include "source2server.h"
 #include "provider.h"
 
-#include <memory_utils/virtual.h>
+#include <dynlibutils/virtual.hpp>
 
 class CGameEventManager;
 

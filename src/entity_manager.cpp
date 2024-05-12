@@ -25,7 +25,7 @@
 #include <tier0/dbg.h>
 #include <tier1/convar.h>
 
-#include <memory_utils/virtual.h>
+#include <dynlibutils/virtual.hpp>
 
 #include "entity_manager.h"
 #include "entity_manager/provider/gameresource.h"
