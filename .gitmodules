@@ -1,9 +1,9 @@
-[submodule "src/memory_utils"]
-	path = src/memory_utils
+[submodule "DynLibUtils"]
+	path = external/memory_utils
 	url = https://github.com/Wend4r/cpp-memory_utils.git
-[submodule "src/logger"]
-	path = src/logger
+[submodule "Logger"]
+	path = external/logger
 	url = https://github.com/Wend4r/s2u-logger.git
-[submodule "src/gamedata"]
-	path = src/gamedata
+[submodule "GameData"]
+	path = external/gamedata
 	url = https://github.com/Wend4r/s2u-gamedata.git
