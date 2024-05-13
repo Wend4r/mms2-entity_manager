@@ -8,8 +8,8 @@ on:
 
 env:
   HL2SDK_BRANCH: cs2
-  HL2SDK_ROOT: hl2sdk-cs2
-  MMSOURCE_ROOT: metamod-source
+  HL2SDK_ROOT: ${{ github.workspace }}/hl2sdk-cs2
+  MMSOURCE_ROOT: ${{ github.workspace }}/metamod-source
 
 jobs:
   build:
