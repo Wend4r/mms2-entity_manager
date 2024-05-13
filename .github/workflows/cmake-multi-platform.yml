@@ -9,6 +9,7 @@ on:
 env:
   HL2SDK_BRANCH: cs2
   HL2SDK_ROOT: hl2sdk-cs2
+  MMSOURCE_ROOT: metamod-source
 
 jobs:
   build:
@@ -56,6 +57,12 @@ jobs:
         ref: ${{ env.HL2SDK_BRANCH }}
         path: ${{ env.HL2SDK_ROOT }}
 
+    - name: Checkout MetaMod:Source
+      uses: actions/checkout@v4
+      with:
+        repository: alliedmodders/metamod-source
+        path: ${{ env.MMSOURCE_ROOT }}
+
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
@@ -63,6 +70,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DSOURCESDK_DIR=${{ env.HL2SDK_ROOT }}
+        -DMETAMOD_DIR=${{ env.MMSOURCE_ROOT }}
         -S ${{ github.workspace }}
 
     - name: Build
