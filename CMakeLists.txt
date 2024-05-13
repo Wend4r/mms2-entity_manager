@@ -19,7 +19,7 @@ endif()
 
 if(NOT METAMOD_DIR)
 	message(WARNING "METAMOD_DIR is empty. Will be used default path")
-	set(SOURCESDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../metamod-source)
+	set(METAMOD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../metamod-source)
 endif()
 
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
