@@ -12,12 +12,16 @@ project(entity_manager
 	LANGUAGES C CXX ASM
 )
 
-if(NOT SOURCESDK_DIR)
+if(SOURCESDK_DIR)
+	file(TO_CMAKE_PATH "${SOURCESDK_DIR}" SOURCESDK_DIR)
+else()
 	message(WARNING "SOURCESDK_DIR is empty. Will be used default path")
 	set(SOURCESDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../hl2sdk-wend4r/hl2sdk-cs2)
 endif()
 
-if(NOT METAMOD_DIR)
+if(METAMOD_DIR)
+	file(TO_CMAKE_PATH "${METAMOD_DIR}" METAMOD_DIR)
+else()
 	message(WARNING "METAMOD_DIR is empty. Will be used default path")
 	set(METAMOD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../metamod-source)
 endif()
