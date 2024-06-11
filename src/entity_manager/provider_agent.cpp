@@ -330,7 +330,7 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup, Lo
 
 				if(pszClassname && pszClassname[0])
 				{
-					CBaseEntity *pEntity = (CBaseEntity *)pEntitySystem->CreateEntity(aSpawn.GetSpawnGroup(), pszClassname, ENTITY_NETWORKING_MODE_DEFAULT, iForceEdictIndex, -1, false);
+					CEntityInstance *pEntity = pEntitySystem->CreateEntity(aSpawn.GetSpawnGroup(), pszClassname, ENTITY_NETWORKING_MODE_DEFAULT, iForceEdictIndex, -1, false);
 
 					if(pEntity)
 					{
@@ -624,7 +624,7 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 
 					if(aHandle.IsValid())
 					{
-						CEntityInstance *pEntity = static_cast<CEntityInstance *>(g_pGameEntitySystem->GetBaseEntity(aHandle));
+						CEntityInstance *pEntity = aHandle.Get();
 
 						if(pEntity)
 						{
@@ -671,7 +671,7 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 
 					if(aHandle.IsValid())
 					{
-						CEntityInstance *pEntity = static_cast<CEntityInstance *>(g_pGameEntitySystem->GetBaseEntity(aHandle));
+						CEntityInstance *pEntity = aHandle.Get();
 
 						if(pEntity)
 						{
