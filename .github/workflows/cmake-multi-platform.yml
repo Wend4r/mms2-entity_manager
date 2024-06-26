@@ -81,7 +81,6 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DSOURCESDK_DIR=${{ env.HL2SDK_ROOT }}
         -DMETAMOD_DIR=${{ env.MMSOURCE_ROOT }}
-        -S ${{ github.workspace }}
 
     - name: Build
       run: cmake --build ---parallel --preset ${{ matrix.preset }} --config ${{ matrix.build_type }}
