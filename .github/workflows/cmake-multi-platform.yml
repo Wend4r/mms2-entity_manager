@@ -24,16 +24,19 @@ jobs:
           - os: windows-latest
             preset: Windows/Release
             artifact_pattern: build/Release/Release/*
+            build_type: Release
             c_compiler: cl
             cpp_compiler: cl
           - os: ubuntu-latest
             preset: Release
             artifact_pattern: build/Release/*.so
+            build_type: Release
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
             preset: Release
             artifact_pattern: build/Release/*.so
+            build_type: Release
             c_compiler: clang
             cpp_compiler: clang++
         exclude:
@@ -78,7 +81,7 @@ jobs:
         -S ${{ github.workspace }}
 
     - name: Build
-      run: cmake --build --parallel --preset ${{ matrix.preset }}
+      run: cmake --build --config ${{ matrix.build_type }} ---parallel --preset ${{ matrix.preset }}
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
