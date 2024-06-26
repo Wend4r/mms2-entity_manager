@@ -5,6 +5,7 @@
 #include "provider/source2server.hpp"
 #include <logger.hpp>
 
+#include <ehandle.h> //FIXME: fix this one in https://github.com/Wend4r/hl2sdk/commits/cs2-entity_handle-get
 #include <tier0/dbg.h>
 #include <tier0/memalloc.h>
 #include <tier0/platform.h>
