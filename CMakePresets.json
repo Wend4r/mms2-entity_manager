@@ -58,6 +58,14 @@
 		{
 			"name": "Release",
 			"configurePreset": "Release"
+		},
+		{
+			"name": "Windows/Debug",
+			"configurePreset": "Windows/Debug"
+		},
+		{
+			"name": "Windows/Release",
+			"configurePreset": "Windows/Release"
 		}
 	]
 }
