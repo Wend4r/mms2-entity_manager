@@ -81,7 +81,7 @@ jobs:
         -S ${{ github.workspace }}
 
     - name: Build
-      run: cmake --build --config ${{ matrix.build_type }} ---parallel --preset ${{ matrix.preset }}
+      run: cmake --build ---parallel --preset ${{ matrix.preset }} --config ${{ matrix.build_type }}
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
