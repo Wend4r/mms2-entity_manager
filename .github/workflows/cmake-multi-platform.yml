@@ -83,7 +83,7 @@ jobs:
         -DMETAMOD_DIR=${{ env.MMSOURCE_ROOT }}
 
     - name: Build
-      run: cmake --build ---parallel --preset ${{ matrix.preset }} --config ${{ matrix.build_type }}
+      run: cmake --build --preset ${{ matrix.preset }} ---parallel --config ${{ matrix.build_type }}
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
