@@ -61,12 +61,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ninja-build
 
-    - name: Install latest cmake
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get remove -y cmake
-        sudo pip install --upgrade cmake
-
     - name: Checkout HL2SDK
       uses: actions/checkout@v4
       with:
