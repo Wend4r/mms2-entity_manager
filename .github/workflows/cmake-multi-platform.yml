@@ -19,16 +19,18 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        preset: [Release, Release, Windows/Release]
         c_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
+            preset: Windows/Release
             c_compiler: cl
             cpp_compiler: cl
           - os: ubuntu-latest
+            preset: Release
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
+            preset: Release
             c_compiler: clang
             cpp_compiler: clang++
         exclude:
