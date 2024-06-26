@@ -23,14 +23,17 @@ jobs:
         include:
           - os: windows-latest
             preset: Windows/Release
+            artifact_pattern: build/Release/Release/*
             c_compiler: cl
             cpp_compiler: cl
           - os: ubuntu-latest
             preset: Release
+            artifact_pattern: build/Release/*.so
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
             preset: Release
+            artifact_pattern: build/Release/*.so
             c_compiler: clang
             cpp_compiler: clang++
         exclude:
@@ -81,7 +84,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ runner.os }}-${{ matrix.c_compiler }}
-        path: |
-          build/*.a
-          build/*.so
-          build/${{ matrix.build_type }}/*
+        if: runner.os == 'Linux'
+        path: ${{ matrix.artifact_pattern }}
