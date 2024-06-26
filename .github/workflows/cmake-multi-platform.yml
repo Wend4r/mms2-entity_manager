@@ -70,7 +70,6 @@ jobs:
         cmake --preset ${{ matrix.preset }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DSOURCESDK_DIR=${{ env.HL2SDK_ROOT }}
         -DMETAMOD_DIR=${{ env.MMSOURCE_ROOT }}
         -S ${{ github.workspace }}
