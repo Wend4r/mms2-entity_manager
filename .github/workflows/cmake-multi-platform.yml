@@ -45,6 +45,12 @@ jobs:
       with:
         submodules: true
 
+    - name: Install dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build
+
     - name: Checkout HL2SDK
       uses: actions/checkout@v4
       with:
