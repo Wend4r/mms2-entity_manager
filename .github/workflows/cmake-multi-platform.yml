@@ -23,7 +23,7 @@ jobs:
         include:
           - os: windows-latest
             preset: Windows/Release
-            artifact_pattern: build/Release/Release/*
+            artifact_pattern: build/Windows/Release/Release/*
             build_type: Release
             c_compiler: cl
             cpp_compiler: cl
