@@ -13,7 +13,6 @@ on:
       - 'external/**.cpp'
       - 'external/**.h'
       - 'external/**.hpp'
-      - 'external/**/*.hpp'
   pull_request:
     branches: [ "main" ]
     paths:
@@ -25,7 +24,7 @@ on:
       - 'external/**.c'
       - 'external/**.cpp'
       - 'external/**.h'
-      - 'external/**.hpp
+      - 'external/**.hpp'
 
 env:
   HL2SDK_BRANCH: cs2
