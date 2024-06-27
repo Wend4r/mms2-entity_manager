@@ -2,9 +2,13 @@ name: Build on Linux
 
 on:
   push:
-    branches: [ "main" ]
+    paths:
+      - 'trigger-build.txt'
+      - '{external,src}/**.{c,cpp,h,hpp}'
   pull_request:
-    branches: [ "main" ]
+    paths:
+      - 'trigger-build.txt'
+      - '{external,src}/**.{c,cpp,h,hpp}'
 
 env:
   HL2SDK_BRANCH: cs2
