@@ -3,9 +3,20 @@ name: Build on Windows
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'trigger-build.txt'
+      - '**/*.c'
+      - '**/*.cpp'
+      - '**/*.h'
+      - '**/*.hpp'
   pull_request:
     branches: [ "main" ]
-
+    paths:
+      - 'trigger-build.txt'
+      - '**/*.c'
+      - '**/*.cpp'
+      - '**/*.h'
+      - '**/*.hpp'
 env:
   HL2SDK_BRANCH: cs2
   HL2SDK_ROOT: hl2sdk-cs2
