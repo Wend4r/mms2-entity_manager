@@ -4,19 +4,29 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'trigger-build.txt'
-      - '**/*.c'
-      - '**/*.cpp'
-      - '**/*.h'
-      - '**/*.hpp'
+      - 'trigger-build.txt':
+      - 'src/**.c'
+      - 'src/**.cpp'
+      - 'src/**.h'
+      - 'src/**.hpp'
+      - 'external/**.c'
+      - 'external/**.cpp'
+      - 'external/**.h'
+      - 'external/**.hpp'
+      - 'external/**/*.hpp'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'trigger-build.txt'
-      - '**/*.c'
-      - '**/*.cpp'
-      - '**/*.h'
-      - '**/*.hpp'
+      - 'trigger-build.txt':
+      - 'src/**.c'
+      - 'src/**.cpp'
+      - 'src/**.h'
+      - 'src/**.hpp'
+      - 'external/**.c'
+      - 'external/**.cpp'
+      - 'external/**.h'
+      - 'external/**.hpp
+
 env:
   HL2SDK_BRANCH: cs2
   HL2SDK_ROOT: hl2sdk-cs2
