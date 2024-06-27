@@ -4,25 +4,11 @@ on:
   push:
     paths:
       - 'trigger-build.txt'
-      - 'src/**.c'
-      - 'src/**.cpp'
-      - 'src/**.h'
-      - 'src/**.hpp'
-      - 'external/**.c'
-      - 'external/**.cpp'
-      - 'external/**.h'
-      - 'external/**.hpp'
+      - '{external,src}/**.{c,cpp,h,hpp}'
   pull_request:
     paths:
       - 'trigger-build.txt'
-      - 'src/**.c'
-      - 'src/**.cpp'
-      - 'src/**.h'
-      - 'src/**.hpp'
-      - 'external/**.c'
-      - 'external/**.cpp'
-      - 'external/**.h'
-      - 'external/**.hpp'
+      - '{external,src}/**.{c,cpp,h,hpp}'
 
 env:
   HL2SDK_BRANCH: cs2
