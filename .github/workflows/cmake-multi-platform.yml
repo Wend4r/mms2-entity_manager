@@ -8,12 +8,13 @@ on:
 
 env:
   HL2SDK_BRANCH: cs2
-  HL2SDK_ROOT: ${{ github.workspace }}/hl2sdk-cs2
-  MMSOURCE_ROOT: ${{ github.workspace }}/metamod-source
+  HL2SDK_ROOT: hl2sdk-cs2
+  MMSOURCE_ROOT: metamod-source
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
 
     strategy:
       fail-fast: false
@@ -28,12 +29,14 @@ jobs:
             c_compiler: cl
             cpp_compiler: cl
           - os: ubuntu-latest
+            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk
             preset: Release
             artifact_pattern: build/Release/*.so
             build_type: Release
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
+            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk
             preset: Release
             artifact_pattern: build/Release/*.so
             build_type: Release
@@ -52,11 +55,24 @@ jobs:
       with:
         submodules: true
 
-    - name: Install dependencies
+    - name: Install dependencies (Linux)
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install -y ninja-build
+
+    - name: Get absolute path (Linux)
+      if: runner.os == 'Linux'
+      id: get_path-linux
+      run: echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV
+
+    - name: Get absolute path (Windows)
+      id: get_path-windows
+      if: runner.os == 'Windows'
+      run: |
+        $path = (Get-Location).Path
+        echo "ABSOLUTE_PATH=$path" >> $env:GITHUB_ENV
+      shell: pwsh
 
     - name: Checkout HL2SDK
       uses: actions/checkout@v4
@@ -76,12 +92,11 @@ jobs:
         cmake --preset ${{ matrix.preset }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DSOURCESDK_DIR=${{ env.HL2SDK_ROOT }}
-        -DMETAMOD_DIR=${{ env.MMSOURCE_ROOT }}
-        -S ${{ github.workspace }}
+        -DSOURCESDK_DIR=${{ env.ABSOLUTE_PATH }}/${{ env.HL2SDK_ROOT }}
+        -DMETAMOD_DIR=${{ env.ABSOLUTE_PATH }}/${{ env.MMSOURCE_ROOT }}
 
     - name: Build
-      run: cmake --build ---parallel --preset ${{ matrix.preset }} --config ${{ matrix.build_type }}
+      run: cmake --build --preset ${{ matrix.preset }} --parallel --config ${{ matrix.build_type }}
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
