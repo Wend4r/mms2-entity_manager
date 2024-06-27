@@ -23,6 +23,7 @@ jobs:
         c_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
+            container: mcr.microsoft.com/windows/servercore:ltsc2022
             preset: Windows/Release
             artifact_pattern: build/Windows/Release/Release/*
             build_type: Release
@@ -55,16 +56,24 @@ jobs:
       with:
         submodules: true
 
-    - name: Install dependencies
+    - name: Install dependencies (Linux)
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install -y ninja-build
 
-    - name: Get absolute path
+    - name: Get absolute path (Linux)
       if: runner.os == 'Linux'
-      id: get-path
+      id: get_path-linux
       run: echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV
+
+    - name: Get absolute path (Windows)
+      id: get_path-windows
+      if: runner.os == 'Windows'
+      run: |
+        $path = (Get-Location).Path
+        echo "ABSOLUTE_PATH=$path" >> $env:GITHUB_ENV
+      shell: pwsh
 
     - name: Checkout HL2SDK
       uses: actions/checkout@v4
