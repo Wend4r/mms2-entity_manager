@@ -2,7 +2,6 @@ name: Build on Windows
 
 on:
   push:
-    branches: [ "main" ]
     paths:
       - 'trigger-build.txt'
       - 'src/**.c'
@@ -14,7 +13,6 @@ on:
       - 'external/**.h'
       - 'external/**.hpp'
   pull_request:
-    branches: [ "main" ]
     paths:
       - 'trigger-build.txt'
       - 'src/**.c'
