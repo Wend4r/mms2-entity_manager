@@ -1,0 +1,84 @@
+name: Build on Linux
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  HL2SDK_BRANCH: cs2
+  HL2SDK_ROOT: hl2sdk-cs2
+  MMSOURCE_ROOT: metamod-source
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        c_compiler: [gcc, clang]
+        include:
+          - os: ubuntu-latest
+            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk
+            preset: Release
+            artifact_pattern: build/Release/*.so
+            build_type: Release
+            c_compiler: gcc
+            cpp_compiler: g++
+          - os: ubuntu-latest
+            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk
+            preset: Release
+            artifact_pattern: build/Release/*.so
+            build_type: Release
+            c_compiler: clang
+            cpp_compiler: clang++
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build
+
+    - name: Get absolute path (Linux)
+      if: runner.os == 'Linux'
+      id: get_path-linux
+      run: echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV
+
+    - name: Checkout HL2SDK
+      uses: actions/checkout@v4
+      with:
+        repository: Wend4r/hl2sdk
+        ref: ${{ env.HL2SDK_BRANCH }}
+        path: ${{ env.HL2SDK_ROOT }}
+
+    - name: Checkout MetaMod:Source
+      uses: actions/checkout@v4
+      with:
+        repository: alliedmodders/metamod-source
+        path: ${{ env.MMSOURCE_ROOT }}
+
+    - name: Configure CMake
+      run: >
+        cmake --preset ${{ matrix.preset }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DSOURCESDK_DIR=${{ env.ABSOLUTE_PATH }}/${{ env.HL2SDK_ROOT }}
+        -DMETAMOD_DIR=${{ env.ABSOLUTE_PATH }}/${{ env.MMSOURCE_ROOT }}
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.preset }} --parallel --config ${{ matrix.build_type }}
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ runner.os }}-${{ matrix.c_compiler }}
+        path: ${{ matrix.artifact_pattern }}
