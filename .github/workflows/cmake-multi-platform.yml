@@ -61,6 +61,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ninja-build
 
+    - name: Get absolute path
+      if: runner.os == 'Linux'
+      id: get-path
+      run: echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV
+
     - name: Checkout HL2SDK
       uses: actions/checkout@v4
       with:
@@ -79,8 +84,8 @@ jobs:
         cmake --preset ${{ matrix.preset }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DSOURCESDK_DIR=${{ env.HL2SDK_ROOT }}
-        -DMETAMOD_DIR=${{ env.MMSOURCE_ROOT }}
+        -DSOURCESDK_DIR=${{ env.ABSOLUTE_PATH }}/${{ env.HL2SDK_ROOT }}
+        -DMETAMOD_DIR=${{ env.ABSOLUTE_PATH }}/${{ env.MMSOURCE_ROOT }}
 
     - name: Build
       run: cmake --build --preset ${{ matrix.preset }} ---parallel --config ${{ matrix.build_type }}
