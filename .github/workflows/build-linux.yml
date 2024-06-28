@@ -66,7 +66,7 @@ jobs:
         repository: alliedmodders/metamod-source
         path: ${{ env.MMSOURCE_ROOT }}
 
-    - name: Configure CMake (Debug, Clang)
+    - name: Debug - Configure CMake (Clang)
       run: >
         cmake --preset ${{ env.CMAKE_DEBUG_PRESET_NAME }}
         -DCMAKE_C_COMPILER=${{ env.CLANG_CC }}
@@ -74,10 +74,17 @@ jobs:
         -DSOURCESDK_DIR=${{ env.ABSOLUTE_PATH }}/${{ env.HL2SDK_ROOT }}
         -DMETAMOD_DIR=${{ env.ABSOLUTE_PATH }}/${{ env.MMSOURCE_ROOT }}
 
-    - name: Build (Debug)
+    - name: Debug - Build
       run: cmake --build --preset ${{ env.CMAKE_DEBUG_PRESET_NAME }} --parallel --config ${{ env.CMAKE_RELEASE_CONFIG_NAME }}
 
-    - name: Configure CMake (Release, Clang)
+    - name: Debug - Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.REPOSITORY_NAME }}-${{ env.CMAKE_DEBUG_PRESET_NAME }}
+        path: |
+          ${{ env.CMAKE_DEBUG_OUTPUT_PATTERN }}
+
+    - name: Release - Configure CMake (Clang)
       run: >
         cmake --preset ${{ env.CMAKE_RELEASE_PRESET_NAME }}
         -DCMAKE_C_COMPILER=${{ env.CLANG_CC }}
@@ -85,19 +92,12 @@ jobs:
         -DSOURCESDK_DIR=${{ env.ABSOLUTE_PATH }}/${{ env.HL2SDK_ROOT }}
         -DMETAMOD_DIR=${{ env.ABSOLUTE_PATH }}/${{ env.MMSOURCE_ROOT }}
 
-    - name: Build (Release)
+    - name: Release - Build
       run: cmake --build --preset ${{ env.CMAKE_RELEASE_PRESET_NAME }} --parallel --config ${{ env.CMAKE_RELEASE_CONFIG_NAME }}
 
-    - name: Upload build artifact (${{ env.CMAKE_DEBUG_PRESET_NAME }})
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.REPOSITORY_NAME }}-${{ env.CMAKE_DEBUG_PRESET_NAME }}
-        path: |
-          ${{ env.CMAKE_DEBUG_OUTPUT_PATTERN }}
-
-    - name: Upload build artifact (${{ env.CMAKE_RELEASE_PRESET_NAME }})
+    - name: Release - Upload build artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.REPOSITORY_NAME }}-${{ env.CMAKE_RELEASE_PRESET_NAME }}
         path: |
-          ${{ env.CMAKE_RELEASE_OUTPUT_PATTERN }}
+          ${{ env.CMAKE_DEBUG_OUTPUT_PATTERN }}
