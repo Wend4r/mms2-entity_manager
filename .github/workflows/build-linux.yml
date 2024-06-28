@@ -49,6 +49,7 @@ jobs:
       run: |
         echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV
         echo "REPOSITORY_NAME=$(basename ${GITHUB_REPOSITORY})" >> $GITHUB_ENV
+        echo "LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)" >> $GITHUB_ENV
 
     - name: Checkout HL2SDK
       uses: actions/checkout@v4
@@ -77,7 +78,7 @@ jobs:
     - name: Debug - Upload build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.REPOSITORY_NAME }}-${{ env.CMAKE_DEBUG_PRESET_NAME }}
+        name: ${{ env.REPOSITORY_NAME }}-${{ env.LATEST_TAG }}-${{ env.CMAKE_DEBUG_PRESET_NAME }}
         path: |
           ${{ env.CMAKE_DEBUG_OUTPUT_PATTERN }}
 
@@ -95,6 +96,6 @@ jobs:
     - name: Release - Upload build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.REPOSITORY_NAME }}-${{ env.CMAKE_RELEASE_PRESET_NAME }}
+        name: ${{ env.REPOSITORY_NAME }}-${{ env.LATEST_TAG }}-${{ env.CMAKE_RELEASE_PRESET_NAME }}
         path: |
           ${{ env.CMAKE_RELEASE_OUTPUT_PATTERN }}
