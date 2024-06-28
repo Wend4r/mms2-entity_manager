@@ -14,8 +14,8 @@ on:
 
 env:
   HL2SDK_BRANCH: cs2
-  HL2SDK_ROOT: hl2sdk-cs2
-  MMSOURCE_ROOT: metamod-source
+  HL2SDK_ROOT: external\hl2sdk-cs2
+  MMSOURCE_ROOT: external\metamod-source
 
 jobs:
   build:
