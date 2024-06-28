@@ -3,12 +3,14 @@ name: Build on Linux
 on:
   push:
     paths:
-      - 'trigger-build.txt'
+      - '.github/workflows/**.yml'
       - '{external,src}/**.{c,cpp,h,hpp}'
+      - 'trigger-build.txt'
   pull_request:
     paths:
-      - 'trigger-build.txt'
+      - '.github/workflows/**.yml'
       - '{external,src}/**.{c,cpp,h,hpp}'
+      - 'trigger-build.txt'
 
 env:
   HL2SDK_BRANCH: cs2
