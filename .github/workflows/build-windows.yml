@@ -66,8 +66,8 @@ jobs:
         cmake --preset ${{ matrix.preset }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DSOURCESDK_DIR=${{ env.ABSOLUTE_PATH }}$\{{ env.HL2SDK_ROOT }}
-        -DMETAMOD_DIR=${{ env.ABSOLUTE_PATH }}\${{ env.MMSOURCE_ROOT }}
+        -DSOURCESDK_DIR=${{ env.ABSOLUTE_PATH }}$\\{{ env.HL2SDK_ROOT }}
+        -DMETAMOD_DIR=${{ env.ABSOLUTE_PATH }}\\${{ env.MMSOURCE_ROOT }}
 
     - name: Build
       run: cmake --build --preset ${{ matrix.preset }} --parallel --config ${{ matrix.build_type }}
