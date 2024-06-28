@@ -48,7 +48,7 @@ jobs:
     - name: Get absolute path
       run: > 
         echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV && 
-        echo "REPOSITORY_NAME=$(basename "${{ github.repository }}")" >> $GITHUB_ENV
+        echo "REPOSITORY_NAME=$(basename '${{ github.repository }}')" >> $GITHUB_ENV
 
     - name: Checkout HL2SDK
       uses: actions/checkout@v4
