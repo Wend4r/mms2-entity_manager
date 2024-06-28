@@ -46,9 +46,9 @@ jobs:
         sudo apt-get install -y ninja-build
 
     - name: Get absolute path
-      run: > 
-        echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV && 
-        echo "REPOSITORY_NAME=$(basename '${{ github.repository }}')" >> $GITHUB_ENV
+      run: |
+        echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV
+        echo "REPOSITORY_NAME=$(basename ${GITHUB_REPOSITORY})" >> $GITHUB_ENV
 
     - name: Checkout HL2SDK
       uses: actions/checkout@v4
