@@ -50,13 +50,13 @@ jobs:
       with:
         submodules: true
 
-    - name: Install dependencies (Linux)
+    - name: Install dependencies
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install -y ninja-build
 
-    - name: Get absolute path (Linux)
+    - name: Get absolute path
       if: runner.os == 'Linux'
       id: get_path-linux
       run: echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV

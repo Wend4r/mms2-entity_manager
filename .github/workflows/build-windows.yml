@@ -40,7 +40,7 @@ jobs:
       with:
         submodules: true
 
-    - name: Get absolute path (Windows)
+    - name: Get absolute path
       id: get_path-windows
       if: runner.os == 'Windows'
       run: |
