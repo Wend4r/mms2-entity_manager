@@ -15,7 +15,6 @@ on:
       - 'trigger-build.txt'
 
 env:
-  DOCKER_IMAGE_NAME: registry.gitlab.steamos.cloud/steamrt/sniper/sdk
   CMAKE_DEBUG_PRESET_NAME: Debug
   CMAKE_DEBUG_CONFIG_NAME: Debug
   CMAKE_DEBUG_OUTPUT_PATTERN: build/Debug/*.so
@@ -31,7 +30,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ${{ env.DOCKER_IMAGE_NAME }}
+    container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk
 
     strategy:
       fail-fast: false
