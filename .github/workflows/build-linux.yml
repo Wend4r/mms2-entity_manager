@@ -97,4 +97,4 @@ jobs:
       with:
         name: ${{ env.REPOSITORY_NAME }}-${{ env.CMAKE_RELEASE_PRESET_NAME }}
         path: |
-          ${{ env.CMAKE_DEBUG_OUTPUT_PATTERN }}
+          ${{ env.CMAKE_RELEASE_PRESET_NAME }}
