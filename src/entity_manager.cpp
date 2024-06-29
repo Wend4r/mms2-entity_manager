@@ -247,15 +247,6 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 				});
 			}
 		}
-
-		{
-			char sHookError[256];
-
-			if(!this->HookEvents((char *)sHookError, sizeof(sHookError)))
-			{
-				this->m_aLogger.WarningFormat("Failed to hook an events: %s\n", sHookError);
-			}
-		}
 	}
 
 	return true;
@@ -639,15 +630,6 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 	else
 	{
 		this->m_aLogger.Warning("Failed to get a net server\n");
-	}
-
-	{
-		char sHookError[256];
-
-		if(!this->HookEvents((char *)sHookError, sizeof(sHookError)))
-		{
-			this->m_aLogger.WarningFormat("Failed to hook an events: %s\n", sHookError);
-		}
 	}
 }
 
