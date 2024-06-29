@@ -37,12 +37,26 @@ jobs:
       with:
         submodules: true
 
-    - name: Get absolute path
-      id: get_path-windows
-      if: runner.os == 'Windows'
+    - name: Set up environment variables
       run: |
-        $path = (Get-Location).Path
-        echo "ABSOLUTE_PATH=$path" >> $env:GITHUB_ENV
+        echo "REPOSITORY_NAME=$(basename ${env:GITHUB_REPOSITORY})" | Out-File -FilePath $env:GITHUB_ENV -Append
+        echo "ABSOLUTE_PATH=${env:GITHUB_WORKSPACE}" | Out-File -FilePath $env:GITHUB_ENV -Append
+      shell: pwsh
+
+    - name: Configure Git to treat current directory as safe
+      run: git config --global --add safe.directory $env:GITHUB_WORKSPACE
+      shell: pwsh
+
+    - name: Get latest tag
+      id: get-latest-tag
+      run: |
+        if ((git tag) -eq $null) {
+          echo "No tags found"
+          echo "LATEST_TAG=none" | Out-File -FilePath $env:GITHUB_ENV -Append
+        } else {
+          $LATEST_TAG = git describe --tags (git rev-list --tags --max-count=1)
+          echo "LATEST_TAG=$LATEST_TAG" | Out-File -FilePath $env:GITHUB_ENV -Append
+        }
       shell: pwsh
 
     - name: Checkout HL2SDK
@@ -72,5 +86,5 @@ jobs:
     - name: Release - Upload build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ runner.os }}-${{ env.CMAKE_RELEASE_PRESET_PUBLIC_NAME }}
+        name: ${{ env.REPOSITORY_NAME }}-${{ env.LATEST_TAG }}-${{ env.CMAKE_RELEASE_PRESET_PUBLIC_NAME }}
         path: ${{ env.CMAKE_RELEASE_OUTPUT_PATTERN }}
