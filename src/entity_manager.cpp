@@ -19,8 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// Hello, GitHub Actions
-
 #include <stdio.h>
 #include <string>
 #include <functional>
