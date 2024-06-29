@@ -15,27 +15,21 @@ on:
       - 'trigger-build.txt'
 
 env:
+  CMAKE_RELEASE_PRESET_NAME: Release
+  CMAKE_RELEASE_CONFIG_NAME: Release
+  CMAKE_RELEASE_OUTPUT_PATTERN: build/Windows/Release/Release/*
+  CL_CC: cl
+  CL_CXX: cl
   HL2SDK_BRANCH: cs2
   HL2SDK_ROOT: external\hl2sdk-cs2
   MMSOURCE_ROOT: external\metamod-source
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
+    runs-on: windows-latest
 
     strategy:
       fail-fast: false
-      matrix:
-        os: [windows-latest]
-        c_compiler: [cl]
-        include:
-          - os: windows-latest
-            preset: Windows/Release
-            artifact_pattern: build/Windows/Release/Release/*
-            build_type: Release
-            c_compiler: cl
-            cpp_compiler: cl
 
     steps:
     - uses: actions/checkout@v4
@@ -63,19 +57,19 @@ jobs:
         repository: alliedmodders/metamod-source
         path: ${{ env.MMSOURCE_ROOT }}
 
-    - name: Configure CMake
+    - name: Release - Configure CMake
       run: >
-        cmake --preset ${{ matrix.preset }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        cmake --preset ${{ env.CMAKE_RELEASE_PRESET_NAME }}
+        -DCMAKE_C_COMPILER=${{ env.CL_CC }}
+        -DCMAKE_CXX_COMPILER=${{ env.CL_CXX }}
         -DSOURCESDK_DIR=${{ env.ABSOLUTE_PATH }}\${{ env.HL2SDK_ROOT }}
         -DMETAMOD_DIR=${{ env.ABSOLUTE_PATH }}\${{ env.MMSOURCE_ROOT }}
 
-    - name: Build
-      run: cmake --build --preset ${{ matrix.preset }} --parallel --config ${{ matrix.build_type }}
+    - name: Release - Build
+      run: cmake --build --preset ${{ env.CMAKE_RELEASE_PRESET_NAME }} --parallel --config ${{ env.CMAKE_RELEASE_CONFIG_NAME }}
 
-    - name: Upload build artifact
+    - name: Release - Upload build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ runner.os }}-${{ matrix.c_compiler }}
-        path: ${{ matrix.artifact_pattern }}
+        name: ${{ runner.os }}-${{ env.CMAKE_RELEASE_PRESET_NAME }}
+        path: ${{ env.CMAKE_RELEASE_OUTPUT_PATTERN }}
