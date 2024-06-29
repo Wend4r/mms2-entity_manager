@@ -46,7 +46,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ninja-build
 
-    - name: Get absolute path
+    - name: Set up environment variables
       run: |
         echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV
         echo "REPOSITORY_NAME=$(basename ${GITHUB_REPOSITORY})" >> $GITHUB_ENV
