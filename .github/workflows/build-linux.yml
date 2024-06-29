@@ -51,9 +51,11 @@ jobs:
         echo "ABSOLUTE_PATH=$(pwd)" >> $GITHUB_ENV
         echo "REPOSITORY_NAME=$(basename ${GITHUB_REPOSITORY})" >> $GITHUB_ENV
 
+    - name: Configure Git to treat current directory as safe
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
     - name: Get latest tag
       run: |
-        git config --global --add safe.directory "${{ env.ABSOLUTE_PATH }}"
         LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
         echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
