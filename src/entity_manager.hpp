@@ -84,6 +84,7 @@ private: // Commands.
 
 public: // SourceHooks.
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *);
+	int OnLoadEventsFromFileHook(const char *pszFilename, bool bSearchAll);
 	void OnEntitySystemSpawnHook(int iCount, const EntitySpawnInfo_t *pInfo);
 	void OnEntitySystemUpdateOnRemoveHook(int iCount, const EntityDeletion_t *pInfo);
 	void OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
@@ -149,6 +150,8 @@ private:
 
 	EntityManager::Settings m_aSettings;
 	Logger m_aLogger;
+
+	int m_iLoadEventsFromFileId;
 };
 
 DLL_IMPORT EntityManagerPlugin *g_pEntityManager;

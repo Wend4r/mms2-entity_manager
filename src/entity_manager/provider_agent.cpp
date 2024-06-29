@@ -16,10 +16,10 @@
 DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 
 DLL_IMPORT IServerGameDLL *server;
+DLL_IMPORT IGameEventManager2 *gameeventmanager;
 
 DLL_EXPORT CEntitySystem *g_pEntitySystem = NULL;
 DLL_EXPORT CGameEntitySystem *g_pGameEntitySystem = NULL;
-DLL_EXPORT IGameEventManager2 *g_pGameEventManager = NULL;
 DLL_EXPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
 class CDefOpsStringBinaryBlock
@@ -78,7 +78,7 @@ bool EntityManager::ProviderAgent::NotifyEntitySystemUpdated()
 
 bool EntityManager::ProviderAgent::NotifyGameEventsUpdated()
 {
-	return (g_pGameEventManager = (((CSource2ServerProvider *)server)->GetGameEventManager())) != NULL;
+	return true;
 }
 
 bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()

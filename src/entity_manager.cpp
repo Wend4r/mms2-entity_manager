@@ -51,6 +51,7 @@ class GameSessionConfiguration_t { };
 
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 SH_DECL_HOOK3_void(INetworkServerService, StartupServer, SH_NOATTRIB, 0, const GameSessionConfiguration_t &, ISource2WorldSession *, const char *);
+SH_DECL_HOOK2(IGameEventManager2, LoadEventsFromFile, SH_NOATTRIB, 0, int, const char *, bool);
 
 SH_DECL_HOOK2_void(CGameEntitySystem, Spawn, SH_NOATTRIB, 0, int, const EntitySpawnInfo_t *);
 SH_DECL_HOOK2_void(CGameEntitySystem, UpdateOnRemove, SH_NOATTRIB, 0, int, const EntityDeletion_t *);
@@ -73,9 +74,9 @@ DLL_EXPORT IVEngineServer *engine = NULL;
 DLL_EXPORT ICvar *icvar = NULL;
 DLL_EXPORT IFileSystem *filesystem = NULL;
 DLL_EXPORT IServerGameDLL *server = NULL;
+DLL_EXPORT IGameEventManager2 *gameeventmanager = NULL;
 
 DLL_IMPORT CGameEntitySystem *g_pGameEntitySystem;
-DLL_IMPORT IGameEventManager2 *g_pGameEventManager;
 DLL_IMPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
@@ -123,6 +124,12 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 	META_CONPRINTF( "Starting %s plugin.\n", this->GetName());
 
 	SH_ADD_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManagerPlugin::OnStartupServerHook, true);
+
+	{
+		auto *pCGameEventManagerVTable = reinterpret_cast<IGameEventManager2 *>((void *)DynLibUtils::CModule(server).GetVirtualTableByName("CGameEventManager"));
+
+		this->m_iLoadEventsFromFileId = SH_ADD_DVPHOOK(IGameEventManager2, LoadEventsFromFile, pCGameEventManagerVTable, SH_MEMBER(this, &EntityManagerPlugin::OnLoadEventsFromFileHook), false);
+	}
 
 	META_CONPRINTF( "All hooks started!\n" );
 
@@ -642,6 +649,23 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 	}
 }
 
+
+int EntityManagerPlugin::OnLoadEventsFromFileHook(const char *pszFilename, bool bSearchAll)
+{
+	ExecuteOnce(gameeventmanager = META_IFACEPTR(IGameEventManager2));
+
+	{
+		char sError[256];
+
+		if(!this->HookEvents((char *)sError, sizeof(sError)))
+		{
+			this->m_aLogger.WarningFormat("Failed to hook events: %s", sError);
+		}
+	}
+
+	RETURN_META_VALUE(MRES_IGNORED, 0);
+}
+
 void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnInfo_t *pInfo)
 {
 	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnEntitySystemSpawnHook(%d, %p)\n", iCount, pInfo);
@@ -883,7 +907,7 @@ bool EntityManagerPlugin::BaseEvent::Init(char *psError, size_t nMaxLength)
 {
 	const char *pszMyName = this->GetName();
 
-	bool bResult = g_pGameEventManager->AddListener(this, pszMyName, true);
+	bool bResult = gameeventmanager->AddListener(this, pszMyName, true);
 
 	if(!bResult)
 	{
@@ -895,7 +919,7 @@ bool EntityManagerPlugin::BaseEvent::Init(char *psError, size_t nMaxLength)
 
 void EntityManagerPlugin::BaseEvent::Destroy()
 {
-	g_pGameEventManager->RemoveListener(this);
+	gameeventmanager->RemoveListener(this);
 }
 
 const char *EntityManagerPlugin::BaseEvent::GetName()
