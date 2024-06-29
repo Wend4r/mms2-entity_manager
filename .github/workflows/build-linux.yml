@@ -72,12 +72,14 @@ jobs:
       with:
         repository: Wend4r/hl2sdk
         ref: ${{ env.HL2SDK_BRANCH }}
+        fetch-depth: 1
         path: ${{ env.HL2SDK_ROOT }}
 
     - name: Checkout MetaMod:Source
       uses: actions/checkout@v4
       with:
         repository: alliedmodders/metamod-source
+        fetch-depth: 1
         path: ${{ env.MMSOURCE_ROOT }}
 
     - name: Debug - Configure CMake (Clang)
