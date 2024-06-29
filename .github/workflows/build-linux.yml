@@ -55,9 +55,15 @@ jobs:
       run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
     - name: Get latest tag
+      id: get-latest-tag
       run: |
-        LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-        echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+        if [ -z "$(git tag)" ]; then
+          echo "No tags found"
+          echo "LATEST_TAG=none" >> $GITHUB_ENV
+        else
+          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+        fi
 
     - name: Checkout HL2SDK
       uses: actions/checkout@v4
