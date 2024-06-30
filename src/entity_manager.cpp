@@ -256,7 +256,10 @@ bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 {
 	this->DestroyMyEntities();
 
-	this->UnhookEvents();
+	if(gameeventmanager)
+	{
+		this->UnhookEvents();
+	}
 
 	SH_REMOVE_HOOK_ID(this->m_iLoadEventsFromFileId);
 
