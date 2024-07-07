@@ -646,7 +646,7 @@ int EntityManagerPlugin::OnLoadEventsFromFileHook(const char *pszFilename, bool 
 
 		if(!this->HookEvents((char *)sError, sizeof(sError)))
 		{
-			this->m_aLogger.WarningFormat("Failed to hook events: %s", sError);
+			this->m_aLogger.WarningFormat("Failed to hook events: %s\n", sError);
 		}
 	}
 
