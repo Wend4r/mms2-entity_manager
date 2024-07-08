@@ -1,5 +1,5 @@
 #include "gamesystem.hpp"
-#include "provider.hpp"
+#include <provider.hpp>
 
 DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 
