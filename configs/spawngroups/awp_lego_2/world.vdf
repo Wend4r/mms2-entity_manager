@@ -1,0 +1,46 @@
+"World"
+{
+	"entity"
+	{
+		"classname" "prop_dynamic_override"
+
+		"origin" "-67.5 65 -307"
+		"angles" "0 180 0"
+
+		"model" "models/props/de_nuke/hr_nuke/chainlink_fence_001/chainlink_fence_001_32.vmdl"
+		"solid" "6"
+	}
+
+	"entity"
+	{
+		"classname" "prop_dynamic_override"
+
+		"origin" "-67.5 -35 -307"
+		"angles" "0 0 0"
+
+		"model" "models/props/de_nuke/hr_nuke/chainlink_fence_001/chainlink_fence_001_64_capped.vmdl"
+		"solid" "6"
+	}
+
+	"entity"
+	{
+		"classname" "prop_dynamic_override"
+
+		"origin" "67.5 -67.125 -307.5"
+		"angles" "0 0 0"
+
+		"model" "models/props/de_nuke/hr_nuke/chainlink_fence_001/chainlink_fence_001_32.vmdl"
+		"solid" "6"
+	}
+
+	"entity"
+	{
+		"classname" "prop_dynamic_override"
+
+		"origin" "67.5 -33 -307.5"
+		"angles" "0 0 0"
+
+		"model" "models/props/de_nuke/hr_nuke/chainlink_fence_001/chainlink_fence_001_64_capped.vmdl"
+		"solid" "6"
+	}
+}
