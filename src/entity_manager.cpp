@@ -987,42 +987,42 @@ bool EntityManagerPlugin::Unpause(char *error, size_t maxlen)
 	return true;
 }
 
-const char *EntityManagerPlugin::GetLicense()
-{
-	return "Public Domain";
-}
-
-const char *EntityManagerPlugin::GetVersion()
-{
-	return "1.0.0";
-}
-
-const char *EntityManagerPlugin::GetDate()
-{
-	return __DATE__;
-}
-
-const char *EntityManagerPlugin::GetLogTag()
-{
-	return "ENTITY_MANAGER";
-}
-
 const char *EntityManagerPlugin::GetAuthor()
 {
-	return "Wend4r";
-}
-
-const char *EntityManagerPlugin::GetDescription()
-{
-	return "Plugin to manage a entities";
+	return META_PLUGIN_AUTHOR;
 }
 
 const char *EntityManagerPlugin::GetName()
 {
-	return "Entity Manager";
+	return META_PLUGIN_NAME;
+}
+
+const char *EntityManagerPlugin::GetDescription()
+{
+	return META_PLUGIN_DESCRIPTION;
 }
 
 const char *EntityManagerPlugin::GetURL()
 {
-	return "https://github.com/mms-entity_manager";
+	return META_PLUGIN_URL;
+}
+
+const char *EntityManagerPlugin::GetLicense()
+{
+	return META_PLUGIN_LICENSE;
+}
+
+const char *EntityManagerPlugin::GetVersion()
+{
+	return META_PLUGIN_VERSION;
+}
+
+const char *EntityManagerPlugin::GetDate()
+{
+	return META_PLUGIN_DATE;
+}
+
+const char *EntityManagerPlugin::GetLogTag()
+{
+	return META_PLUGIN_LOG_TAG;
 }
