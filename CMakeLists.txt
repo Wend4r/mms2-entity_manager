@@ -5,7 +5,7 @@ if(POLICY CMP0092)
 endif()
 
 
-project(entitymgr
+project(entity_manager
 	VERSION 1.0.0
 	DESCRIPTION "Entity Manager"
 	HOMEPAGE_URL "https://github.com/Wend4r/mms-entity_manager"
@@ -50,22 +50,22 @@ include("cmake/metamod.cmake")
 include("cmake/sourcesdk.cmake")
 
 set(SOURCE_FILES
-	${SOURCE_DIR}/entity_manager/provider_agent/resourcemanifest.cpp
-	${SOURCE_DIR}/entity_manager/provider_agent/spawngroup.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamedata/entitysystem.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamedata/gameresource.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamedata/gamesystem.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamedata/source2server.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamedata/spawngroup.cpp
-	${SOURCE_DIR}/entity_manager/provider/entitysystem.cpp
-	${SOURCE_DIR}/entity_manager/provider/gameresource.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamesystem.cpp
-	${SOURCE_DIR}/entity_manager/provider/source2server.cpp
-	${SOURCE_DIR}/entity_manager/provider/spawngroup.cpp
-	${SOURCE_DIR}/entity_manager/provider_agent.cpp
-	${SOURCE_DIR}/entity_manager/provider.cpp
-	${SOURCE_DIR}/entity_manager/settings.cpp
-	${SOURCE_DIR}/entity_manager.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent/resourcemanifest.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent/spawngroup.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/entitysystem.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/gameresource.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/gamesystem.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/source2server.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/spawngroup.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/entitysystem.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gameresource.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamesystem.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/source2server.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/spawngroup.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/settings.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCESDK_SOURCE_FILES} ${SOURCE_FILES})
