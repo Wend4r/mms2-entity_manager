@@ -10,6 +10,7 @@
 #define GAMECONFIG_FOLDER_DIR "gamedata"
 #define GAMECONFIG_ENTITYSYSTEM_FILENAME "entitysystem.games.txt"
 #define GAMECONFIG_GAMERESOURCE_FILENAME "gameresource.games.txt"
+#define GAMECONFIG_GAMESYSTEM_FILENAME "gamesystem.games.txt"
 #define GAMECONFIG_SOURCE2SERVER_FILENAME "source2server.games.txt"
 #define GAMECONFIG_SPAWNGROUP_FILENAME "spawngroup.games.txt"
 
@@ -89,6 +90,10 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 			&GameDataStorage::LoadGameResource
 		},
 		{
+			GAMECONFIG_GAMESYSTEM_FILENAME,
+			&GameDataStorage::LoadGameSystem
+		},
+		{
 			GAMECONFIG_SOURCE2SERVER_FILENAME,
 			&GameDataStorage::LoadSource2Server
 		},
@@ -140,6 +145,11 @@ bool EntityManager::Provider::GameDataStorage::LoadGameResource(IGameData *pRoot
 	return this->m_aGameResource.Load(pRoot, pGameConfig, psError, nMaxLength);
 }
 
+bool EntityManager::Provider::GameDataStorage::LoadGameSystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+{
+	return this->m_aGameSystem.Load(pRoot, pGameConfig, psError, nMaxLength);
+}
+
 bool EntityManager::Provider::GameDataStorage::LoadSource2Server(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
 {
 	return this->m_aSource2Server.Load(pRoot, pGameConfig, psError, nMaxLength);
@@ -158,6 +168,11 @@ const EntityManager::Provider::GameDataStorage::EntitySystem &EntityManager::Pro
 const EntityManager::Provider::GameDataStorage::GameResource &EntityManager::Provider::GameDataStorage::GetGameResource() const
 {
 	return this->m_aGameResource;
+}
+
+const EntityManager::Provider::GameDataStorage::GameSystem &EntityManager::Provider::GameDataStorage::GetGameSystem() const
+{
+	return this->m_aGameSystem;
 }
 
 const EntityManager::Provider::GameDataStorage::Source2Server &EntityManager::Provider::GameDataStorage::GetSource2Server() const

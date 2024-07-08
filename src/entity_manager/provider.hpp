@@ -15,6 +15,7 @@
 #include "gamedata.hpp"
 
 class CSpawnGroupMgrGameSystem;
+class CBaseGameSystemFactory;
 
 namespace EntityManager
 {
@@ -37,6 +38,7 @@ namespace EntityManager
 		protected:
 			bool LoadEntitySystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadGameResource(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+			bool LoadGameSystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadSource2Server(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 			bool LoadEntitySpawnGroup(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
 
@@ -119,6 +121,31 @@ namespace EntityManager
 				ptrdiff_t m_nEntityManifestVFTableOffset = -1;
 			};
 
+			class GameSystem
+			{
+			public:
+				GameSystem();
+
+			public:
+				bool Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+				void Reset();
+
+			public:
+				typedef CBaseGameSystemFactory **(*OnGameSystemInitPtr)();
+
+				CBaseGameSystemFactory **GetBaseGameSystemFactoryFirst() const;
+				OnGameSystemInitPtr GameSystemInitFunction() const;
+
+			private:
+				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
+				// GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
+				GameData::Config m_aGameConfig;
+
+			private: // Addresses.
+				CBaseGameSystemFactory **m_pBaseGameSystemFactoryFirst = nullptr;
+				OnGameSystemInitPtr m_pfnGameSystemInit = nullptr;
+			};
+
 			class Source2Server
 			{
 			public:
@@ -169,12 +196,14 @@ namespace EntityManager
 
 			const EntitySystem &GetEntitySystem() const;
 			const GameResource &GetGameResource() const;
+			const GameSystem &GetGameSystem() const;
 			const Source2Server &GetSource2Server() const;
 			const SpawnGroup &GetSpawnGroup() const;
 
 		private:
 			EntitySystem m_aEntitySystem;
 			GameResource m_aGameResource;
+			GameSystem m_aGameSystem;
 			Source2Server m_aSource2Server;
 			SpawnGroup m_aSpawnGroup;
 		};

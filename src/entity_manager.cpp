@@ -26,6 +26,7 @@
 
 // Game SDK.
 #include <eiface.h>
+#include <igamesystemfactory.h>
 #include <iserver.h>
 #include <entity2/entitysystem.h>
 #include <gamesystems/spawngroup_manager.h>
@@ -56,6 +57,8 @@ SH_DECL_HOOK2(IGameEventManager2, LoadEventsFromFile, SH_NOATTRIB, 0, int, const
 SH_DECL_HOOK2_void(CGameEntitySystem, Spawn, SH_NOATTRIB, 0, int, const EntitySpawnInfo_t *);
 SH_DECL_HOOK2_void(CGameEntitySystem, UpdateOnRemove, SH_NOATTRIB, 0, int, const EntityDeletion_t *);
 
+SH_DECL_HOOK1_void(IGameSystemFactory, SetGlobalPtr, SH_NOATTRIB, 0, void *);
+
 SH_DECL_HOOK2_void(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, SH_NOATTRIB, 0, SpawnGroupHandle_t, ISpawnGroup *);
 SH_DECL_HOOK4_void(CSpawnGroupMgrGameSystem, SpawnGroupInit, SH_NOATTRIB, 0, SpawnGroupHandle_t, IEntityResourceManifest *, IEntityPrecacheConfiguration *, ISpawnGroupPrerequisiteRegistry *);
 SH_DECL_HOOK4(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, SH_NOATTRIB, 0, ILoadingSpawnGroup *, SpawnGroupHandle_t, bool, bool, const CUtlVector<const CEntityKeyValues *> *);
@@ -77,6 +80,8 @@ DLL_EXPORT IServerGameDLL *server = NULL;
 DLL_EXPORT IGameEventManager2 *gameeventmanager = NULL;
 
 DLL_IMPORT CGameEntitySystem *g_pGameEntitySystem;
+
+DLL_IMPORT IGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem;
 DLL_IMPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
@@ -189,6 +194,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 		{
 			this->InitEntitySystem();
 			this->InitGameResource();
+			this->InitGameSystem();
 			this->InitGameEvents();
 			this->InitSpawnGroup();
 
@@ -278,6 +284,7 @@ bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 	this->DestroySpawnGroup();
 	this->DestroyGameEvents();
 	this->DestroyEntitySystem();
+	this->DestroyGameSystem();
 	this->DestroyGameResource();
 
 	ConVar_Unregister();
@@ -328,6 +335,25 @@ void EntityManagerPlugin::DestroyGameResource()
 	// ...
 }
 
+
+bool EntityManagerPlugin::InitGameSystem()
+{
+	bool bResult = s_aEntityManagerProviderAgent.NotifyGameSystemUpdated();
+
+	if(bResult)
+	{
+		SH_ADD_HOOK_MEMFUNC(IGameSystemFactory, SetGlobalPtr, g_pGSFactoryCSpawnGroupMgrGameSystem, this, &EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook, false);
+	}
+
+	return bResult;
+}
+
+void EntityManagerPlugin::DestroyGameSystem()
+{
+
+}
+
+
 bool EntityManagerPlugin::InitGameEvents()
 {
 	return s_aEntityManagerProviderAgent.NotifyGameEventsUpdated();
@@ -341,6 +367,8 @@ void EntityManagerPlugin::DestroyGameEvents()
 bool EntityManagerPlugin::InitSpawnGroup()
 {
 	bool bResult = s_aEntityManagerProviderAgent.NotifySpawnGroupMgrUpdated();
+
+	this->m_aLogger.DetailedFormat("EntityManagerPlugin::InitSpawnGroup(): bResult = %s\n", bResult ? "true" : "false");
 
 	if(bResult)
 	{
@@ -633,6 +661,7 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 
 		this->InitEntitySystem();
 		this->InitGameResource();
+		this->InitGameSystem();
 		this->InitGameEvents();
 		this->InitSpawnGroup();
 	}
@@ -720,6 +749,13 @@ void EntityManagerPlugin::OnEntitySystemUpdateOnRemoveHook(int iCount, const Ent
 
 		this->EraseMyEntity(aInfoOne.m_pEntity->m_pInstance);
 	}
+}
+
+void EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(void *pValue)
+{
+	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(%p)\n", pValue);
+
+	g_pEntityManagerProviderAgent->NotifySpawnGroupMgrUpdated();
 }
 
 void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)

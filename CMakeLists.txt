@@ -54,10 +54,12 @@ set(SOURCE_FILES
 	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent/spawngroup.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/entitysystem.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/gameresource.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/gamesystem.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/source2server.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/spawngroup.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/entitysystem.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/gameresource.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamesystem.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/source2server.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/spawngroup.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent.cpp

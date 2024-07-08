@@ -6,6 +6,7 @@
 #include <logger.hpp>
 
 #include <ehandle.h> //FIXME: fix this one in https://github.com/Wend4r/hl2sdk/commits/cs2-entity_handle-get
+#include <igamesystemfactory.h>
 #include <tier0/dbg.h>
 #include <tier0/memalloc.h>
 #include <tier0/platform.h>
@@ -20,6 +21,8 @@ DLL_IMPORT IGameEventManager2 *gameeventmanager;
 
 DLL_EXPORT CEntitySystem *g_pEntitySystem = NULL;
 DLL_EXPORT CGameEntitySystem *g_pGameEntitySystem = NULL;
+DLL_EXPORT CBaseGameSystemFactory **CBaseGameSystemFactory::sm_pFirst = nullptr;
+DLL_EXPORT IGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem = NULL;
 DLL_EXPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
 class CDefOpsStringBinaryBlock
@@ -71,6 +74,18 @@ bool EntityManager::ProviderAgent::NotifyGameResourceUpdated()
 	return bResult;
 }
 
+bool EntityManager::ProviderAgent::NotifyGameSystemUpdated()
+{
+	bool bResult = (CBaseGameSystemFactory::sm_pFirst = g_pEntityManagerProvider->GetGameDataStorage().GetGameSystem().GetBaseGameSystemFactoryFirst()) != NULL;
+
+	if(bResult)
+	{
+		g_pGSFactoryCSpawnGroupMgrGameSystem = CBaseGameSystemFactory::GetFactoryByName("SpawnGroupManagerGameSystem");
+	}
+
+	return bResult;
+}
+
 bool EntityManager::ProviderAgent::NotifyEntitySystemUpdated()
 {
 	return (g_pEntitySystem = (CEntitySystem *)(g_pGameEntitySystem = *(CGameEntitySystem **)((uintptr_t)g_pGameResourceServiceServer + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntitySystemOffset()))) != NULL;
@@ -83,6 +98,15 @@ bool EntityManager::ProviderAgent::NotifyGameEventsUpdated()
 
 bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()
 {
+	// bool bResult = (g_pSpawnGroupMgr = static_cast<decltype(g_pSpawnGroupMgr)>(g_pGSFactoryCSpawnGroupMgrGameSystem->GetStaticGameSystem())) != NULL;
+
+	// if(bResult)
+	// {
+	// 	// ...
+	// }
+
+	// return bResult;
+
 	return (g_pSpawnGroupMgr = *g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetSpawnGroupMgrAddress()) != NULL;
 }
 

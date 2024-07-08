@@ -61,6 +61,9 @@ protected:
 	bool InitGameResource();
 	void DestroyGameResource();
 
+	bool InitGameSystem();
+	void DestroyGameSystem();
+
 	bool InitSpawnGroup();
 	void DestroySpawnGroup();
 
@@ -87,6 +90,7 @@ public: // SourceHooks.
 	int OnLoadEventsFromFileHook(const char *pszFilename, bool bSearchAll);
 	void OnEntitySystemSpawnHook(int iCount, const EntitySpawnInfo_t *pInfo);
 	void OnEntitySystemUpdateOnRemoveHook(int iCount, const EntityDeletion_t *pInfo);
+	void OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(void *pValue);
 	void OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
 	void OnSpawnGroupInitHook(SpawnGroupHandle_t handle, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry);
 	ILoadingSpawnGroup *OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues);
