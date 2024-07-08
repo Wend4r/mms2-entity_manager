@@ -21,7 +21,9 @@ DLL_IMPORT IGameEventManager2 *gameeventmanager;
 
 DLL_EXPORT CEntitySystem *g_pEntitySystem = NULL;
 DLL_EXPORT CGameEntitySystem *g_pGameEntitySystem = NULL;
-DLL_EXPORT CBaseGameSystemFactory **CBaseGameSystemFactory::sm_pFirst = nullptr;
+
+CBaseGameSystemFactory **CBaseGameSystemFactory::sm_pFirst = NULL;
+
 DLL_EXPORT IGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem = NULL;
 DLL_EXPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
