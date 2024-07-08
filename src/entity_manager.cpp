@@ -350,9 +350,8 @@ bool EntityManagerPlugin::InitGameSystem()
 
 void EntityManagerPlugin::DestroyGameSystem()
 {
-
+	SH_REMOVE_HOOK_MEMFUNC(IGameSystemFactory, SetGlobalPtr, g_pGSFactoryCSpawnGroupMgrGameSystem, this, &EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook, false);
 }
-
 
 bool EntityManagerPlugin::InitGameEvents()
 {
