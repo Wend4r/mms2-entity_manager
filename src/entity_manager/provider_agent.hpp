@@ -36,6 +36,7 @@ namespace EntityManager
 
 	public:
 		virtual bool NotifyGameResourceUpdated();
+		virtual bool NotifyGameSystemUpdated();
 		virtual bool NotifyEntitySystemUpdated();
 		virtual bool NotifyGameEventsUpdated();
 		virtual bool NotifySpawnGroupMgrUpdated();

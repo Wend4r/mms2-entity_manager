@@ -1,5 +1,5 @@
 #include "spawngroup.hpp"
-#include "provider.hpp"
+#include <provider.hpp>
 
 #include <tier1/utlmap.h>
 
@@ -7,9 +7,7 @@ DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 
 CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupHandle_t h)
 {
-	auto pMgrSpawnGroupMap = this->GetSpawnGroups();
-
-	pMgrSpawnGroupMap->SetLessFunc(DefLessFunc(SpawnGroupHandle_t));
+	auto *pMgrSpawnGroupMap = this->GetSpawnGroups();
 
 	auto iFoundIndex = pMgrSpawnGroupMap->Find(h);
 
@@ -18,7 +16,7 @@ CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupH
 
 void EntityManager::CSpawnGroupMgrGameSystemProvider::LoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
 {
-	auto pMgrSpawnGroupMap = this->GetSpawnGroups();
+	auto *pMgrSpawnGroupMap = this->GetSpawnGroups();
 
 	{
 		const int iInvalidIndex = pMgrSpawnGroupMap->InvalidIndex();
@@ -32,7 +30,7 @@ void EntityManager::CSpawnGroupMgrGameSystemProvider::LoopBySpawnGroups(std::fun
 
 void EntityManager::CSpawnGroupMgrGameSystemProvider::FastLoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
 {
-	auto pMgrSpawnGroupMap = this->GetSpawnGroups();
+	auto *pMgrSpawnGroupMap = this->GetSpawnGroups();
 
 	{
 		const int iMaxElement = pMgrSpawnGroupMap->MaxElement();

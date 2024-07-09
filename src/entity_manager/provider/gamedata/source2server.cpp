@@ -1,7 +1,18 @@
-#include "provider.hpp"
+#include <provider.hpp>
 
 EntityManager::Provider::GameDataStorage::Source2Server::Source2Server()
 {
+	{
+		auto &aCallbacks = this->m_aAddressCallbacks;
+
+		aCallbacks.Insert("&s_GameEventManager", [this](const std::string &, const DynLibUtils::CMemory &aAddress)
+		{
+			this->m_ppGameEventManager = aAddress.RCast<decltype(this->m_ppGameEventManager)>();
+		});
+
+		this->m_aGameConfig.GetAddresses().AddListener(&aCallbacks);
+	}
+
 	{
 		auto &aCallbacks = this->m_aOffsetCallbacks;
 
@@ -21,7 +32,14 @@ bool EntityManager::Provider::GameDataStorage::Source2Server::Load(IGameData *pR
 
 void EntityManager::Provider::GameDataStorage::Source2Server::Reset()
 {
+	this->m_ppGameEventManager = nullptr;
+
 	this->m_nGetterGameEventManager = -1;
+}
+
+CGameEventManager **EntityManager::Provider::GameDataStorage::Source2Server::GetGameEventManagerPtr() const
+{
+	return this->m_ppGameEventManager;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::Source2Server::GetGameEventManagerOffset() const

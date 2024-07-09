@@ -6,11 +6,22 @@ endif()
 
 
 project(entity_manager
-	VERSION 1.0.0
+	VERSION 1.0.1
 	DESCRIPTION "Entity Manager"
 	HOMEPAGE_URL "https://github.com/Wend4r/mms-entity_manager"
 	LANGUAGES C CXX ASM
 )
+
+string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWER)
+string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
+
+set(PROJECT_OUTPUT_NAME "entitymgr")
+
+set(PROJECT_AUTHOR "Wend4r")
+set(PROJECT_DESCRIPTION_FULL "MM:Source plugin to manage entities")
+set(PROJECT_LICENSE "GPLv3")
+string(TIMESTAMP PROJECT_BUILD_DATE "%Y-%m-%d")
+string(TIMESTAMP PROJECT_BUILD_TIME "%H:%M:%S")
 
 if(SOURCESDK_DIR)
 	file(TO_CMAKE_PATH "${SOURCESDK_DIR}" SOURCESDK_DIR)
@@ -54,10 +65,12 @@ set(SOURCE_FILES
 	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent/spawngroup.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/entitysystem.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/gameresource.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/gamesystem.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/source2server.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/spawngroup.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/entitysystem.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/gameresource.cpp
+	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamesystem.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/source2server.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider/spawngroup.cpp
 	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent.cpp
@@ -76,9 +89,11 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_EXTENSIONS OFF)
 
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_OUTPUT_NAME})
+
 target_compile_options(${PROJECT_NAME} PRIVATE ${PLATFORM_COMPILER_OPTIONS})
 target_link_options(${PROJECT_NAME} PRIVATE ${PLATFORM_LINKER_OPTIONS})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE ${PLATFORM_COMPILE_DEFINITIONS} ${METAMOD_DEFINITIONS} ${SOURCESDK_DEFINTIONS})
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${PLATFORM_COMPILE_DEFINITIONS} ${METAMOD_COMPILE_DEFINITIONS} ${SOURCESDK_DEFINTIONS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${DYNLIBUTILS_INCLUDE_DIR} ${DYNOHOOK_INCLUDE_DIR} ${GAMEDATA_INCLUDE_DIR} ${LOGGER_INCLUDE_DIR} ${METAMOD_INCLUDE_DIR} ${SOURCESDK_INCLUDE_DIR} ${SOURCE_PROJECT_DIR} ${SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${DYNLIBUTILS_BINARY_DIR} ${DYNOHOOK_BINARY_DIR} ${GAMEDATA_BINARY_DIR} ${LOGGER_BINARY_DIR} ${SOURCESDK_LIBRARIES})

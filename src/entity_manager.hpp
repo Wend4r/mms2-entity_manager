@@ -35,7 +35,7 @@
 #include "entity_manager/settings.hpp"
 #include "logger.hpp"
 
-#define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
+#define PREFIX_ENTITY_MANAGER META_PLUGIN_PREFIX
 
 class ISpawnGroup;
 class ISpawnGroupPrerequisiteRegistry;
@@ -45,11 +45,12 @@ class EntityManagerPlugin final : public ISmmPlugin, public IMetamodListener
 public:
 	EntityManagerPlugin();
 
-	bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late);
-	bool Unload(char *error, size_t maxlen);
-	bool Pause(char *error, size_t maxlen);
-	bool Unpause(char *error, size_t maxlen);
-	void AllPluginsLoaded();
+public: // IMetamodListener
+	bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late) override;
+	bool Unload(char *error, size_t maxlen) override;
+	bool Pause(char *error, size_t maxlen) override;
+	bool Unpause(char *error, size_t maxlen) override;
+	void AllPluginsLoaded() override;
 
 protected:
 	bool InitEntitySystem();
@@ -60,6 +61,9 @@ protected:
 
 	bool InitGameResource();
 	void DestroyGameResource();
+
+	bool InitGameSystem();
+	void DestroyGameSystem();
 
 	bool InitSpawnGroup();
 	void DestroySpawnGroup();
@@ -87,6 +91,7 @@ public: // SourceHooks.
 	int OnLoadEventsFromFileHook(const char *pszFilename, bool bSearchAll);
 	void OnEntitySystemSpawnHook(int iCount, const EntitySpawnInfo_t *pInfo);
 	void OnEntitySystemUpdateOnRemoveHook(int iCount, const EntityDeletion_t *pInfo);
+	void OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(void *pValue);
 	void OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
 	void OnSpawnGroupInitHook(SpawnGroupHandle_t handle, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry);
 	ILoadingSpawnGroup *OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues);
@@ -127,18 +132,18 @@ private:
 		void FireGameEvent(IGameEvent *pEvent);
 	};
 
-public:
-	const char *GetAuthor();
-	const char *GetName();
-	const char *GetDescription();
-	const char *GetURL();
-	const char *GetLicense();
-	const char *GetVersion();
-	const char *GetDate();
-	const char *GetLogTag();
+public: // ISmmPlugin
+	const char *GetAuthor() override;
+	const char *GetName() override;
+	const char *GetDescription() override;
+	const char *GetURL() override;
+	const char *GetLicense() override;
+	const char *GetVersion() override;
+	const char *GetDate() override;
+	const char *GetLogTag() override;
 
 private:
-	std::string m_sBasePath = "addons" CORRECT_PATH_SEPARATOR_S META_PLUGIN_NAME;
+	std::string m_sBasePath = "addons" CORRECT_PATH_SEPARATOR_S META_PLUGIN_PREFIX;
 	std::string m_sCurrentMap = "\0";
 
 	bool m_bIsCurrentMySpawnOfEntities = false;

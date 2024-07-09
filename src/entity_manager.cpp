@@ -26,6 +26,7 @@
 
 // Game SDK.
 #include <eiface.h>
+#include <igamesystemfactory.h>
 #include <iserver.h>
 #include <entity2/entitysystem.h>
 #include <gamesystems/spawngroup_manager.h>
@@ -56,6 +57,8 @@ SH_DECL_HOOK2(IGameEventManager2, LoadEventsFromFile, SH_NOATTRIB, 0, int, const
 SH_DECL_HOOK2_void(CGameEntitySystem, Spawn, SH_NOATTRIB, 0, int, const EntitySpawnInfo_t *);
 SH_DECL_HOOK2_void(CGameEntitySystem, UpdateOnRemove, SH_NOATTRIB, 0, int, const EntityDeletion_t *);
 
+SH_DECL_HOOK1_void(CBaseGameSystemFactory, SetGlobalPtr, SH_NOATTRIB, 0, void *);
+
 SH_DECL_HOOK2_void(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, SH_NOATTRIB, 0, SpawnGroupHandle_t, ISpawnGroup *);
 SH_DECL_HOOK4_void(CSpawnGroupMgrGameSystem, SpawnGroupInit, SH_NOATTRIB, 0, SpawnGroupHandle_t, IEntityResourceManifest *, IEntityPrecacheConfiguration *, ISpawnGroupPrerequisiteRegistry *);
 SH_DECL_HOOK4(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, SH_NOATTRIB, 0, ILoadingSpawnGroup *, SpawnGroupHandle_t, bool, bool, const CUtlVector<const CEntityKeyValues *> *);
@@ -77,6 +80,8 @@ DLL_EXPORT IServerGameDLL *server = NULL;
 DLL_EXPORT IGameEventManager2 *gameeventmanager = NULL;
 
 DLL_IMPORT CGameEntitySystem *g_pGameEntitySystem;
+
+DLL_IMPORT CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem;
 DLL_IMPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
@@ -124,12 +129,6 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 	META_CONPRINTF( "Starting %s plugin.\n", this->GetName());
 
 	SH_ADD_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManagerPlugin::OnStartupServerHook, true);
-
-	{
-		auto *pCGameEventManagerVTable = reinterpret_cast<IGameEventManager2 *>((void *)DynLibUtils::CModule(server).GetVirtualTableByName("CGameEventManager"));
-
-		this->m_iLoadEventsFromFileId = SH_ADD_DVPHOOK(IGameEventManager2, LoadEventsFromFile, pCGameEventManagerVTable, SH_MEMBER(this, &EntityManagerPlugin::OnLoadEventsFromFileHook), false);
-	}
 
 	META_CONPRINTF( "All hooks started!\n" );
 
@@ -187,14 +186,16 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 		if(pNewServer)
 		{
-			this->InitEntitySystem();
-			this->InitGameResource();
-			this->InitGameEvents();
-			this->InitSpawnGroup();
+			assert(this->InitEntitySystem());
+			assert(this->InitGameResource());
+			assert(this->InitGameSystem());
+			assert(this->InitGameEvents());
 
 			// Load by spawn groups now.
 			{
-				auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+				auto *pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+
+				assert(pSpawnGroupMgr);
 
 				auto aWarnings = this->m_aLogger.CreateWarningsScope();
 
@@ -230,7 +231,13 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 						IWorldReference *pOwnerWorldRef = pSpawnGroup->GetWorldReference();
 
-						if(!s_aEntityManagerProviderAgent.CreateSpawnGroup(aDesc, pSpawnGroup->ComputeWorldOrigin(pOwnerWorldName, h, pOwnerWorldRef ? g_pWorldRendererMgr->GetGeomentryFromReference(pOwnerWorldRef) : NULL).GetOrigin()))
+						Vector aWorldOrigin =
+#if 0
+							pSpawnGroup->ComputeWorldOrigin(pOwnerWorldName, h, pOwnerWorldRef ? g_pWorldRendererMgr->GetGeomentryFromReference(pOwnerWorldRef) : NULL).GetOrigin();
+#else
+							{0.0f, 0.0f, 0.0f};
+#endif
+						if(!s_aEntityManagerProviderAgent.CreateSpawnGroup(aDesc, aWorldOrigin))
 						{
 							aWarnings.PushFormat("Failed to start creating JustInTime spawn group for \"%s\" world\n", pOwnerWorldName);
 						}
@@ -256,9 +263,10 @@ bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 {
 	this->DestroyMyEntities();
 
-	this->UnhookEvents();
-
-	SH_REMOVE_HOOK_ID(this->m_iLoadEventsFromFileId);
+	if(gameeventmanager)
+	{
+		this->UnhookEvents();
+	}
 
 	this->m_aSettings.Destroy();
 	s_aEntityManagerProvider.Destroy();
@@ -269,6 +277,7 @@ bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 	this->DestroySpawnGroup();
 	this->DestroyGameEvents();
 	this->DestroyEntitySystem();
+	this->DestroyGameSystem();
 	this->DestroyGameResource();
 
 	ConVar_Unregister();
@@ -319,19 +328,63 @@ void EntityManagerPlugin::DestroyGameResource()
 	// ...
 }
 
+
+bool EntityManagerPlugin::InitGameSystem()
+{
+	bool bResult = s_aEntityManagerProviderAgent.NotifyGameSystemUpdated();
+
+	if(bResult)
+	{
+		if(g_pGSFactoryCSpawnGroupMgrGameSystem)
+		{
+			s_aEntityManagerProviderAgent.NotifySpawnGroupMgrUpdated();
+
+			if(g_pSpawnGroupMgr)
+			{
+				g_pGSFactoryCSpawnGroupMgrGameSystem->SetGlobalPtr(g_pSpawnGroupMgr);
+				this->InitSpawnGroup();
+			}
+
+			SH_ADD_HOOK_MEMFUNC(CBaseGameSystemFactory, SetGlobalPtr, g_pGSFactoryCSpawnGroupMgrGameSystem, this, &EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook, false);
+		}
+	}
+
+	return bResult;
+}
+
+void EntityManagerPlugin::DestroyGameSystem()
+{
+	if(g_pGSFactoryCSpawnGroupMgrGameSystem)
+	{
+		SH_REMOVE_HOOK_MEMFUNC(CBaseGameSystemFactory, SetGlobalPtr, g_pGSFactoryCSpawnGroupMgrGameSystem, this, &EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook, false);
+	}
+}
+
 bool EntityManagerPlugin::InitGameEvents()
 {
-	return s_aEntityManagerProviderAgent.NotifyGameEventsUpdated();
+	bool bResult = s_aEntityManagerProviderAgent.NotifyGameEventsUpdated();
+
+	if(bResult)
+	{
+		char sError[256];
+
+		if(!this->HookEvents(sError, sizeof(sError)))
+		{
+			this->m_aLogger.WarningFormat("Failed to hook events: %s\n", sError);
+		}
+	}
+
+	return bResult;
 }
 
 void EntityManagerPlugin::DestroyGameEvents()
 {
-	// ...
+	this->UnhookEvents();
 }
 
 bool EntityManagerPlugin::InitSpawnGroup()
 {
-	bool bResult = s_aEntityManagerProviderAgent.NotifySpawnGroupMgrUpdated();
+	bool bResult = true; // s_aEntityManagerProviderAgent.NotifySpawnGroupMgrUpdated();
 
 	if(bResult)
 	{
@@ -372,8 +425,9 @@ bool EntityManagerPlugin::HookEvents(char *psError, size_t nMaxLength)
 
 void EntityManagerPlugin::UnhookEvents()
 {
-	this->m_aRoundPreStart.Destroy();
 	this->m_aRoundStart.Destroy();
+	this->m_aRoundPreStart.Destroy();
+
 	this->m_bIsHookedEvents = false;
 }
 
@@ -491,7 +545,7 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 	{
 		auto aWarnings = this->m_aLogger.CreateWarningsScope();
 
-		auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+		auto *pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
 
 		pSpawnGroupMgr->LoopBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void
 		{
@@ -516,7 +570,7 @@ void EntityManagerPlugin::SpawnMyEntities()
 {
 	auto aWarnings = this->m_aLogger.CreateWarningsScope();
 	
-	auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+	auto *pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
 
 	pSpawnGroupMgr->LoopBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void
 	{
@@ -529,7 +583,7 @@ void EntityManagerPlugin::SpawnMyEntities()
 		{
 			const char *pSaveFilterName = pMap->GetEntityFilterName();
 
-			auto pSpawnGroupEx = ((EntityManager::CBaseSpawnGroupProvider *)pSpawnGroup);
+			auto *pSpawnGroupEx = ((EntityManager::CBaseSpawnGroupProvider *)pSpawnGroup);
 
 			pSpawnGroupEx->SetEntityFilterName(ENTITY_FILTER_NAME_RESPAWN);
 
@@ -622,10 +676,10 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 			this->DestroySpawnGroup();
 		}
 
-		this->InitEntitySystem();
-		this->InitGameResource();
-		this->InitGameEvents();
-		this->InitSpawnGroup();
+		assert(this->InitEntitySystem());
+		assert(this->InitGameResource());
+		assert(this->InitGameSystem());
+		assert(this->InitGameEvents());
 	}
 	else
 	{
@@ -633,26 +687,12 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 	}
 }
 
-
-int EntityManagerPlugin::OnLoadEventsFromFileHook(const char *pszFilename, bool bSearchAll)
-{
-	ExecuteOnce(gameeventmanager = META_IFACEPTR(IGameEventManager2));
-
-	{
-		char sError[256];
-
-		if(!this->HookEvents((char *)sError, sizeof(sError)))
-		{
-			this->m_aLogger.WarningFormat("Failed to hook events: %s", sError);
-		}
-	}
-
-	RETURN_META_VALUE(MRES_IGNORED, 0);
-}
-
 void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnInfo_t *pInfo)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnEntitySystemSpawnHook(%d, %p)\n", iCount, pInfo);
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnEntitySystemSpawnHook(%d, %p)\n", iCount, pInfo);
+	}
 
 #ifdef DEBUG
 	auto aDetails = this->m_aLogger.CreateDetailsScope();
@@ -713,9 +753,34 @@ void EntityManagerPlugin::OnEntitySystemUpdateOnRemoveHook(int iCount, const Ent
 	}
 }
 
+void EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(void *pValue)
+{
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(%p)\n", pValue);
+	}
+
+	if(pValue)
+	{
+		if(!g_pSpawnGroupMgr)
+		{
+			g_pSpawnGroupMgr = reinterpret_cast<decltype(g_pSpawnGroupMgr)>(pValue);
+			this->InitSpawnGroup();
+		}
+	}
+	else
+	{
+		this->DestroySpawnGroup();
+		g_pSpawnGroupMgr = NULL;
+	}
+}
+
 void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %p)\n", handle, pSpawnGroup);
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %p)\n", handle, pSpawnGroup);
+	}
 
 	// Load settings by spawn group name.
 	{
@@ -732,7 +797,7 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 
 ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
+	this->m_aLogger.DetailedFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
 
 	auto funcCreateLoadingSpawnGroup = &CSpawnGroupMgrGameSystem::CreateLoadingSpawnGroup;
 
@@ -850,14 +915,20 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 void EntityManagerPlugin::OnSpawnGroupShutdownHook(SpawnGroupHandle_t handle)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", handle);
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", handle);
+	}
 
 	s_aEntityManagerProviderAgent.NotifyDestroySpawnGroup(handle);
 }
 
 void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, const int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::ListenLoadingSpawnGroup(%d, %d, %p, %p)\n", hSpawnGroup, iCount, pEntities, pListener);
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::ListenLoadingSpawnGroup(%d, %d, %p, %p)\n", hSpawnGroup, iCount, pEntities, pListener);
+	}
 
 	if(iCount)
 	{
@@ -877,7 +948,10 @@ void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup
 
 void EntityManagerPlugin::OnMyEntityFinish(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnMyEntityFinish(%s (%d))\n", pEntity->GetClassname(), pEntity->GetEntityIndex().Get());
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnMyEntityFinish(%s (%d))\n", pEntity->GetClassname(), pEntity->GetEntityIndex().Get());
+	}
 
 	this->m_vecMyEntities.push_back(pEntity);
 }
@@ -942,42 +1016,42 @@ bool EntityManagerPlugin::Unpause(char *error, size_t maxlen)
 	return true;
 }
 
-const char *EntityManagerPlugin::GetLicense()
-{
-	return "Public Domain";
-}
-
-const char *EntityManagerPlugin::GetVersion()
-{
-	return "1.0.0";
-}
-
-const char *EntityManagerPlugin::GetDate()
-{
-	return __DATE__;
-}
-
-const char *EntityManagerPlugin::GetLogTag()
-{
-	return "ENTITY_MANAGER";
-}
-
 const char *EntityManagerPlugin::GetAuthor()
 {
-	return "Wend4r";
-}
-
-const char *EntityManagerPlugin::GetDescription()
-{
-	return "Plugin to manage a entities";
+	return META_PLUGIN_AUTHOR;
 }
 
 const char *EntityManagerPlugin::GetName()
 {
-	return "Entity Manager";
+	return META_PLUGIN_NAME;
+}
+
+const char *EntityManagerPlugin::GetDescription()
+{
+	return META_PLUGIN_DESCRIPTION;
 }
 
 const char *EntityManagerPlugin::GetURL()
 {
-	return "https://github.com/mms-entity_manager";
+	return META_PLUGIN_URL;
+}
+
+const char *EntityManagerPlugin::GetLicense()
+{
+	return META_PLUGIN_LICENSE;
+}
+
+const char *EntityManagerPlugin::GetVersion()
+{
+	return META_PLUGIN_VERSION;
+}
+
+const char *EntityManagerPlugin::GetDate()
+{
+	return META_PLUGIN_DATE;
+}
+
+const char *EntityManagerPlugin::GetLogTag()
+{
+	return META_PLUGIN_LOG_TAG;
 }
