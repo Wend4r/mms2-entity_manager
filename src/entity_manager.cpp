@@ -133,7 +133,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 	{
 		auto *pCGameEventManagerVTable = reinterpret_cast<IGameEventManager2 *>((void *)DynLibUtils::CModule(server).GetVirtualTableByName("CGameEventManager"));
 
-		this->m_iLoadEventsFromFileId = SH_ADD_DVPHOOK(IGameEventManager2, LoadEventsFromFile, pCGameEventManagerVTable, SH_MEMBER(this, &EntityManagerPlugin::OnLoadEventsFromFileHook), false);
+		this->m_iLoadEventsFromFileId = SH_ADD_DVPHOOK(IGameEventManager2, LoadEventsFromFile, pCGameEventManagerVTable, SH_MEMBER(this, &EntityManagerPlugin::OnLoadEventsFromFileHook), true);
 	}
 
 	META_CONPRINTF( "All hooks started!\n" );
@@ -408,8 +408,9 @@ bool EntityManagerPlugin::HookEvents(char *psError, size_t nMaxLength)
 
 void EntityManagerPlugin::UnhookEvents()
 {
-	this->m_aRoundPreStart.Destroy();
 	this->m_aRoundStart.Destroy();
+	this->m_aRoundPreStart.Destroy();
+
 	this->m_bIsHookedEvents = false;
 }
 
@@ -673,6 +674,8 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 
 int EntityManagerPlugin::OnLoadEventsFromFileHook(const char *pszFilename, bool bSearchAll)
 {
+	this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnLoadEventsFromFileHook(pszFilename = \"%s\", bSearchAll = %s)\n", pszFilename, bSearchAll ? "true" : "false");
+
 	ExecuteOnce(gameeventmanager = META_IFACEPTR(IGameEventManager2));
 
 	{
