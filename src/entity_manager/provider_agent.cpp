@@ -24,7 +24,7 @@ DLL_EXPORT CGameEntitySystem *g_pGameEntitySystem = NULL;
 
 CBaseGameSystemFactory **CBaseGameSystemFactory::sm_pFirst = NULL;
 
-DLL_EXPORT IGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem = NULL;
+DLL_EXPORT CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem = NULL;
 DLL_EXPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
 class CDefOpsStringBinaryBlock
@@ -82,7 +82,7 @@ bool EntityManager::ProviderAgent::NotifyGameSystemUpdated()
 
 	if(bResult)
 	{
-		g_pGSFactoryCSpawnGroupMgrGameSystem = CBaseGameSystemFactory::GetFactoryByName("SpawnGroupManagerGameSystem");
+		g_pGSFactoryCSpawnGroupMgrGameSystem = reinterpret_cast<decltype(g_pGSFactoryCSpawnGroupMgrGameSystem)>(CBaseGameSystemFactory::GetFactoryByName("SpawnGroupManagerGameSystem"));
 	}
 
 	return bResult;

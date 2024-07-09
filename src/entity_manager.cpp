@@ -57,7 +57,7 @@ SH_DECL_HOOK2(IGameEventManager2, LoadEventsFromFile, SH_NOATTRIB, 0, int, const
 SH_DECL_HOOK2_void(CGameEntitySystem, Spawn, SH_NOATTRIB, 0, int, const EntitySpawnInfo_t *);
 SH_DECL_HOOK2_void(CGameEntitySystem, UpdateOnRemove, SH_NOATTRIB, 0, int, const EntityDeletion_t *);
 
-SH_DECL_HOOK1_void(IGameSystemFactory, SetGlobalPtr, SH_NOATTRIB, 0, void *);
+SH_DECL_HOOK1_void(CBaseGameSystemFactory, SetGlobalPtr, SH_NOATTRIB, 0, void *);
 
 SH_DECL_HOOK2_void(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, SH_NOATTRIB, 0, SpawnGroupHandle_t, ISpawnGroup *);
 SH_DECL_HOOK4_void(CSpawnGroupMgrGameSystem, SpawnGroupInit, SH_NOATTRIB, 0, SpawnGroupHandle_t, IEntityResourceManifest *, IEntityPrecacheConfiguration *, ISpawnGroupPrerequisiteRegistry *);
@@ -81,7 +81,7 @@ DLL_EXPORT IGameEventManager2 *gameeventmanager = NULL;
 
 DLL_IMPORT CGameEntitySystem *g_pGameEntitySystem;
 
-DLL_IMPORT IGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem;
+DLL_IMPORT CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem;
 DLL_IMPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
@@ -196,11 +196,12 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 			this->InitGameResource();
 			this->InitGameSystem();
 			this->InitGameEvents();
-			this->InitSpawnGroup();
 
 			// Load by spawn groups now.
 			{
 				auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+
+				assert(pSpawnGroupMgr);
 
 				auto aWarnings = this->m_aLogger.CreateWarningsScope();
 
@@ -342,7 +343,17 @@ bool EntityManagerPlugin::InitGameSystem()
 
 	if(bResult)
 	{
-		SH_ADD_HOOK_MEMFUNC(IGameSystemFactory, SetGlobalPtr, g_pGSFactoryCSpawnGroupMgrGameSystem, this, &EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook, false);
+		if(g_pGSFactoryCSpawnGroupMgrGameSystem)
+		{
+			g_pEntityManagerProviderAgent->NotifySpawnGroupMgrUpdated();
+
+			SH_ADD_HOOK_MEMFUNC(CBaseGameSystemFactory, SetGlobalPtr, g_pGSFactoryCSpawnGroupMgrGameSystem, this, &EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook, false);
+
+			if(g_pSpawnGroupMgr)
+			{
+				g_pGSFactoryCSpawnGroupMgrGameSystem->SetGlobalPtr(g_pSpawnGroupMgr);
+			}
+		}
 	}
 
 	return bResult;
@@ -350,7 +361,10 @@ bool EntityManagerPlugin::InitGameSystem()
 
 void EntityManagerPlugin::DestroyGameSystem()
 {
-	SH_REMOVE_HOOK_MEMFUNC(IGameSystemFactory, SetGlobalPtr, g_pGSFactoryCSpawnGroupMgrGameSystem, this, &EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook, false);
+	if(g_pGSFactoryCSpawnGroupMgrGameSystem)
+	{
+		SH_REMOVE_HOOK_MEMFUNC(CBaseGameSystemFactory, SetGlobalPtr, g_pGSFactoryCSpawnGroupMgrGameSystem, this, &EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook, false);
+	}
 }
 
 bool EntityManagerPlugin::InitGameEvents()
@@ -365,9 +379,7 @@ void EntityManagerPlugin::DestroyGameEvents()
 
 bool EntityManagerPlugin::InitSpawnGroup()
 {
-	bool bResult = s_aEntityManagerProviderAgent.NotifySpawnGroupMgrUpdated();
-
-	this->m_aLogger.DetailedFormat("EntityManagerPlugin::InitSpawnGroup(): bResult = %s\n", bResult ? "true" : "false");
+	bool bResult = true; // s_aEntityManagerProviderAgent.NotifySpawnGroupMgrUpdated();
 
 	if(bResult)
 	{
@@ -663,7 +675,6 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 		this->InitGameResource();
 		this->InitGameSystem();
 		this->InitGameEvents();
-		this->InitSpawnGroup();
 	}
 	else
 	{
@@ -757,7 +768,19 @@ void EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(vo
 {
 	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(%p)\n", pValue);
 
-	g_pEntityManagerProviderAgent->NotifySpawnGroupMgrUpdated();
+	if(pValue)
+	{
+		if(!g_pSpawnGroupMgr)
+		{
+			g_pSpawnGroupMgr = reinterpret_cast<decltype(g_pSpawnGroupMgr)>(pValue);
+			this->InitSpawnGroup();
+		}
+	}
+	else
+	{
+		this->DestroySpawnGroup();
+		g_pSpawnGroupMgr = NULL;
+	}
 }
 
 void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
