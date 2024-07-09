@@ -95,7 +95,7 @@ bool EntityManager::ProviderAgent::NotifyEntitySystemUpdated()
 
 bool EntityManager::ProviderAgent::NotifyGameEventsUpdated()
 {
-	return true;
+	return (gameeventmanager = *(IGameEventManager2 **)g_pEntityManagerProvider->GetGameDataStorage().GetSource2Server().GetGameEventManagerPtr()) != NULL;
 }
 
 bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()

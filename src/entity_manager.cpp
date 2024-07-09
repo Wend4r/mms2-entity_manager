@@ -130,12 +130,6 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 	SH_ADD_HOOK_MEMFUNC(INetworkServerService, StartupServer, g_pNetworkServerService, this, &EntityManagerPlugin::OnStartupServerHook, true);
 
-	{
-		auto *pCGameEventManagerVTable = reinterpret_cast<IGameEventManager2 *>((void *)DynLibUtils::CModule(server).GetVirtualTableByName("CGameEventManager"));
-
-		this->m_iLoadEventsFromFileId = SH_ADD_DVPHOOK(IGameEventManager2, LoadEventsFromFile, pCGameEventManagerVTable, SH_MEMBER(this, &EntityManagerPlugin::OnLoadEventsFromFileHook), true);
-	}
-
 	META_CONPRINTF( "All hooks started!\n" );
 
 	g_pCVar = icvar;
@@ -274,8 +268,6 @@ bool EntityManagerPlugin::Unload(char *error, size_t maxlen)
 		this->UnhookEvents();
 	}
 
-	SH_REMOVE_HOOK_ID(this->m_iLoadEventsFromFileId);
-
 	this->m_aSettings.Destroy();
 	s_aEntityManagerProvider.Destroy();
 	s_aEntityManagerProviderAgent.Destroy();
@@ -369,12 +361,24 @@ void EntityManagerPlugin::DestroyGameSystem()
 
 bool EntityManagerPlugin::InitGameEvents()
 {
-	return s_aEntityManagerProviderAgent.NotifyGameEventsUpdated();
+	bool bResult = s_aEntityManagerProviderAgent.NotifyGameEventsUpdated();
+
+	if(bResult)
+	{
+		char sError[256];
+
+		if(!this->HookEvents(sError, sizeof(sError)))
+		{
+			this->m_aLogger.WarningFormat("Failed to hook events: %s\n", sError);
+		}
+	}
+
+	return bResult;
 }
 
 void EntityManagerPlugin::DestroyGameEvents()
 {
-	// ...
+	this->UnhookEvents();
 }
 
 bool EntityManagerPlugin::InitSpawnGroup()
@@ -680,28 +684,6 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 	{
 		this->m_aLogger.Warning("Failed to get a net server\n");
 	}
-}
-
-
-int EntityManagerPlugin::OnLoadEventsFromFileHook(const char *pszFilename, bool bSearchAll)
-{
-	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
-	{
-		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnLoadEventsFromFileHook(pszFilename = \"%s\", bSearchAll = %s)\n", pszFilename, bSearchAll ? "true" : "false");
-	}
-
-	ExecuteOnce(gameeventmanager = META_IFACEPTR(IGameEventManager2));
-
-	{
-		char sError[256];
-
-		if(!this->HookEvents((char *)sError, sizeof(sError)))
-		{
-			this->m_aLogger.WarningFormat("Failed to hook events: %s\n", sError);
-		}
-	}
-
-	RETURN_META_VALUE(MRES_IGNORED, 0);
 }
 
 void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnInfo_t *pInfo)

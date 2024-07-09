@@ -16,6 +16,7 @@
 
 class CSpawnGroupMgrGameSystem;
 class CBaseGameSystemFactory;
+class CGameEventManager;
 
 namespace EntityManager
 {
@@ -156,12 +157,16 @@ namespace EntityManager
 				void Reset();
 
 			public:
+				CGameEventManager **GetGameEventManagerPtr() const;
 				ptrdiff_t GetGameEventManagerOffset() const;
 
 			private:
-				// GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
+				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
 				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
 				GameData::Config m_aGameConfig;
+
+			private: // Addresses.
+				CGameEventManager **m_ppGameEventManager = nullptr;
 
 			private: // Offsets.
 				ptrdiff_t m_nGetterGameEventManager = -1;
