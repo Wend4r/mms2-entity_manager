@@ -545,7 +545,7 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 	{
 		auto aWarnings = this->m_aLogger.CreateWarningsScope();
 
-		auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+		auto *pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
 
 		pSpawnGroupMgr->LoopBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void
 		{
@@ -570,7 +570,7 @@ void EntityManagerPlugin::SpawnMyEntities()
 {
 	auto aWarnings = this->m_aLogger.CreateWarningsScope();
 	
-	auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+	auto *pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
 
 	pSpawnGroupMgr->LoopBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void
 	{
@@ -583,7 +583,7 @@ void EntityManagerPlugin::SpawnMyEntities()
 		{
 			const char *pSaveFilterName = pMap->GetEntityFilterName();
 
-			auto pSpawnGroupEx = ((EntityManager::CBaseSpawnGroupProvider *)pSpawnGroup);
+			auto *pSpawnGroupEx = ((EntityManager::CBaseSpawnGroupProvider *)pSpawnGroup);
 
 			pSpawnGroupEx->SetEntityFilterName(ENTITY_FILTER_NAME_RESPAWN);
 
