@@ -685,7 +685,10 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 
 int EntityManagerPlugin::OnLoadEventsFromFileHook(const char *pszFilename, bool bSearchAll)
 {
-	this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnLoadEventsFromFileHook(pszFilename = \"%s\", bSearchAll = %s)\n", pszFilename, bSearchAll ? "true" : "false");
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnLoadEventsFromFileHook(pszFilename = \"%s\", bSearchAll = %s)\n", pszFilename, bSearchAll ? "true" : "false");
+	}
 
 	ExecuteOnce(gameeventmanager = META_IFACEPTR(IGameEventManager2));
 
@@ -703,7 +706,10 @@ int EntityManagerPlugin::OnLoadEventsFromFileHook(const char *pszFilename, bool 
 
 void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnInfo_t *pInfo)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnEntitySystemSpawnHook(%d, %p)\n", iCount, pInfo);
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnEntitySystemSpawnHook(%d, %p)\n", iCount, pInfo);
+	}
 
 #ifdef DEBUG
 	auto aDetails = this->m_aLogger.CreateDetailsScope();
@@ -766,7 +772,10 @@ void EntityManagerPlugin::OnEntitySystemUpdateOnRemoveHook(int iCount, const Ent
 
 void EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(void *pValue)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(%p)\n", pValue);
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(%p)\n", pValue);
+	}
 
 	if(pValue)
 	{
@@ -785,7 +794,10 @@ void EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(vo
 
 void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %p)\n", handle, pSpawnGroup);
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %p)\n", handle, pSpawnGroup);
+	}
 
 	// Load settings by spawn group name.
 	{
@@ -802,7 +814,7 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 
 ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
+	this->m_aLogger.DetailedFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
 
 	auto funcCreateLoadingSpawnGroup = &CSpawnGroupMgrGameSystem::CreateLoadingSpawnGroup;
 
@@ -920,14 +932,20 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 void EntityManagerPlugin::OnSpawnGroupShutdownHook(SpawnGroupHandle_t handle)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", handle);
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", handle);
+	}
 
 	s_aEntityManagerProviderAgent.NotifyDestroySpawnGroup(handle);
 }
 
 void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, const int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::ListenLoadingSpawnGroup(%d, %d, %p, %p)\n", hSpawnGroup, iCount, pEntities, pListener);
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::ListenLoadingSpawnGroup(%d, %d, %p, %p)\n", hSpawnGroup, iCount, pEntities, pListener);
+	}
 
 	if(iCount)
 	{
@@ -947,7 +965,10 @@ void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup
 
 void EntityManagerPlugin::OnMyEntityFinish(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues)
 {
-	this->m_aLogger.MessageFormat("EntityManagerPlugin::OnMyEntityFinish(%s (%d))\n", pEntity->GetClassname(), pEntity->GetEntityIndex().Get());
+	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnMyEntityFinish(%s (%d))\n", pEntity->GetClassname(), pEntity->GetEntityIndex().Get());
+	}
 
 	this->m_vecMyEntities.push_back(pEntity);
 }
