@@ -193,7 +193,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 			// Load by spawn groups now.
 			{
-				auto pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+				auto *pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
 
 				assert(pSpawnGroupMgr);
 
@@ -337,14 +337,15 @@ bool EntityManagerPlugin::InitGameSystem()
 	{
 		if(g_pGSFactoryCSpawnGroupMgrGameSystem)
 		{
-			g_pEntityManagerProviderAgent->NotifySpawnGroupMgrUpdated();
-
-			SH_ADD_HOOK_MEMFUNC(CBaseGameSystemFactory, SetGlobalPtr, g_pGSFactoryCSpawnGroupMgrGameSystem, this, &EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook, false);
+			s_aEntityManagerProviderAgent.NotifySpawnGroupMgrUpdated();
 
 			if(g_pSpawnGroupMgr)
 			{
 				g_pGSFactoryCSpawnGroupMgrGameSystem->SetGlobalPtr(g_pSpawnGroupMgr);
+				this->InitSpawnGroup();
 			}
+
+			SH_ADD_HOOK_MEMFUNC(CBaseGameSystemFactory, SetGlobalPtr, g_pGSFactoryCSpawnGroupMgrGameSystem, this, &EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook, false);
 		}
 	}
 
