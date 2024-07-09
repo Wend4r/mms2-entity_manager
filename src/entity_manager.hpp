@@ -143,7 +143,7 @@ public: // ISmmPlugin
 	const char *GetLogTag() override;
 
 private:
-	std::string m_sBasePath = "addons" CORRECT_PATH_SEPARATOR_S META_PLUGIN_NAME;
+	std::string m_sBasePath = "addons" CORRECT_PATH_SEPARATOR_S META_PLUGIN_PREFIX;
 	std::string m_sCurrentMap = "\0";
 
 	bool m_bIsCurrentMySpawnOfEntities = false;
