@@ -35,7 +35,7 @@
 #include "entity_manager/settings.hpp"
 #include "logger.hpp"
 
-#define PREFIX_ENTITY_MANAGER META_PLUGIN_NAME
+#define PREFIX_ENTITY_MANAGER META_PLUGIN_PREFIX
 
 class ISpawnGroup;
 class ISpawnGroupPrerequisiteRegistry;
