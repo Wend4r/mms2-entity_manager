@@ -6,7 +6,7 @@ endif()
 
 
 project(entity_manager
-	VERSION 1.0.0
+	VERSION 1.0.1
 	DESCRIPTION "Entity Manager"
 	HOMEPAGE_URL "https://github.com/Wend4r/mms-entity_manager"
 	LANGUAGES C CXX ASM
