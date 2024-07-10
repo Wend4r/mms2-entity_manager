@@ -775,11 +775,11 @@ void EntityManagerPlugin::OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(vo
 	}
 }
 
-void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
+void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup)
 {
 	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
 	{
-		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %p)\n", handle, pSpawnGroup);
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnAllocateSpawnGroupHook(%d, %p)\n", hSpawnGroup, pSpawnGroup);
 	}
 
 	// Load settings by spawn group name.
@@ -792,12 +792,12 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t handle, IS
 		}
 	}
 
-	s_aEntityManagerProviderAgent.NotifyAllocateSpawnGroup(handle, pSpawnGroup);
+	s_aEntityManagerProviderAgent.NotifyAllocateSpawnGroup(hSpawnGroup, pSpawnGroup);
 }
 
-ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t handle, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
+ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t hSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
 {
-	this->m_aLogger.DetailedFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", handle, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
+	this->m_aLogger.DetailedFormat("EntityManagerPlugin::CreateLoadingSpawnGroup(%d, bSynchronouslySpawnEntities = %s, bConfirmResourcesLoaded = %s, pKeyValues = %p)\n", hSpawnGroup, bSynchronouslySpawnEntities ? "true" : "false", bConfirmResourcesLoaded ? "true" : "false", pKeyValues);
 
 	auto funcCreateLoadingSpawnGroup = &CSpawnGroupMgrGameSystem::CreateLoadingSpawnGroup;
 
@@ -806,7 +806,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 	EntityManager::CSpawnGroupMgrGameSystemProvider *pSpawnGroupMgr = reinterpret_cast<EntityManager::CSpawnGroupMgrGameSystemProvider *>(reinterpret_cast<CSpawnGroupMgrGameSystem *>(SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup)));
 
-	CMapSpawnGroup *pMapSpawnGroup = pSpawnGroupMgr->Get(handle);
+	CMapSpawnGroup *pMapSpawnGroup = pSpawnGroupMgr->Get(hSpawnGroup);
 
 	CUtlVector<const CEntityKeyValues *> vecLayerEntities; // pKeyValues stored it. Control the lifecycle.
 
@@ -824,7 +824,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 				vecLayerEntities = *pKeyValues;
 			}
 
-			SpawnGroupHandle_t hTargetSpawnGroup = bIsMySpawnGroup ? pMapSpawnGroup->GetOwnerSpawnGroup() : handle;
+			SpawnGroupHandle_t hTargetSpawnGroup = bIsMySpawnGroup ? pMapSpawnGroup->GetOwnerSpawnGroup() : hSpawnGroup;
 
 			if(s_aEntityManagerProviderAgent.HasInSpawnQueue(hTargetSpawnGroup))
 			{
@@ -834,7 +834,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 		}
 	}
 
-	ILoadingSpawnGroup *pLoading = (pSpawnGroupMgr->*(funcCreateLoadingSpawnGroup))(handle, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, pKeyValues);
+	ILoadingSpawnGroup *pLoading = (pSpawnGroupMgr->*(funcCreateLoadingSpawnGroup))(hSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, pKeyValues);
 
 	const int iCount = pLoading->EntityCount();
 
@@ -906,21 +906,21 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 		if(!this->m_bIsCurrentMySpawnOfEntities)
 		{
-			this->ListenLoadingSpawnGroup(handle, aMyEntities.Count(), aMyEntities.Base());
+			this->ListenLoadingSpawnGroup(hSpawnGroup, aMyEntities.Count(), aMyEntities.Base());
 		}
 	}
 
 	RETURN_META_VALUE(MRES_SUPERCEDE, pLoading);
 }
 
-void EntityManagerPlugin::OnSpawnGroupShutdownHook(SpawnGroupHandle_t handle)
+void EntityManagerPlugin::OnSpawnGroupShutdownHook(SpawnGroupHandle_t hSpawnGroup)
 {
 	if(this->m_aLogger.IsChannelEnabled(LV_DETAILED))
 	{
-		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", handle);
+		this->m_aLogger.DetailedFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", hSpawnGroup);
 	}
 
-	s_aEntityManagerProviderAgent.NotifyDestroySpawnGroup(handle);
+	s_aEntityManagerProviderAgent.NotifyDestroySpawnGroup(hSpawnGroup);
 }
 
 void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, const int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener)
