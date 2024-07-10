@@ -9,6 +9,8 @@ CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupH
 {
 	auto *pMgrSpawnGroupMap = this->GetSpawnGroups();
 
+	pMgrSpawnGroupMap->SetLessFunc(DefLessFunc(SpawnGroupHandle_t));
+
 	auto iFoundIndex = pMgrSpawnGroupMap->Find(h);
 
 	return iFoundIndex == pMgrSpawnGroupMap->InvalidIndex() ? nullptr : pMgrSpawnGroupMap->Element(iFoundIndex);
