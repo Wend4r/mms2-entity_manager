@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
     paths:
       - '.github/workflows/**.yml'
+      - 'cmake/**'
       - 'external/**'
       - 'src/**'
       - 'trigger-build.txt'
@@ -12,6 +13,7 @@ on:
     branches: [ "main" ]
     paths:
       - '.github/workflows/**.yml'
+      - 'cmake/**'
       - 'external/**'
       - 'src/**'
       - 'trigger-build.txt'
