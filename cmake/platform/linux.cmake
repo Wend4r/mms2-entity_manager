@@ -10,6 +10,13 @@ set(PLATFORM_COMPILER_OPTIONS
 	-fno-threadsafe-statics -fvisibility=default
 )
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set(PLATFORM_COMPILER_OPTIONS
+		${PLATFORM_COMPILER_OPTIONS}
+		-g3 -ggdb
+	)
+endif()
+
 set(PLATFORM_LINKER_OPTIONS)
 
 set(PLATFORM_COMPILE_DEFINITIONS
