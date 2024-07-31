@@ -1,3 +1,6 @@
+[submodule "Any Config"]
+	path = external/any_config
+	url = https://github.com/Wend4r/s2u-any_config.git
 [submodule "DynLibUtils"]
 	path = external/memory_utils
 	url = https://github.com/Wend4r/cpp-memory_utils.git
