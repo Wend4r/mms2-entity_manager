@@ -1016,42 +1016,11 @@ bool EntityManagerPlugin::Unpause(char *error, size_t maxlen)
 	return true;
 }
 
-const char *EntityManagerPlugin::GetAuthor()
-{
-	return META_PLUGIN_AUTHOR;
-}
-
-const char *EntityManagerPlugin::GetName()
-{
-	return META_PLUGIN_NAME;
-}
-
-const char *EntityManagerPlugin::GetDescription()
-{
-	return META_PLUGIN_DESCRIPTION;
-}
-
-const char *EntityManagerPlugin::GetURL()
-{
-	return META_PLUGIN_URL;
-}
-
-const char *EntityManagerPlugin::GetLicense()
-{
-	return META_PLUGIN_LICENSE;
-}
-
-const char *EntityManagerPlugin::GetVersion()
-{
-	return META_PLUGIN_VERSION;
-}
-
-const char *EntityManagerPlugin::GetDate()
-{
-	return META_PLUGIN_DATE;
-}
-
-const char *EntityManagerPlugin::GetLogTag()
-{
-	return META_PLUGIN_LOG_TAG;
-}
+const char *EntityManagerPlugin::GetAuthor()      { return META_PLUGIN_AUTHOR; }
+const char *EntityManagerPlugin::GetName()        { return META_PLUGIN_NAME; }
+const char *EntityManagerPlugin::GetDescription() { return META_PLUGIN_DESCRIPTION; }
+const char *EntityManagerPlugin::GetURL()         { return META_PLUGIN_URL; }
+const char *EntityManagerPlugin::GetLicense()     { return META_PLUGIN_LICENSE; }
+const char *EntityManagerPlugin::GetVersion()     { return META_PLUGIN_VERSION; }
+const char *EntityManagerPlugin::GetDate()        { return META_PLUGIN_DATE; }
+const char *EntityManagerPlugin::GetLogTag()      { return META_PLUGIN_LOG_TAG; }
