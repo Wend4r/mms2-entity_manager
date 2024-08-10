@@ -138,8 +138,8 @@
 			//  "CGameResourceService::BuildResourceManifest(finish)"
 			"CGameResourceService::m_pEntitySystem"
 			{
-				"win64"          "0x58"
-				"linuxsteamrt64" "0x50"
+				"win64"          "88"
+				"linuxsteamrt64" "80"
 			}
 
 			// Used in CEntitySystem::BuildResourceManifest().
@@ -156,8 +156,8 @@
 			//     "SV"
 			"CEntitySystem::m_ActiveSpawnGroupHandle"
 			{
-				"win64"          "0x13B8"
-				"linuxsteamrt64" "0x13E0"
+				"win64"          "5048"
+				"linuxsteamrt64" "5088"
 			}
 
 			// Passes to CEntityKeyValues::CEntityKeyValues() as argument.

@@ -10,12 +10,12 @@
 
 				"win64"
 				{
-					"read_offs32"    "0xD7"
+					"read_offs32"    "215"
 				}
 
 				"linuxsteamrt64"
 				{
-					"read_offs32"    "0xA1"
+					"read_offs32"    "161"
 				}
 			}
 		}
@@ -55,15 +55,15 @@
 			//   s_GSFactoryCSpawnGroupMgrGameSystem.m_ppGlobalPointer = &g_pSpawnGroupMgr; // <-- Here.
 			"CGameSystemReallocatingFactory<CSpawnGroupMgrGameSystem,CSpawnGroupMgrGameSystem>::m_ppGlobalPointer"
 			{
-				"win64"          "0x18"
-				"linuxsteamrt64" "0x18"
+				"win64"          "24"
+				"linuxsteamrt64" "24"
 			}
 
 			// See ISpawnGroup::GetName() used.
 			"CSpawnGroupMgrGameSystem::m_SpawnGroups" // CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *>
 			{
-				"win64"          "0x140"
-				"linuxsteamrt64" "0x140"
+				"win64"          "320"
+				"linuxsteamrt64" "320"
 			}
 
 			"CLoadingMapGroup::m_spawnInfo"
