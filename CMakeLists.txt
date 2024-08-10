@@ -25,6 +25,8 @@ string(TIMESTAMP PROJECT_BUILD_TIME "%H:%M:%S")
 
 set(PROTOBUF_FILES
 	common/networkbasetypes
+	common/netmessages
+	common/network_connection
 )
 
 if(SOURCESDK_DIR)
