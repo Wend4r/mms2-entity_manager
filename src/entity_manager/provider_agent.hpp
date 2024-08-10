@@ -4,12 +4,12 @@
 #include <stddef.h>
 
 #include <eiface.h>
-#include <tier0/utlbinaryblock.h>
-#include <tier1/utlmap.h>
-#include <tier1/utlvector.h>
-#include <tier1/keyvalues3.h>
 #include <entity2/entityidentity.h>
 #include <entity2/entitykeyvalues.h>
+#include <tier1/keyvalues3.h>
+#include <tier1/utlmap.h>
+#include <tier1/utlsymbollarge.h>
+#include <tier1/utlvector.h>
 
 #include "logger.hpp"
 #include "provider_agent/resourcemanifest.hpp"
@@ -33,6 +33,10 @@ namespace EntityManager
 		bool Init();
 		void Clear();
 		void Destroy();
+
+	public:
+		CUtlSymbolLarge AllocPooledString(const char *pString);
+		CUtlSymbolLarge FindPooledString(const char* pString);
 
 	public:
 		virtual bool NotifyGameResourceUpdated();
@@ -85,7 +89,7 @@ namespace EntityManager
 		static bool MakeDumpColorAlpha(Color &rgba);
 
 	protected: // Cache of entity keys.
-		typedef CUtlMap<CUtlBinaryBlock, EntityKeyId_t> CacheMapType;
+		typedef CUtlMap<CUtlSymbolLarge, EntityKeyId_t> CacheMapType;
 		typedef CacheMapType::IndexType_t CacheMapOIndexType;
 
 		const EntityKeyId_t &GetCachedEntityKey(CacheMapOIndexType nElm);

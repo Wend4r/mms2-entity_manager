@@ -27,23 +27,14 @@ CBaseGameSystemFactory **CBaseGameSystemFactory::sm_pFirst = NULL;
 DLL_EXPORT CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem = NULL;
 DLL_EXPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
-class CDefOpsStringBinaryBlock
-{
-public:
-	static bool LessFunc(const CUtlBinaryBlock &lhs, const CUtlBinaryBlock &rhs)
-	{
-		return StringLessThan((const char *)lhs.Get(), (const char *)rhs.Get());
-	}
-};
-
 EntityManager::ProviderAgent::ProviderAgent()
- :   m_mapCachedKeys(CDefOpsStringBinaryBlock::LessFunc)
+ :   m_mapCachedKeys(DefLessFunc(const CUtlSymbolLarge))
 {
 	// Cache the classname.
 	{
 		static const char szClassname[] = "classname";
 
-		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert({szClassname, sizeof(szClassname)}, {szClassname, (const char *)szClassname});
+		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert(AllocPooledString(szClassname), {szClassname, szClassname});
 	}
 }
 
@@ -62,6 +53,16 @@ void EntityManager::ProviderAgent::Clear()
 void EntityManager::ProviderAgent::Destroy()
 {
 	this->Clear();
+}
+
+CUtlSymbolLarge EntityManager::ProviderAgent::AllocPooledString(const char *pString)
+{
+	return g_pEntitySystem->AllocPooledString(pString);
+}
+
+CUtlSymbolLarge EntityManager::ProviderAgent::FindPooledString(const char* pString)
+{
+	return g_pEntitySystem->FindPooledString(pString);
 }
 
 bool EntityManager::ProviderAgent::NotifyGameResourceUpdated()
@@ -854,11 +855,11 @@ const EntityKeyId_t &EntityManager::ProviderAgent::GetCachedClassnameKey()
 
 EntityManager::ProviderAgent::CacheMapOIndexType EntityManager::ProviderAgent::CacheOrGetEntityKey(const char *pszName)
 {
-	const CUtlBinaryBlock aName(pszName, V_strlen(pszName) + 1);
+	CUtlSymbolLarge sName = this->AllocPooledString(pszName);
 
-	CacheMapOIndexType nFindElm = this->m_mapCachedKeys.Find(aName);
+	CacheMapOIndexType nFindElm = this->m_mapCachedKeys.Find(sName);
 
-	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(aName, {(const char *)aName.Get()}) : nFindElm;
+	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, {MakeStringToken(pszName), pszName}) : nFindElm;
 }
 
 EntityManager::ProviderAgent::SpawnData::SpawnData(CEntityKeyValues *pKeyValues)
