@@ -28,14 +28,7 @@ DLL_EXPORT CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem = NULL;
 DLL_EXPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
 EntityManager::ProviderAgent::ProviderAgent()
- :   m_mapCachedKeys(DefLessFunc(const CUtlSymbolLarge))
 {
-	// Cache the classname.
-	{
-		static const char szClassname[] = "classname";
-
-		this->m_nElmCachedClassnameKey = this->m_mapCachedKeys.Insert(AllocPooledString(szClassname), {szClassname, szClassname});
-	}
 }
 
 bool EntityManager::ProviderAgent::Init()
@@ -194,7 +187,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 			{
 				const char *pszAttrKey = pAttrKeyValue->GetName();
 
-				const EntityKeyId_t &aAttrKey = this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszAttrKey));
+				const EntityKeyId_t &aAttrKey {MakeStringToken(pszAttrKey), pszAttrKey};
 
 				pNewKeyValues->SetString(aAttrKey, pAttrKeyValue->GetString(), true);
 			}
@@ -207,7 +200,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 	{
 		const char *pszKey = pKeyValue->GetName();
 
-		const EntityKeyId_t &aKey = this->GetCachedEntityKey(this->CacheOrGetEntityKey(pszKey));
+		const EntityKeyId_t &aKey {MakeStringToken(pszKey), pszKey};
 
 		pNewKeyValues->SetString(aKey, pKeyValue->GetString());
 	}
@@ -340,9 +333,11 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup, Lo
 
 	const int iQueueLength = vecEntitySpawnQueue.Count();
 
+	const char szClassnameKey[] = "classname";
+
 	const CEntityIndex iForceEdictIndex = CEntityIndex(-1);
 
-	const auto &aClassnameKey = this->GetCachedClassnameKey();
+	const EntityKeyId_t aClassnameKey {szClassnameKey, szClassnameKey};
 
 	for(int i = 0; i < iQueueLength; i++)
 	{
@@ -841,25 +836,6 @@ bool EntityManager::ProviderAgent::MakeDumpColorAlpha(Color &rgba)
 	}
 
 	return bResult;
-}
-
-const EntityKeyId_t &EntityManager::ProviderAgent::GetCachedEntityKey(CacheMapOIndexType nElm)
-{
-	return this->m_mapCachedKeys[nElm];
-}
-
-const EntityKeyId_t &EntityManager::ProviderAgent::GetCachedClassnameKey()
-{
-	return this->m_mapCachedKeys[this->m_nElmCachedClassnameKey];
-}
-
-EntityManager::ProviderAgent::CacheMapOIndexType EntityManager::ProviderAgent::CacheOrGetEntityKey(const char *pszName)
-{
-	CUtlSymbolLarge sName = this->AllocPooledString(pszName);
-
-	CacheMapOIndexType nFindElm = this->m_mapCachedKeys.Find(sName);
-
-	return nFindElm == this->m_mapCachedKeys.InvalidIndex() ? this->m_mapCachedKeys.Insert(sName, {MakeStringToken(pszName), pszName}) : nFindElm;
 }
 
 EntityManager::ProviderAgent::SpawnData::SpawnData(CEntityKeyValues *pKeyValues)

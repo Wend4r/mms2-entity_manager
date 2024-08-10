@@ -88,14 +88,6 @@ namespace EntityManager
 		static int DumpEntityKeyValue(KeyValues3 *pMember, char *psBuffer, size_t nMaxLength);
 		static bool MakeDumpColorAlpha(Color &rgba);
 
-	protected: // Cache of entity keys.
-		typedef CUtlMap<CUtlSymbolLarge, EntityKeyId_t> CacheMapType;
-		typedef CacheMapType::IndexType_t CacheMapOIndexType;
-
-		const EntityKeyId_t &GetCachedEntityKey(CacheMapOIndexType nElm);
-		const EntityKeyId_t &GetCachedClassnameKey();
-		CacheMapOIndexType CacheOrGetEntityKey(const char *pszName);
-
 	private:
 		class SpawnData
 		{
@@ -139,9 +131,6 @@ namespace EntityManager
 		CKeyValues3Context m_aEntityAllocator;
 
 		CUtlVector<DestoryData> m_vecEntityDestroyQueue;
-
-		CacheMapType m_mapCachedKeys;
-		CacheMapOIndexType m_nElmCachedClassnameKey;
 
 		ResourceManifest m_aResourceManifest;
 		CUtlVector<SpawnGroup *> m_vecSpawnGroups;
