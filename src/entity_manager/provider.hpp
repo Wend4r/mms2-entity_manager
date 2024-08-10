@@ -12,7 +12,7 @@
 
 #include "provider/entitysystem.hpp"
 
-#include "gamedata.hpp"
+#include <gamedata.hpp>
 
 class CSpawnGroupMgrGameSystem;
 class CBaseGameSystemFactory;
@@ -20,28 +20,37 @@ class CGameEventManager;
 
 namespace EntityManager
 {
-	class Provider
+	class Provider : public IGameData
 	{
 	public:
-		bool Init(char *psError, size_t nMaxLength);
-		bool Load(const char *pszBaseDir, char *psError = NULL, size_t nMaxLength = 0);
+		Provider();
+
+		bool Init(GameData::CBufferStringVector &vecMessages);
+		bool Load(const char *pszBaseDir, GameData::CBufferStringVector &vecMessages);
 		void Destroy();
 
+	public: // IGameData
+		const DynLibUtils::CModule *FindLibrary(const char *pszName) const;
+
+	public:
+		CUtlSymbolLarge GetSymbol(const char *pszText);
+		CUtlSymbolLarge FindSymbol(const char *pszText) const;
+
 	protected:
-		bool LoadGameData(const char *pszBaseDir, char *psError = NULL, size_t nMaxLength = 0);
+		bool LoadGameData(const char *pszBaseDir, GameData::CBufferStringVector &vecMessages);
 
 	public:
 		class GameDataStorage
 		{
 		public:
-			bool Load(IGameData *pRoot, const char *pszBaseConfigDir, char *psError = NULL, size_t nMaxLength = 0);
+			bool Load(IGameData *pRoot, const char *pszBaseConfigDir, GameData::CBufferStringVector &vecMessages);
 
 		protected:
-			bool LoadEntitySystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
-			bool LoadGameResource(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
-			bool LoadGameSystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
-			bool LoadSource2Server(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
-			bool LoadEntitySpawnGroup(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+			bool LoadEntitySystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+			bool LoadGameResource(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+			bool LoadGameSystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+			bool LoadSource2Server(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+			bool LoadEntitySpawnGroup(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
 
 		public:
 			class EntitySystem
@@ -50,7 +59,7 @@ namespace EntityManager
 				EntitySystem();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
 				void Reset();
 
 			public:
@@ -95,7 +104,7 @@ namespace EntityManager
 				GameResource();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
 				void Reset();
 
 			public:
@@ -128,7 +137,7 @@ namespace EntityManager
 				GameSystem();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
 				void Reset();
 
 			public:
@@ -153,7 +162,7 @@ namespace EntityManager
 				Source2Server();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
 				void Reset();
 
 			public:
@@ -178,7 +187,7 @@ namespace EntityManager
 				SpawnGroup();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError = NULL, size_t nMaxLength = 0);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
 				void Reset();
 
 			public:
@@ -216,7 +225,9 @@ namespace EntityManager
 		const GameDataStorage &GetGameDataStorage() const;
 
 	private:
-		GameData m_aData;
+		CUtlSymbolTableLarge_CI m_aSymbolTable;
+
+		CUtlMap<CUtlSymbolLarge, DynLibUtils::CModule *> m_mapLibraries;
 		GameDataStorage m_aStorage;
 	};
 };

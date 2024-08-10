@@ -23,6 +23,10 @@ set(PROJECT_LICENSE "GPLv3")
 string(TIMESTAMP PROJECT_BUILD_DATE "%Y-%m-%d")
 string(TIMESTAMP PROJECT_BUILD_TIME "%H:%M:%S")
 
+set(PROTOBUF_FILES
+	common/networkbasetypes
+)
+
 if(SOURCESDK_DIR)
 	file(TO_CMAKE_PATH "${SOURCESDK_DIR}" SOURCESDK_DIR)
 else()
@@ -61,6 +65,7 @@ include("cmake/gamedata.cmake")
 include("cmake/logger.cmake")
 include("cmake/metamod.cmake")
 include("cmake/sourcesdk.cmake")
+include("cmake/sourcesdk/proto.cmake")
 
 set(SOURCE_FILES
 	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent/resourcemanifest.cpp

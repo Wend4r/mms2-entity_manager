@@ -7,34 +7,63 @@
 #include <tier0/strtools.h>
 #include <entity2/entitysystem.h>
 
-#define GAMECONFIG_FOLDER_DIR "gamedata"
-#define GAMECONFIG_ENTITYSYSTEM_FILENAME "entitysystem.games.txt"
-#define GAMECONFIG_GAMERESOURCE_FILENAME "gameresource.games.txt"
-#define GAMECONFIG_GAMESYSTEM_FILENAME "gamesystem.games.txt"
-#define GAMECONFIG_SOURCE2SERVER_FILENAME "source2server.games.txt"
-#define GAMECONFIG_SPAWNGROUP_FILENAME "spawngroup.games.txt"
+#include <any_config.hpp>
 
-DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
+#define GAMECONFIG_FOLDER_DIR "gamedata"
+#define GAMECONFIG_ENTITYSYSTEM_FILENAME "entitysystem.games.*"
+#define GAMECONFIG_GAMERESOURCE_FILENAME "gameresource.games.*"
+#define GAMECONFIG_GAMESYSTEM_FILENAME "gamesystem.games.*"
+#define GAMECONFIG_SOURCE2SERVER_FILENAME "source2server.games.*"
+#define GAMECONFIG_SPAWNGROUP_FILENAME "spawngroup.games.*"
 
 DLL_IMPORT IFileSystem *filesystem;
+DLL_IMPORT IVEngineServer *engine;
+DLL_IMPORT IServerGameDLL *server;
 
-bool EntityManager::Provider::Init(char *psError, size_t nMaxLength)
+DynLibUtils::CModule g_aLibEngine, 
+                     g_aLibServer;
+
+EntityManager::Provider::Provider()
+ :  m_mapLibraries(DefLessFunc(const CUtlSymbolLarge))
 {
-	char sGameDataError[256];
-
-	bool bResult = this->m_aData.Init((char *)sGameDataError, sizeof(sGameDataError));
-
-	if(!bResult && psError)
-	{
-		snprintf(psError, nMaxLength, "Failed to init a gamedata: %s", sGameDataError);
-	}
-
-	return bResult;
 }
 
-bool EntityManager::Provider::Load(const char *pszBaseDir, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::Init(GameData::CBufferStringVector &vecMessages)
 {
-	bool bResult = this->LoadGameData(pszBaseDir, psError, nMaxLength);
+	// Enigne 2.
+	{
+		const char szEngineModuleName[] = "engine2";
+
+		if(!g_aLibEngine.InitFromMemory(engine))
+		{
+			static const char *s_pszMessageConcat[] = {"Failed to ", "get ", szEngineModuleName, " module"};
+
+			vecMessages.AddToTail({s_pszMessageConcat});
+		}
+
+		this->m_mapLibraries.Insert(this->GetSymbol(szEngineModuleName), &g_aLibEngine);
+	}
+
+	// Server.
+	{
+		const char szServerModuleName[] = "server";
+
+		if(!g_aLibServer.InitFromMemory(server))
+		{
+			static const char *s_pszMessageConcat[] = {"Failed to ", "get ", szServerModuleName, " module"};
+
+			vecMessages.AddToTail({s_pszMessageConcat});
+		}
+
+		this->m_mapLibraries.Insert(this->GetSymbol(szServerModuleName), &g_aLibServer);
+	}
+
+	return true;
+}
+
+bool EntityManager::Provider::Load(const char *pszBaseDir, GameData::CBufferStringVector &vecMessages)
+{
+	bool bResult = this->LoadGameData(pszBaseDir, vecMessages);
 
 	if(bResult)
 	{
@@ -49,36 +78,42 @@ void EntityManager::Provider::Destroy()
 	// ...
 }
 
-bool EntityManager::Provider::LoadGameData(const char *pszBaseDir, char *psError, size_t nMaxLength)
+const DynLibUtils::CModule *EntityManager::Provider::FindLibrary(const char *pszName) const
+{
+	auto iFoundIndex = this->m_mapLibraries.Find(this->FindSymbol(pszName));
+
+	Assert(IS_VALID_GAMEDATA_INDEX(iFoundIndex));
+
+	return this->m_mapLibraries.Element(iFoundIndex);
+}
+
+CUtlSymbolLarge EntityManager::Provider::GetSymbol(const char *pszText)
+{
+	return this->m_aSymbolTable.AddString(pszText);
+}
+
+CUtlSymbolLarge EntityManager::Provider::FindSymbol(const char *pszText) const
+{
+	return this->m_aSymbolTable.Find(pszText);
+}
+
+bool EntityManager::Provider::LoadGameData(const char *pszBaseDir, GameData::CBufferStringVector &vecMessages)
 {
 	char sBaseConfigDir[MAX_PATH];
 
 	snprintf((char *)sBaseConfigDir, sizeof(sBaseConfigDir), "%s" CORRECT_PATH_SEPARATOR_S "%s", pszBaseDir, GAMECONFIG_FOLDER_DIR);
 
-	char sGameDataError[256];
-
-	bool bResult = this->m_aStorage.Load((IGameData *)&this->m_aData, (const char *)sBaseConfigDir, (char *)sGameDataError, sizeof(sGameDataError));
-
-	if(!bResult && psError)
-	{
-		snprintf(psError, nMaxLength, "Failed to load a gamedata: %s", sGameDataError);
-	}
-
-	return bResult;
+	return this->m_aStorage.Load(this, sBaseConfigDir, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char *pszBaseConfigDir, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char *pszBaseConfigDir, GameData::CBufferStringVector &vecMessages)
 {
-	KeyValues *pGameConfig = new KeyValues("Games");
-
-	char sConfigFile[MAX_PATH];
-
 	bool bResult = true;
 
 	struct
 	{
 		const char *pszFilename;
-		bool (EntityManager::Provider::GameDataStorage::*pfnLoad)(IGameData *, KeyValues *, char *, size_t);
+		bool (EntityManager::Provider::GameDataStorage::*pfnLoad)(IGameData *, KeyValues3 *, GameData::CBufferStringVector &);
 	} aConfigs[] =
 	{
 		{
@@ -103,61 +138,76 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 		}
 	};
 
+	char sConfigFile[MAX_PATH];
+
+	const char *pszConfigPathID = "GAME";
+
+	CUtlString sError;
+
+	AnyConfig::LoadFromFile_Generic_t aLoadPresets({{&sError, NULL, pszConfigPathID}, g_KV3Format_Generic});
+
 	for(size_t n = 0, nSize = std::size(aConfigs); n < nSize; n++)
 	{
+		AnyConfig::Anyone aGameConfig;
+
 		snprintf((char *)sConfigFile, sizeof(sConfigFile), "%s" CORRECT_PATH_SEPARATOR_S "%s", pszBaseConfigDir, aConfigs[n].pszFilename);
 
-		bResult = pGameConfig->LoadFromFile(filesystem, (const char *)sConfigFile);
+		CUtlVector<CUtlString> vecConfigFiles;
+
+		filesystem->FindFileAbsoluteList(vecConfigFiles, (const char *)sConfigFile, pszConfigPathID);
+
+		bResult = vecConfigFiles.Count() > 0;
 
 		if(bResult)
 		{
-			bResult = (this->*(aConfigs[n].pfnLoad))(pRoot, pGameConfig, psError, nMaxLength);
+			aLoadPresets.m_pszFilename = vecConfigFiles[0].Get();
+			bResult = aGameConfig.Load(aLoadPresets);
 
 			if(bResult)
 			{
-				pGameConfig->Clear();
+				(this->*(aConfigs[n].pfnLoad))(pRoot, aGameConfig.Get(), vecMessages);
 			}
 			else
 			{
-				break;
+				const char *pszMessageConcat[] = {"Failed to ", "load \"", sConfigFile, "\" file", ": ", sError.Get()};
+
+				vecMessages.AddToTail({pszMessageConcat});
 			}
 		}
-		else if(psError)
+		else
 		{
-			snprintf(psError, nMaxLength, "Failed to load KeyValues from \"%s\" file", sConfigFile);
+			const char *pszMessageConcat[] = {"Failed to ", "find \"", sConfigFile, "\" file", ": ", sError.Get()};
 
-			break;
+			vecMessages.AddToTail({pszMessageConcat});
 		}
 	}
-
-	delete pGameConfig;
 
 	return bResult;
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadEntitySystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::GameDataStorage::LoadEntitySystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aEntitySystem.Load(pRoot, pGameConfig, psError, nMaxLength);
+	return this->m_aEntitySystem.Load(pRoot, pGameConfig, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadGameResource(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::GameDataStorage::LoadGameResource(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aGameResource.Load(pRoot, pGameConfig, psError, nMaxLength);
+	return this->m_aGameResource.Load(pRoot, pGameConfig, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadGameSystem(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::GameDataStorage::LoadGameSystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aGameSystem.Load(pRoot, pGameConfig, psError, nMaxLength);
+	return this->m_aGameSystem.Load(pRoot, pGameConfig, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadSource2Server(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::GameDataStorage::LoadSource2Server(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aSource2Server.Load(pRoot, pGameConfig, psError, nMaxLength);
+	return this->m_aSource2Server.Load(pRoot, pGameConfig, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadEntitySpawnGroup(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::GameDataStorage::LoadEntitySpawnGroup(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aSpawnGroup.Load(pRoot, pGameConfig, psError, nMaxLength);
+	return this->m_aSpawnGroup.Load(pRoot, pGameConfig, vecMessages);
 }
 
 const EntityManager::Provider::GameDataStorage::EntitySystem &EntityManager::Provider::GameDataStorage::GetEntitySystem() const

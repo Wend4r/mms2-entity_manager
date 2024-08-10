@@ -8,32 +8,32 @@ EntityManager::Provider::GameDataStorage::GameResource::GameResource()
 	{
 		auto &aCallbacks = this->m_aOffsetCallbacks;
 
-		aCallbacks.Insert("CGameResourceService::DestroyResourceManifest", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CGameResourceService::DestroyResourceManifest"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			this->m_nDestroyResourceManifestOffset = nOffset;
 		});
-		aCallbacks.Insert("CGameResourceService::PrecacheEntitiesAndConfirmResourcesAreLoaded", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CGameResourceService::PrecacheEntitiesAndConfirmResourcesAreLoaded"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			this->m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset = nOffset;
 		});
-		aCallbacks.Insert("CGameResourceService::AllocGameResourceManifest", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CGameResourceService::AllocGameResourceManifest"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			this->m_nAllocGameResourceManifestOffset = nOffset;
 		});
-		aCallbacks.Insert("CGameResourceService::AppendToAndCreateGameResourceManifest", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CGameResourceService::AppendToAndCreateGameResourceManifest"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			this->m_nAppendToAndCreateGameResourceManifestOffset = nOffset;
 		});
-		aCallbacks.Insert("CGameResourceService::m_pEntitySystem", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CGameResourceService::m_pEntitySystem"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			this->m_nEntitySystemOffset = nOffset;
 			g_pEntityManagerProviderAgent->NotifyEntitySystemUpdated();
 		});
-		aCallbacks.Insert("CGameResourceService::m_pEntityManifest", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CGameResourceService::m_pEntityManifest"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			this->m_nEntityManifestOffset = nOffset;
 		});
-		aCallbacks.Insert("CEntityResourceManifest::`vftable'", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CEntityResourceManifest::`vftable'"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			this->m_nEntityManifestVFTableOffset = nOffset;
 		});
@@ -42,9 +42,9 @@ EntityManager::Provider::GameDataStorage::GameResource::GameResource()
 	}
 }
 
-bool EntityManager::Provider::GameDataStorage::GameResource::Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::GameDataStorage::GameResource::Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aGameConfig.Load(pRoot, pGameConfig, psError, nMaxLength);
+	return this->m_aGameConfig.Load(pRoot, pGameConfig, vecMessages);
 }
 
 void EntityManager::Provider::GameDataStorage::GameResource::Reset()

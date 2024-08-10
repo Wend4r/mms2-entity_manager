@@ -5,12 +5,12 @@ EntityManager::Provider::GameDataStorage::GameSystem::GameSystem()
 	{
 		auto &aCallbacks = this->m_aAddressCallbacks;
 
-		aCallbacks.Insert("CBaseGameSystemFactory::sm_pFirst", [this](const std::string &, const DynLibUtils::CMemory &aAddress)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CBaseGameSystemFactory::sm_pFirst"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &aAddress)
 		{
 			this->m_pBaseGameSystemFactoryFirst = aAddress.RCast<decltype(this->m_pBaseGameSystemFactoryFirst)>();
 		});
 
-		aCallbacks.Insert("IGameSystem::InitAllSystems", [this](const std::string &, const DynLibUtils::CMemory &aAddress)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("IGameSystem::InitAllSystems"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &aAddress)
 		{
 			this->m_pfnGameSystemInit = aAddress.UCast<decltype(this->m_pfnGameSystemInit)>();
 		});
@@ -19,9 +19,9 @@ EntityManager::Provider::GameDataStorage::GameSystem::GameSystem()
 	}
 }
 
-bool EntityManager::Provider::GameDataStorage::GameSystem::Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::GameDataStorage::GameSystem::Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aGameConfig.Load(pRoot, pGameConfig, psError, nMaxLength);
+	return this->m_aGameConfig.Load(pRoot, pGameConfig, vecMessages);
 }
 
 void EntityManager::Provider::GameDataStorage::GameSystem::Reset()

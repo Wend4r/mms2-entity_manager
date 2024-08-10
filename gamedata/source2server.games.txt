@@ -6,16 +6,16 @@
 		{
 			"&s_GameEventManager"
 			{
-				"signature"     "CSource2Server::Init"
+				"signature"      "CSource2Server::Init"
 
-				"windows64"
+				"win64"
 				{
-					"read_offs32"   "0x72"
+					"read_offs32"    "0x72"
 				}
 
-				"linux64"
+				"linuxsteamrt64"
 				{
-					"read_offs32"   "0x6C"
+					"read_offs32"    "0x6C"
 				}
 			}
 		}
@@ -33,9 +33,10 @@
 			//   "[STARTUP] {%.3f} server module init %s\n", ... "ok"
 			"CSource2Server::Init"
 			{
-				"library"   "server"
-				"windows64" "40 57 48 83 EC 20 48 83 3D ? ? ? ? ? 74 07 33 C9 E8 ? ? ? ? FF 15"
-				"linux64"   "55 48 89 E5 41 55 41 54 53 48 83 EC 08 48 8D 05 ? ? ? ? 48 83 38 00 74 07 31 FF E8"
+				"library"        "server"
+
+				"win64"          "40 57 48 83 EC 20 48 83 3D ? ? ? ? ? 74 07 33 C9 E8 ? ? ? ? FF 15"
+				"linuxsteamrt64" "55 48 89 E5 41 55 41 54 53 48 83 EC 08 48 8D 05 ? ? ? ? 48 83 38 00 74 07 31 FF E8"
 			}
 		}
 
@@ -43,8 +44,8 @@
 		{
 			"CSource2Server::GetGameEventManager"
 			{
-				"windows64" "93"
-				"linux64"   "93"
+				"win64"          "93"
+				"linuxsteamrt64" "93"
 			}
 		}
 	}

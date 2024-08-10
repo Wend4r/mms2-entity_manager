@@ -72,7 +72,7 @@ protected:
 	void UnhookEvents();
 
 protected:
-	bool LoadProvider(char *psError = NULL, size_t nMaxLength = 0);
+	bool LoadProvider();
 	bool LoadSettings(ISpawnGroup *pSpawnGroup, char *psError = NULL, size_t nMaxLength = 0);
 	virtual void OnBasePathChanged(const char *pszNewOne);
 

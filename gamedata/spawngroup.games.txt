@@ -6,16 +6,16 @@
 		{
 			"&g_pSpawnGroupMgr"
 			{
-				"signature"     "CPhysicsGameSystem::GetOrCreateLevelWorld"
+				"signature"      "CPhysicsGameSystem::GetOrCreateLevelWorld"
 
-				"windows64"
+				"win64"
 				{
-					"read_offs32"   "0xD7"
+					"read_offs32"    "0xD7"
 				}
 
-				"linux64"
+				"linuxsteamrt64"
 				{
-					"read_offs32"   "0xA1"
+					"read_offs32"    "0xA1"
 				}
 			}
 		}
@@ -40,8 +40,9 @@
 			"CPhysicsGameSystem::GetOrCreateLevelWorld"
 			{
 				"library"       "server"
-				"windows64"     "40 53 55 56 48 83 EC 20 44 0F B7 49 ? 48 8B E9 B9 ? ? ? ? 41 8B F0 8B DA 66 44 3B C9 74 51 4C 8B 45 48 0F 1F 40 00 0F 1F 84 00"
-				"linux64"       "55 48 89 E5 41 57 41 56 41 89 D6 41 55 49 89 FD 41 54 41 89 F4 53 48 83 EC 28 0F B7 47 58 66 83 F8 FF 74 28 48 8B 57 48"
+
+				"win64"          "40 53 55 56 48 83 EC 20 44 0F B7 49 ? 48 8B E9 B9 ? ? ? ? 41 8B F0 8B DA 66 44 3B C9 74 51 4C 8B 45 48 0F 1F 40 00 0F 1F 84 00"
+				"linuxsteamrt64" "55 48 89 E5 41 57 41 56 41 89 D6 41 55 49 89 FD 41 54 41 89 F4 53 48 83 EC 28 0F B7 47 58 66 83 F8 FF 74 28 48 8B 57 48"
 			}
 		}
 
@@ -54,21 +55,21 @@
 			//   s_GSFactoryCSpawnGroupMgrGameSystem.m_ppGlobalPointer = &g_pSpawnGroupMgr; // <-- Here.
 			"CGameSystemReallocatingFactory<CSpawnGroupMgrGameSystem,CSpawnGroupMgrGameSystem>::m_ppGlobalPointer"
 			{
-				"windows64"     "0x18"
-				"linux64"       "0x18"
+				"win64"          "0x18"
+				"linuxsteamrt64" "0x18"
 			}
 
 			// See ISpawnGroup::GetName() used.
 			"CSpawnGroupMgrGameSystem::m_SpawnGroups" // CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *>
 			{
-				"windows64"     "0x140"
-				"linux64"       "0x140"
+				"win64"          "0x140"
+				"linuxsteamrt64" "0x140"
 			}
 
 			"CLoadingMapGroup::m_spawnInfo"
 			{
-				"windows64"     "8"
-				"linux64"       "8"
+				"win64"          "8"
+				"linuxsteamrt64" "8"
 			}
 
 			// Used in CMapSpawnGroup::OnSpawnGroupLoad():
@@ -93,14 +94,14 @@
 			//  ...
 			"ISpawnGroup::GetName"
 			{
-				"windows64"     "0"
-				"linux64"       "0"
+				"win64"          "0"
+				"linuxsteamrt64" "0"
 			}
 
 			"CBaseSpawnGroup::m_pEntityFilterName"
 			{
-				"windows64"     "128"
-				"linux64"       "128"
+				"win64"          "128"
+				"linuxsteamrt64" "128"
 			}
 		}
 	}

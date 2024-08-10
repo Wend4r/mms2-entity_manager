@@ -8,7 +8,7 @@ EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
 	{
 		auto &aCallbacks = this->m_aAddressCallbacks;
 
-		aCallbacks.Insert("&g_pSpawnGroupMgr", [this](const std::string &, const DynLibUtils::CMemory &pFunction)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("&g_pSpawnGroupMgr"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
 		{
 			this->m_ppSpawnGroupMgrAddress = pFunction.RCast<decltype(this->m_ppSpawnGroupMgrAddress)>();
 			// g_pEntityManagerProviderAgent->NotifySpawnGroupMgrUpdated();
@@ -20,15 +20,15 @@ EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
 	{
 		auto &aCallbacks = this->m_aOffsetCallbacks;
 
-		aCallbacks.Insert("CSpawnGroupMgrGameSystem::m_SpawnGroups", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CSpawnGroupMgrGameSystem::m_SpawnGroups"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			this->m_nMgrGameSystemSpawnGroupsOffset = nOffset;
 		});
-		aCallbacks.Insert("CLoadingMapGroup::m_spawnInfo", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CLoadingMapGroup::m_spawnInfo"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			this->m_nLoadingMapSpawnInfoOffset = nOffset;
 		});
-		aCallbacks.Insert("CBaseSpawnGroup::m_pEntityFilterName", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(this->m_aGameConfig.GetSymbol("CBaseSpawnGroup::m_pEntityFilterName"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			this->m_nBaseSpawnGroupEntityFilterNameOffset = nOffset;
 		});
@@ -37,9 +37,9 @@ EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
 	}
 }
 
-bool EntityManager::Provider::GameDataStorage::SpawnGroup::Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::GameDataStorage::SpawnGroup::Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aGameConfig.Load(pRoot, pGameConfig, psError, nMaxLength);
+	return this->m_aGameConfig.Load(pRoot, pGameConfig, vecMessages);
 }
 
 void EntityManager::Provider::GameDataStorage::SpawnGroup::Reset()

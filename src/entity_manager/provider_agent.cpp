@@ -47,7 +47,7 @@ EntityManager::ProviderAgent::ProviderAgent()
 	}
 }
 
-bool EntityManager::ProviderAgent::Init(char *psError, size_t nMaxLength)
+bool EntityManager::ProviderAgent::Init()
 {
 	return true;
 }

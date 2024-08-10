@@ -30,7 +30,7 @@ namespace EntityManager
 	public:
 		ProviderAgent();
 
-		bool Init(char *psError, size_t nMaxLength);
+		bool Init();
 		void Clear();
 		void Destroy();
 

@@ -48,8 +48,6 @@
 
 const Color ENTITY_MANAGER_LOGGINING_COLOR = {125, 125, 125, 255};
 
-class GameSessionConfiguration_t { };
-
 SH_DECL_HOOK3_void(IServerGameDLL, GameFrame, SH_NOATTRIB, 0, bool, bool, bool);
 SH_DECL_HOOK3_void(INetworkServerService, StartupServer, SH_NOATTRIB, 0, const GameSessionConfiguration_t &, ISource2WorldSession *, const char *);
 SH_DECL_HOOK2(IGameEventManager2, LoadEventsFromFile, SH_NOATTRIB, 0, int, const char *, bool);
@@ -137,20 +135,36 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 	// Initialize and load a provider.
 	{
-		char sProviderError[256];
+		GameData::CBufferStringVector vecMessages;
 
-		if(s_aEntityManagerProvider.Init((char *)sProviderError, sizeof(sProviderError)))
+		bool bResult = s_aEntityManagerProvider.Init(vecMessages);
+
+		auto aWarnings = this->m_aLogger.CreateWarningsScope();
+
+		FOR_EACH_VEC(vecMessages, i)
 		{
-			if(!this->LoadProvider((char *)sProviderError, sizeof(sProviderError)))
+			auto &aMessage = vecMessages[i];
+
+			aWarnings.Push(aMessage.Get());
+		}
+
+		aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
+		{
+			this->m_aLogger.Warning(rgba, pszContent);
+		});
+
+		if(bResult)
+		{
+			if(!this->LoadProvider())
 			{
-				snprintf(error, maxlen, "Failed to load a provider: %s", sProviderError);
+				snprintf(error, maxlen, "Failed to load a provider");
 
 				return false;
 			}
 		}
 		else
 		{
-			snprintf(error, maxlen, "Failed to init a provider: %s", sProviderError);
+			snprintf(error, maxlen, "Failed to init a provider");
 
 			return false;
 		}
@@ -158,11 +172,9 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 	// Initialize a provider agent.
 	{
-		char sProviderAgentError[256];
-
-		if(!s_aEntityManagerProviderAgent.Init((char *)sProviderAgentError, sizeof(sProviderAgentError)))
+		if(!s_aEntityManagerProviderAgent.Init())
 		{
-			snprintf(error, maxlen, "Failed to init a provider agent: %s", sProviderAgentError);
+			snprintf(error, maxlen, "Failed to init a provider agent");
 
 			return false;
 		}
@@ -431,15 +443,27 @@ void EntityManagerPlugin::UnhookEvents()
 	this->m_bIsHookedEvents = false;
 }
 
-bool EntityManagerPlugin::LoadProvider(char *psError, size_t nMaxLength)
+bool EntityManagerPlugin::LoadProvider()
 {
-	char sProviderError[256];
+	GameData::CBufferStringVector vecMessages;
 
-	bool bResult = s_aEntityManagerProvider.Load(this->m_sBasePath.c_str(), (char *)sProviderError, sizeof(sProviderError));
+	bool bResult = s_aEntityManagerProvider.Load(this->m_sBasePath.c_str(), vecMessages);
 
-	if(!bResult && psError)
+	// Print messages
 	{
-		snprintf(psError, nMaxLength, "Failed to init a provider: %s", sProviderError);
+		Logger::Scope aWarnings = this->m_aLogger.CreateWarningsScope();
+
+		FOR_EACH_VEC(vecMessages, i)
+		{
+			auto &aMessage = vecMessages[i];
+
+			aWarnings.Push(aMessage.Get());
+
+			aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
+			{
+				this->m_aLogger.Warning(rgba, pszContent);
+			});
+		}
 	}
 
 	return bResult;
@@ -535,9 +559,9 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 	{
 		char sProviderError[256];
 
-		if(!this->LoadProvider((char *)sProviderError, sizeof(sProviderError)))
+		if(!this->LoadProvider())
 		{
-			this->m_aLogger.WarningFormat("Failed to load a provider: %s\n", sProviderError);
+			this->m_aLogger.Warning("Failed to load a provider\n");
 		}
 	}
 
