@@ -148,9 +148,9 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 			aWarnings.Push(aMessage.Get());
 		}
 
-		aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
+		aWarnings.SendColor([this](Color rgba, CUtlString sContext)
 		{
-			this->m_aLogger.Warning(rgba, pszContent);
+			this->m_aLogger.Warning(rgba, sContext);
 		});
 
 		if(bResult)
@@ -260,9 +260,9 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 					}
 				});
 
-				aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
+				aWarnings.SendColor([this](Color rgba, CUtlString sContext)
 				{
-					this->m_aLogger.Warning(rgba, pszContent);
+					this->m_aLogger.Warning(rgba, sContext);
 				});
 			}
 		}
@@ -459,9 +459,9 @@ bool EntityManagerPlugin::LoadProvider()
 
 			aWarnings.Push(aMessage.Get());
 
-			aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
+			aWarnings.SendColor([this](Color rgba, CUtlString sContext)
 			{
-				this->m_aLogger.Warning(rgba, pszContent);
+				this->m_aLogger.Warning(rgba, sContext);
 			});
 		}
 	}
@@ -536,15 +536,15 @@ bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, 
 	if(bResult)
 	{
 #ifdef DEBUG
-		aDetails.SendColor([this](const Color &rgba, const char *pszContent)
+		aDetails.SendColor([this](Color rgba, CUtlString sContext)
 		{
-			this->m_aLogger.Detailed(rgba, pszContent);
+			this->m_aLogger.Detailed(rgba, sContext);
 		});
 #endif
 
-		aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
+		aWarnings.SendColor([this](Color rgba, CUtlString sContext)
 		{
-			this->m_aLogger.Warning(rgba, pszContent);
+			this->m_aLogger.Warning(rgba, sContext);
 		});
 	}
 
@@ -583,9 +583,9 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 			}
 		});
 
-		aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
+		aWarnings.SendColor([this](Color rgba, CUtlString sContext)
 		{
-			this->m_aLogger.Warning(rgba, pszContent);
+			this->m_aLogger.Warning(rgba, sContext);
 		});
 	}
 }
@@ -629,9 +629,9 @@ void EntityManagerPlugin::SpawnMyEntities()
 		}
 	});
 
-	aWarnings.SendColor([this](const Color &rgba, const char *pszContent)
+	aWarnings.SendColor([this](Color rgba, CUtlString sContext)
 	{
-		this->m_aLogger.Warning(rgba, pszContent);
+		this->m_aLogger.Warning(rgba, sContext);
 	});
 }
 
@@ -922,9 +922,9 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 		}
 
 #ifdef DEBUG
-		aDetails.SendColor([this](const Color &rgba, const char *pszContent)
+		aDetails.SendColor([this](Color rgba, CUtlString sContext)
 		{
-			this->m_aLogger.Detailed(rgba, pszContent);
+			this->m_aLogger.Detailed(rgba, sContext);
 		});
 #endif
 
