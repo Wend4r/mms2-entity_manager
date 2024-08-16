@@ -27,7 +27,7 @@ set(PROJECT_LICENSE "GPLv3")
 string(TIMESTAMP PROJECT_BUILD_DATE "%Y-%m-%d")
 string(TIMESTAMP PROJECT_BUILD_TIME "%H:%M:%S")
 
-set(PROTOBUF_FILES
+set(SOURCESDK_PROTO_FILES
 	common/networkbasetypes
 	common/netmessages
 	common/network_connection
