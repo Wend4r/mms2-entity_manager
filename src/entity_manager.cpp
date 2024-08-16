@@ -758,9 +758,9 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 	}
 
 #ifdef DEBUG
-	aDetails.SendColor([this](const Color &rgba, const std::string sContent)
+	aDetails.SendColor([this](const Color &rgba, CUtlString sContent)
 	{
-		this->m_aLogger.Detailed(rgba, sContent.c_str());
+		this->m_aLogger.Detailed(rgba, sContent);
 	});
 #endif
 
