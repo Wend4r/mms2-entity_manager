@@ -1,3 +1,7 @@
+# Entity Manager
+# Copyright (C) 2023-2024 Wend4r
+# Licensed under the GPLv3 license. See LICENSE file in the project root for details.
+
 if(NOT ANY_CONFIG_DIR)
 	message(FATAL_ERROR "ANY_CONFIG_DIR is empty")
 endif()
