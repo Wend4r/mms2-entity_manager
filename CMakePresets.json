@@ -5,14 +5,14 @@
 		{
 			"name": "default",
 			"displayName": "Default Config",
-			"description": "Default build using Ninja generator",
+			"description": "Build using Ninja generator",
 			"generator": "Ninja",
 			"binaryDir": "${sourceDir}/build/${presetName}",
 			"hidden": true
 		},
 		{
 			"name": "Debug",
-			"displayName": "Debug",
+			"displayName": "Debug - Ninja",
 			"inherits": "default",
 			"cacheVariables":
 			{
@@ -21,7 +21,7 @@
 		},
 		{
 			"name": "Release",
-			"displayName": "Release",
+			"displayName": "Release - Ninja",
 			"inherits": "default",
 			"cacheVariables":
 			{
@@ -30,8 +30,8 @@
 		},
 		{
 			"name": "Windows/Debug",
-			"displayName": "Debug - Visual Studio 2022",
-			"generator": "Visual Studio 17 2022",
+			"description": "Debug configuration for building with Visual Studio",
+			"generator": "Debug - Visual Studio 17 2022",
 			"inherits": "default",
 			"cacheVariables":
 			{
@@ -40,6 +40,7 @@
 		},
 		{
 			"name": "Windows/Release",
+			"description": "Release configuration for building with Visual Studio",
 			"displayName": "Release - Visual Studio 2022",
 			"generator": "Visual Studio 17 2022",
 			"inherits": "default",
