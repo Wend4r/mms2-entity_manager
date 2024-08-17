@@ -1,5 +1,5 @@
-#include "spawngroup.hpp"
-#include <provider.hpp>
+#include <entity_manager/provider/spawngroup.hpp>
+#include <entity_manager/provider.hpp>
 
 #include <tier1/utlmap.h>
 

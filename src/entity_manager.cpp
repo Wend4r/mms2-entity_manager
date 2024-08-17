@@ -19,6 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <entity_manager.hpp>
+#include <entity_manager/provider/gameresource.hpp>
+#include <entity_manager/provider/spawngroup.hpp>
+
 #include <stdio.h>
 #include <string>
 #include <functional>
@@ -36,10 +40,6 @@
 #include <tier1/convar.h>
 
 #include <dynlibutils/virtual.hpp>
-
-#include "entity_manager.hpp"
-#include "entity_manager/provider/gameresource.hpp"
-#include "entity_manager/provider/spawngroup.hpp"
 
 #define ENTITY_MANAGER_WORLD_ROOT "entity_manager"
 #define ENTITY_MANAGER_PROGENITOR_WORLD_NAME "progenitor_layer"

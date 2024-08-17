@@ -1,5 +1,5 @@
-#include "source2server.hpp"
-#include <provider.hpp>
+#include <entity_manager/provider/source2server.hpp>
+#include <entity_manager/provider.hpp>
 
 #include <dynlibutils/virtual.hpp>
 

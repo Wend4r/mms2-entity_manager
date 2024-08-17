@@ -22,6 +22,10 @@
 #ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_HPP_
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_HPP_
 
+#include <entity_manager/provider.hpp>
+#include <entity_manager/provider_agent.hpp>
+#include <entity_manager/settings.hpp>
+
 #include <ISmmPlugin.h>
 #include <igameevents.h>
 #include <iplayerinfo.h>
@@ -30,9 +34,6 @@
 #include <tier1/utlvector.h>
 #include <entity2/entityidentity.h>
 
-#include "entity_manager/provider.hpp"
-#include "entity_manager/provider_agent.hpp"
-#include "entity_manager/settings.hpp"
 #include "logger.hpp"
 
 #define PREFIX_ENTITY_MANAGER META_PLUGIN_PREFIX

@@ -1,5 +1,5 @@
-#include <provider.hpp>
-#include "provider_agent.hpp"
+#include <entity_manager/provider_agent.hpp>
+#include <entity_manager/provider.hpp>
 
 DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 

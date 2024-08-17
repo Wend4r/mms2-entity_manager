@@ -1,12 +1,11 @@
-#include "provider.hpp"
-
-#include "gamedata.hpp"
-#include "provider_agent.hpp"
+#include <entity_manager/provider_agent.hpp>
+#include <entity_manager/provider.hpp>
 
 #include <filesystem.h>
 #include <tier0/strtools.h>
 #include <entity2/entitysystem.h>
 
+#include <gamedata.hpp>
 #include <any_config.hpp>
 
 #define GAMECONFIG_FOLDER_DIR "gamedata"

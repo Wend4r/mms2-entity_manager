@@ -1,5 +1,5 @@
-#include "gameresource.hpp"
-#include <provider.hpp>
+#include <entity_manager/provider/gameresource.hpp>
+#include <entity_manager/provider.hpp>
 
 #include <dynlibutils/virtual.hpp>
 

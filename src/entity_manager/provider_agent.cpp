@@ -1,8 +1,8 @@
-#include "provider_agent.hpp"
+#include <entity_manager/provider/entitysystem.hpp>
+#include <entity_manager/provider/source2server.hpp>
+#include <entity_manager/provider_agent.hpp>
+#include <entity_manager/provider.hpp>
 
-#include "provider.hpp"
-#include "provider/entitysystem.hpp"
-#include "provider/source2server.hpp"
 #include <logger.hpp>
 
 #include <ehandle.h> //FIXME: fix this one in https://github.com/Wend4r/hl2sdk/commits/cs2-entity_handle-get
