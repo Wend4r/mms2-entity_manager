@@ -148,7 +148,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 			aWarnings.Push(aMessage.Get());
 		}
 
-		aWarnings.SendColor([this](Color rgba, CUtlString sContext)
+		aWarnings.SendColor([this](Color rgba, const CUtlString &sContext)
 		{
 			this->m_aLogger.Warning(rgba, sContext);
 		});
@@ -260,7 +260,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 					}
 				});
 
-				aWarnings.SendColor([this](Color rgba, CUtlString sContext)
+				aWarnings.SendColor([this](Color rgba, const CUtlString &sContext)
 				{
 					this->m_aLogger.Warning(rgba, sContext);
 				});
@@ -459,7 +459,7 @@ bool EntityManagerPlugin::LoadProvider()
 
 			aWarnings.Push(aMessage.Get());
 
-			aWarnings.SendColor([this](Color rgba, CUtlString sContext)
+			aWarnings.SendColor([this](Color rgba, const CUtlString &sContext)
 			{
 				this->m_aLogger.Warning(rgba, sContext);
 			});
@@ -536,13 +536,13 @@ bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, 
 	if(bResult)
 	{
 #ifdef DEBUG
-		aDetails.SendColor([this](Color rgba, CUtlString sContext)
+		aDetails.SendColor([this](Color rgba, const CUtlString &sContext)
 		{
 			this->m_aLogger.Detailed(rgba, sContext);
 		});
 #endif
 
-		aWarnings.SendColor([this](Color rgba, CUtlString sContext)
+		aWarnings.SendColor([this](Color rgba, const CUtlString &sContext)
 		{
 			this->m_aLogger.Warning(rgba, sContext);
 		});
@@ -583,7 +583,7 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 			}
 		});
 
-		aWarnings.SendColor([this](Color rgba, CUtlString sContext)
+		aWarnings.SendColor([this](Color rgba, const CUtlString &sContext)
 		{
 			this->m_aLogger.Warning(rgba, sContext);
 		});
@@ -629,7 +629,7 @@ void EntityManagerPlugin::SpawnMyEntities()
 		}
 	});
 
-	aWarnings.SendColor([this](Color rgba, CUtlString sContext)
+	aWarnings.SendColor([this](Color rgba, const CUtlString &sContext)
 	{
 		this->m_aLogger.Warning(rgba, sContext);
 	});
@@ -758,7 +758,7 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 	}
 
 #ifdef DEBUG
-	aDetails.SendColor([this](const Color &rgba, CUtlString sContent)
+	aDetails.SendColor([this](Color rgba, const CUtlString &sContent)
 	{
 		this->m_aLogger.Detailed(rgba, sContent);
 	});
@@ -922,7 +922,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 		}
 
 #ifdef DEBUG
-		aDetails.SendColor([this](Color rgba, CUtlString sContext)
+		aDetails.SendColor([this](Color rgba, const CUtlString &sContext)
 		{
 			this->m_aLogger.Detailed(rgba, sContext);
 		});
