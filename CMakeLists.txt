@@ -29,7 +29,7 @@ string(TIMESTAMP PROJECT_BUILD_DATE "%Y-%m-%d")
 string(TIMESTAMP PROJECT_BUILD_TIME "%H:%M:%S")
 
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/entity_manager")
+set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/${PROJECT_NAME_SUBSTRING}")
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
 
 if(SOURCESDK_DIR)
@@ -98,22 +98,22 @@ include("cmake/sourcesdk.cmake")
 include("cmake/sourcesdk/proto.cmake")
 
 set(SOURCE_FILES
-	${SOURCE_DIR}/entity_manager/provider_agent/resourcemanifest.cpp
-	${SOURCE_DIR}/entity_manager/provider_agent/spawngroup.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamedata/entitysystem.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamedata/gameresource.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamedata/gamesystem.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamedata/source2server.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamedata/spawngroup.cpp
-	${SOURCE_DIR}/entity_manager/provider/entitysystem.cpp
-	${SOURCE_DIR}/entity_manager/provider/gameresource.cpp
-	${SOURCE_DIR}/entity_manager/provider/gamesystem.cpp
-	${SOURCE_DIR}/entity_manager/provider/source2server.cpp
-	${SOURCE_DIR}/entity_manager/provider/spawngroup.cpp
-	${SOURCE_DIR}/entity_manager/provider_agent.cpp
-	${SOURCE_DIR}/entity_manager/provider.cpp
-	${SOURCE_DIR}/entity_manager/settings.cpp
-	${SOURCE_DIR}/entity_manager.cpp
+	${SOURCE_PROJECT_DIR}/provider_agent/resourcemanifest.cpp
+	${SOURCE_PROJECT_DIR}/provider_agent/spawngroup.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/entitysystem.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/gameresource.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/gamesystem.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/source2server.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/spawngroup.cpp
+	${SOURCE_PROJECT_DIR}/provider/entitysystem.cpp
+	${SOURCE_PROJECT_DIR}/provider/gameresource.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamesystem.cpp
+	${SOURCE_PROJECT_DIR}/provider/source2server.cpp
+	${SOURCE_PROJECT_DIR}/provider/spawngroup.cpp
+	${SOURCE_PROJECT_DIR}/provider_agent.cpp
+	${SOURCE_PROJECT_DIR}/provider.cpp
+	${SOURCE_PROJECT_DIR}/settings.cpp
+	${SOURCE_PROJECT_DIR}.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCESDK_SOURCE_FILES} ${SOURCE_FILES})
