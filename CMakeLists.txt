@@ -28,18 +28,50 @@ set(PROJECT_LICENSE "GPLv3")
 string(TIMESTAMP PROJECT_BUILD_DATE "%Y-%m-%d")
 string(TIMESTAMP PROJECT_BUILD_TIME "%H:%M:%S")
 
+set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/entity_manager")
+set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
+
 if(SOURCESDK_DIR)
 	file(TO_CMAKE_PATH "${SOURCESDK_DIR}" SOURCESDK_DIR)
 else()
-	message(WARNING "SOURCESDK_DIR is empty. Will be used default path")
-	set(SOURCESDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../hl2sdk-wend4r/hl2sdk-cs2)
+	set(SOURCESDK_DIR "${EXTERNAL_DIR}/hl2sdk")
 endif()
 
 if(METAMOD_DIR)
 	file(TO_CMAKE_PATH "${METAMOD_DIR}" METAMOD_DIR)
 else()
-	message(WARNING "METAMOD_DIR is empty. Will be used default path")
-	set(METAMOD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../metamod-source)
+	set(METAMOD_DIR "${EXTERNAL_DIR}/metamod-source")
+endif()
+
+if(ANY_CONFIG_DIR)
+	file(TO_CMAKE_PATH "${ANY_CONFIG_DIR}" ANY_CONFIG_DIR)
+else()
+	set(ANY_CONFIG_DIR "${EXTERNAL_DIR}/any_config")
+endif()
+
+if(DYNLIBUTILS_DIR)
+	file(TO_CMAKE_PATH "${DYNLIBUTILS_DIR}" DYNLIBUTILS_DIR)
+else()
+	set(DYNLIBUTILS_DIR "${EXTERNAL_DIR}/memory_utils")
+endif()
+
+if(DYNOHOOK_DIR)
+	file(TO_CMAKE_PATH "${DYNOHOOK_DIR}" DYNOHOOK_DIR)
+else()
+	set(DYNOHOOK_DIR "${EXTERNAL_DIR}/dynohook")
+endif()
+
+if(GAMEDATA_DIR)
+	file(TO_CMAKE_PATH "${GAMEDATA_DIR}" GAMEDATA_DIR)
+else()
+	set(GAMEDATA_DIR "${EXTERNAL_DIR}/gamedata")
+endif()
+
+if(LOGGER_DIR)
+	file(TO_CMAKE_PATH "${LOGGER_DIR}" LOGGER_DIR)
+else()
+	set(LOGGER_DIR "${EXTERNAL_DIR}/logger")
 endif()
 
 set(SOURCESDK_PROTO_FILES
@@ -47,15 +79,6 @@ set(SOURCESDK_PROTO_FILES
 	common/netmessages
 	common/network_connection
 )
-
-set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/entity_manager")
-set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
-set(ANY_CONFIG_DIR "${EXTERNAL_DIR}/any_config")
-set(DYNLIBUTILS_DIR "${EXTERNAL_DIR}/memory_utils")
-set(DYNOHOOK_DIR "${EXTERNAL_DIR}/dynohook")
-set(GAMEDATA_DIR "${EXTERNAL_DIR}/gamedata")
-set(LOGGER_DIR "${EXTERNAL_DIR}/logger")
 
 include("cmake/platform/shared.cmake")
 
