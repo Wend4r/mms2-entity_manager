@@ -28,12 +28,6 @@ set(PROJECT_LICENSE "GPLv3")
 string(TIMESTAMP PROJECT_BUILD_DATE "%Y-%m-%d")
 string(TIMESTAMP PROJECT_BUILD_TIME "%H:%M:%S")
 
-set(SOURCESDK_PROTO_FILES
-	common/networkbasetypes
-	common/netmessages
-	common/network_connection
-)
-
 if(SOURCESDK_DIR)
 	file(TO_CMAKE_PATH "${SOURCESDK_DIR}" SOURCESDK_DIR)
 else()
@@ -47,6 +41,12 @@ else()
 	message(WARNING "METAMOD_DIR is empty. Will be used default path")
 	set(METAMOD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../metamod-source)
 endif()
+
+set(SOURCESDK_PROTO_FILES
+	common/networkbasetypes
+	common/netmessages
+	common/network_connection
+)
 
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/entity_manager")
