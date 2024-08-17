@@ -9,15 +9,16 @@ if(POLICY CMP0092)
 endif()
 
 
-project(entity_manager
+project(mms2-entity_manager
 	VERSION 1.0.1
 	DESCRIPTION "Entity Manager"
-	HOMEPAGE_URL "https://github.com/Wend4r/mms-entity_manager"
+	HOMEPAGE_URL "https://github.com/Wend4r/mms2-entity_manager"
 	LANGUAGES C CXX ASM
 )
 
-string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWER)
-string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
+string(REGEX REPLACE "^[^-]*-" "" PROJECT_NAME_SUBSTRING "${PROJECT_NAME}")
+string(TOLOWER "${PROJECT_NAME_SUBSTRING}" PROJECT_NAME_LOWER)
+string(TOUPPER "${PROJECT_NAME_SUBSTRING}" PROJECT_NAME_UPPER)
 
 set(PROJECT_OUTPUT_NAME "entitymgr")
 
@@ -48,7 +49,7 @@ else()
 endif()
 
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/${PROJECT_NAME}")
+set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/entity_manager")
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
 set(ANY_CONFIG_DIR "${EXTERNAL_DIR}/any_config")
 set(DYNLIBUTILS_DIR "${EXTERNAL_DIR}/memory_utils")
@@ -74,22 +75,22 @@ include("cmake/sourcesdk.cmake")
 include("cmake/sourcesdk/proto.cmake")
 
 set(SOURCE_FILES
-	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent/resourcemanifest.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent/spawngroup.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/entitysystem.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/gameresource.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/gamesystem.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/source2server.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/spawngroup.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/entitysystem.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gameresource.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamesystem.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/source2server.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/spawngroup.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/settings.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}.cpp
+	${SOURCE_DIR}/entity_manager/provider_agent/resourcemanifest.cpp
+	${SOURCE_DIR}/entity_manager/provider_agent/spawngroup.cpp
+	${SOURCE_DIR}/entity_manager/provider/gamedata/entitysystem.cpp
+	${SOURCE_DIR}/entity_manager/provider/gamedata/gameresource.cpp
+	${SOURCE_DIR}/entity_manager/provider/gamedata/gamesystem.cpp
+	${SOURCE_DIR}/entity_manager/provider/gamedata/source2server.cpp
+	${SOURCE_DIR}/entity_manager/provider/gamedata/spawngroup.cpp
+	${SOURCE_DIR}/entity_manager/provider/entitysystem.cpp
+	${SOURCE_DIR}/entity_manager/provider/gameresource.cpp
+	${SOURCE_DIR}/entity_manager/provider/gamesystem.cpp
+	${SOURCE_DIR}/entity_manager/provider/source2server.cpp
+	${SOURCE_DIR}/entity_manager/provider/spawngroup.cpp
+	${SOURCE_DIR}/entity_manager/provider_agent.cpp
+	${SOURCE_DIR}/entity_manager/provider.cpp
+	${SOURCE_DIR}/entity_manager/settings.cpp
+	${SOURCE_DIR}/entity_manager.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCESDK_SOURCE_FILES} ${SOURCE_FILES})
