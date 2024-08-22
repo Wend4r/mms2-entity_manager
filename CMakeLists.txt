@@ -28,7 +28,7 @@ set(PROJECT_LICENSE "GPLv3")
 string(TIMESTAMP PROJECT_BUILD_DATE "%Y-%m-%d")
 string(TIMESTAMP PROJECT_BUILD_TIME "%H:%M:%S")
 
-set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")	
 set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/${PROJECT_NAME_SUBSTRING}")
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -50,8 +50,6 @@ set_or_external_dir(DYNLIBUTILS_DIR "memory_utils")
 set_or_external_dir(DYNOHOOK_DIR "dynohook")
 set_or_external_dir(GAMEDATA_DIR "gamedata")
 set_or_external_dir(LOGGER_DIR "logger")
-
-message(STATUS "ANY_CONFIG_DIR = ${ANY_CONFIG_DIR}")
 
 set(SOURCESDK_PROTO_FILES
 	common/networkbasetypes
