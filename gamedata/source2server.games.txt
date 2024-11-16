@@ -1,6 +1,6 @@
 "Games"
 {
-	"cs2"
+	"csgo"
 	{
 		"Addresses"
 		{
