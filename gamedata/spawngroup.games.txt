@@ -62,8 +62,8 @@
 			// See ISpawnGroup::GetName() used.
 			"CSpawnGroupMgrGameSystem::m_SpawnGroups" // CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *>
 			{
-				"win64"          "320"
-				"linuxsteamrt64" "320"
+				"win64"          "256"
+				"linuxsteamrt64" "256"
 			}
 
 			"CLoadingMapGroup::m_spawnInfo"
