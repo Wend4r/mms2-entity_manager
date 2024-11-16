@@ -203,10 +203,10 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 		if(pNewServer)
 		{
-			assert(InitEntitySystem());
-			assert(InitGameResource());
-			assert(InitGameSystem());
-			assert(InitGameEvents());
+			InitEntitySystem();
+			InitGameResource();
+			InitGameSystem();
+			InitGameEvents();
 
 			// Load by spawn groups now.
 			{
@@ -705,10 +705,10 @@ void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &
 			DestroySpawnGroup();
 		}
 
-		assert(InitEntitySystem());
-		assert(InitGameResource());
-		assert(InitGameSystem());
-		assert(InitGameEvents());
+		InitEntitySystem();
+		InitGameResource();
+		InitGameSystem();
+		InitGameEvents();
 	}
 	else
 	{
