@@ -7,7 +7,7 @@ DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 
 CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupHandle_t h)
 {
-	auto *pMgrSpawnGroupMap = this->GetSpawnGroups();
+	auto *pMgrSpawnGroupMap = GetSpawnGroups();
 
 	pMgrSpawnGroupMap->SetLessFunc(DefLessFunc(SpawnGroupHandle_t));
 
@@ -18,7 +18,7 @@ CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupH
 
 void EntityManager::CSpawnGroupMgrGameSystemProvider::LoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
 {
-	auto *pMgrSpawnGroupMap = this->GetSpawnGroups();
+	auto *pMgrSpawnGroupMap = GetSpawnGroups();
 
 	{
 		const int iInvalidIndex = pMgrSpawnGroupMap->InvalidIndex();
@@ -32,7 +32,7 @@ void EntityManager::CSpawnGroupMgrGameSystemProvider::LoopBySpawnGroups(std::fun
 
 void EntityManager::CSpawnGroupMgrGameSystemProvider::FastLoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
 {
-	auto *pMgrSpawnGroupMap = this->GetSpawnGroups();
+	auto *pMgrSpawnGroupMap = GetSpawnGroups();
 
 	{
 		const int iMaxElement = pMgrSpawnGroupMap->MaxElement();
@@ -54,12 +54,12 @@ CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *EntityManager::CSpawnGroupMgrGame
 
 int EntityManager::CLoadingSpawnGroupProvider::AddSpawnInfos(int iCount, const EntitySpawnInfo_t *pEntities)
 {
-	return this->GetSpawnInfo()->AddMultipleToTail(iCount, pEntities);
+	return GetSpawnInfo()->AddMultipleToTail(iCount, pEntities);
 }
 
 int EntityManager::CLoadingSpawnGroupProvider::FindAndRemoveSpawnInfoByKeyValues(const CEntityKeyValues *pElement, CUtlVector<CEntityIdentity *> &vecRemovedIdentities)
 {
-	auto vecSpawnInfo = this->GetSpawnInfo();
+	auto vecSpawnInfo = GetSpawnInfo();
 
 	const int iSpawnInfoCount = vecSpawnInfo->Count();
 

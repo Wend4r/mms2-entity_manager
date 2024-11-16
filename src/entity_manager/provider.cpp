@@ -40,7 +40,7 @@ bool EntityManager::Provider::Init(GameData::CBufferStringVector &vecMessages)
 			vecMessages.AddToTail({s_pszMessageConcat});
 		}
 
-		this->m_mapLibraries.Insert(this->GetSymbol(szEngineModuleName), &g_aLibEngine);
+		m_mapLibraries.Insert(GetSymbol(szEngineModuleName), &g_aLibEngine);
 	}
 
 	// Server.
@@ -54,7 +54,7 @@ bool EntityManager::Provider::Init(GameData::CBufferStringVector &vecMessages)
 			vecMessages.AddToTail({s_pszMessageConcat});
 		}
 
-		this->m_mapLibraries.Insert(this->GetSymbol(szServerModuleName), &g_aLibServer);
+		m_mapLibraries.Insert(GetSymbol(szServerModuleName), &g_aLibServer);
 	}
 
 	return true;
@@ -62,7 +62,7 @@ bool EntityManager::Provider::Init(GameData::CBufferStringVector &vecMessages)
 
 bool EntityManager::Provider::Load(const char *pszBaseDir, GameData::CBufferStringVector &vecMessages)
 {
-	bool bResult = this->LoadGameData(pszBaseDir, vecMessages);
+	bool bResult = LoadGameData(pszBaseDir, vecMessages);
 
 	if(bResult)
 	{
@@ -79,21 +79,21 @@ void EntityManager::Provider::Destroy()
 
 const DynLibUtils::CModule *EntityManager::Provider::FindLibrary(const char *pszName) const
 {
-	auto iFoundIndex = this->m_mapLibraries.Find(this->FindSymbol(pszName));
+	auto iFoundIndex = m_mapLibraries.Find(FindSymbol(pszName));
 
-	Assert(IS_VALID_GAMEDATA_INDEX(this->m_mapLibraries, iFoundIndex));
+	Assert(IS_VALID_GAMEDATA_INDEX(m_mapLibraries, iFoundIndex));
 
-	return this->m_mapLibraries.Element(iFoundIndex);
+	return m_mapLibraries.Element(iFoundIndex);
 }
 
 CUtlSymbolLarge EntityManager::Provider::GetSymbol(const char *pszText)
 {
-	return this->m_aSymbolTable.AddString(pszText);
+	return m_aSymbolTable.AddString(pszText);
 }
 
 CUtlSymbolLarge EntityManager::Provider::FindSymbol(const char *pszText) const
 {
-	return this->m_aSymbolTable.Find(pszText);
+	return m_aSymbolTable.Find(pszText);
 }
 
 bool EntityManager::Provider::LoadGameData(const char *pszBaseDir, GameData::CBufferStringVector &vecMessages)
@@ -102,7 +102,7 @@ bool EntityManager::Provider::LoadGameData(const char *pszBaseDir, GameData::CBu
 
 	snprintf((char *)sBaseConfigDir, sizeof(sBaseConfigDir), "%s" CORRECT_PATH_SEPARATOR_S "%s", pszBaseDir, GAMECONFIG_FOLDER_DIR);
 
-	return this->m_aStorage.Load(this, sBaseConfigDir, vecMessages);
+	return m_aStorage.Load(this, sBaseConfigDir, vecMessages);
 }
 
 bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char *pszBaseConfigDir, GameData::CBufferStringVector &vecMessages)
@@ -186,55 +186,55 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 
 bool EntityManager::Provider::GameDataStorage::LoadEntitySystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aEntitySystem.Load(pRoot, pGameConfig, vecMessages);
+	return m_aEntitySystem.Load(pRoot, pGameConfig, vecMessages);
 }
 
 bool EntityManager::Provider::GameDataStorage::LoadGameResource(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aGameResource.Load(pRoot, pGameConfig, vecMessages);
+	return m_aGameResource.Load(pRoot, pGameConfig, vecMessages);
 }
 
 bool EntityManager::Provider::GameDataStorage::LoadGameSystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aGameSystem.Load(pRoot, pGameConfig, vecMessages);
+	return m_aGameSystem.Load(pRoot, pGameConfig, vecMessages);
 }
 
 bool EntityManager::Provider::GameDataStorage::LoadSource2Server(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aSource2Server.Load(pRoot, pGameConfig, vecMessages);
+	return m_aSource2Server.Load(pRoot, pGameConfig, vecMessages);
 }
 
 bool EntityManager::Provider::GameDataStorage::LoadEntitySpawnGroup(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aSpawnGroup.Load(pRoot, pGameConfig, vecMessages);
+	return m_aSpawnGroup.Load(pRoot, pGameConfig, vecMessages);
 }
 
 const EntityManager::Provider::GameDataStorage::EntitySystem &EntityManager::Provider::GameDataStorage::GetEntitySystem() const
 {
-	return this->m_aEntitySystem;
+	return m_aEntitySystem;
 }
 
 const EntityManager::Provider::GameDataStorage::GameResource &EntityManager::Provider::GameDataStorage::GetGameResource() const
 {
-	return this->m_aGameResource;
+	return m_aGameResource;
 }
 
 const EntityManager::Provider::GameDataStorage::GameSystem &EntityManager::Provider::GameDataStorage::GetGameSystem() const
 {
-	return this->m_aGameSystem;
+	return m_aGameSystem;
 }
 
 const EntityManager::Provider::GameDataStorage::Source2Server &EntityManager::Provider::GameDataStorage::GetSource2Server() const
 {
-	return this->m_aSource2Server;
+	return m_aSource2Server;
 }
 
 const EntityManager::Provider::GameDataStorage::SpawnGroup &EntityManager::Provider::GameDataStorage::GetSpawnGroup() const
 {
-	return this->m_aSpawnGroup;
+	return m_aSpawnGroup;
 }
 
 const EntityManager::Provider::GameDataStorage &EntityManager::Provider::GetGameDataStorage() const
 {
-	return this->m_aStorage;
+	return m_aStorage;
 }
