@@ -187,7 +187,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 			{
 				const char *pszAttrKey = pAttrKeyValue->GetName();
 
-				const EntityKeyId_t &aAttrKey {MakeStringToken(pszAttrKey), pszAttrKey};
+				const EntityKeyId_t &aAttrKey {MakeStringToken(pszAttrKey).GetHashCode(), pszAttrKey};
 
 				pNewKeyValues->SetString(aAttrKey, pAttrKeyValue->GetString(), true);
 			}
@@ -200,7 +200,7 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 	{
 		const char *pszKey = pKeyValue->GetName();
 
-		const EntityKeyId_t &aKey {MakeStringToken(pszKey), pszKey};
+		const EntityKeyId_t &aKey {MakeStringToken(pszKey).GetHashCode(), pszKey};
 
 		pNewKeyValues->SetString(aKey, pKeyValue->GetString());
 	}
@@ -337,7 +337,7 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup, Lo
 
 	const CEntityIndex iForceEdictIndex = CEntityIndex(-1);
 
-	const EntityKeyId_t aClassnameKey {szClassnameKey, szClassnameKey};
+	const EntityKeyId_t aClassnameKey {MakeStringToken(szClassnameKey).GetHashCode(), szClassnameKey};
 
 	for(int i = 0; i < iQueueLength; i++)
 	{

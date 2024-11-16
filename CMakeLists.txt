@@ -51,28 +51,27 @@ set_or_external_dir(DYNOHOOK_DIR "dynohook")
 set_or_external_dir(GAMEDATA_DIR "gamedata")
 set_or_external_dir(LOGGER_DIR "logger")
 
-set(SOURCESDK_PROTO_FILES
-	common/networkbasetypes
-	common/netmessages
-	common/network_connection
+set(SOURCESDK_PROTOS
+	networkbasetypes
+	netmessages
+	network_connection
 )
 
-include("cmake/platform/shared.cmake")
+include(cmake/platform/shared.cmake)
 
 if(LINUX)
-	include("cmake/platform/linux.cmake")
+	include(cmake/platform/linux.cmake)
 elseif(WINDOWS)
-	include("cmake/platform/windows.cmake")
+	include(cmake/platform/windows.cmake)
 endif()
 
 # Libraries.
-include("cmake/any_config.cmake")
-include("cmake/dynlibutils.cmake")
-include("cmake/gamedata.cmake")
-include("cmake/logger.cmake")
-include("cmake/metamod.cmake")
-include("cmake/sourcesdk.cmake")
-include("cmake/sourcesdk/proto.cmake")
+include(cmake/any_config.cmake)
+include(cmake/dynlibutils.cmake)
+include(cmake/gamedata.cmake)
+include(cmake/logger.cmake)
+include(cmake/metamod.cmake)
+include(cmake/sourcesdk.cmake)
 
 set(SOURCE_FILES
 	${SOURCE_PROJECT_DIR}/provider_agent/resourcemanifest.cpp
@@ -95,19 +94,29 @@ set(SOURCE_FILES
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${SOURCESDK_SOURCE_FILES})
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD 17)
-set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD_REQUIRED ON)
-set_property(TARGET ${PROJECT_NAME} PROPERTY C_EXTENSIONS OFF)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	C_STANDARD 17
+	C_STANDARD_REQUIRED ON
+	C_EXTENSIONS OFF
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_EXTENSIONS OFF)
+	CXX_STANDARD 17
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS OFF
+)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_OUTPUT_NAME})
 
-target_compile_options(${PROJECT_NAME} PRIVATE ${COMPILER_OPTIONS} ${PLATFORM_COMPILER_OPTIONS})
-target_link_options(${PROJECT_NAME} PRIVATE ${LINKER_OPTIONS} ${PLATFORM_LINKER_OPTIONS})
+if(WINDOWS)
+	if(SOURCESDK_MSVC_RUNTIME_LIBRARY)
+		set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	endif()
+elseif(MACOS)
+	set_target_properties(${PROJECT_NAME} PROPERTIES OSX_ARCHITECTURES "x86_64")
+endif()
+
+target_compile_options(${PROJECT_NAME} PRIVATE ${COMPILER_OPTIONS} ${PLATFORM_COMPILER_OPTIONS} ${COMPILE_OPTIONS} ${SOURCESDK_COMPILE_OPTIONS})
+target_link_options(${PROJECT_NAME} PRIVATE ${LINKER_OPTIONS} ${PLATFORM_LINKER_OPTIONS} ${SOURCESDK_LINK_OPTIONS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${COMPILER_DEFINITIONS} ${PLATFORM_COMPILE_DEFINITIONS} ${METAMOD_COMPILE_DEFINITIONS} ${SOURCESDK_COMPILE_DEFINTIONS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR} ${ANY_CONFIG_INCLUDE_DIR} ${DYNLIBUTILS_INCLUDE_DIR} ${DYNOHOOK_INCLUDE_DIR} ${GAMEDATA_INCLUDE_DIR} ${LOGGER_INCLUDE_DIR} ${METAMOD_INCLUDE_DIR} ${SOURCESDK_INCLUDE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES} ${ANY_CONFIG_BINARY_DIR} ${DYNLIBUTILS_BINARY_DIR} ${DYNOHOOK_BINARY_DIR} ${GAMEDATA_BINARY_DIR} ${LOGGER_BINARY_DIR} ${SOURCESDK_LINK_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES} ${ANY_CONFIG_BINARY_DIR} ${DYNLIBUTILS_BINARY_DIR} ${DYNLIBUTILS_BINARY_DIR} ${DYNOHOOK_BINARY_DIR} ${GAMEDATA_BINARY_DIR} ${LOGGER_BINARY_DIR} ${SOURCESDK_BINARY_DIR})

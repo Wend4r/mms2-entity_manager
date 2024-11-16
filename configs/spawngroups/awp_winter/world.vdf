@@ -1,0 +1,23 @@
+"World"
+{
+	"entity"
+	{
+		"classname" "prop_dynamic_override"
+
+		"origin" "-140 -3 -310"
+
+		"model" "models/props/de_nuke/hr_nuke/chainlink_fence_001/chainlink_fence_001_64_capped.vmdl"
+		"solid" "6"
+	}
+
+	"entity"
+	{
+		"classname" "prop_dynamic_override"
+
+		"origin" "175 -3 -310"
+
+
+		"model" "models/props/de_nuke/hr_nuke/chainlink_fence_001/chainlink_fence_001_64_capped.vmdl"
+		"solid" "6"
+	}
+}

@@ -81,7 +81,7 @@ const DynLibUtils::CModule *EntityManager::Provider::FindLibrary(const char *psz
 {
 	auto iFoundIndex = this->m_mapLibraries.Find(this->FindSymbol(pszName));
 
-	Assert(IS_VALID_GAMEDATA_INDEX(iFoundIndex, this->m_mapLibraries));
+	Assert(IS_VALID_GAMEDATA_INDEX(this->m_mapLibraries, iFoundIndex));
 
 	return this->m_mapLibraries.Element(iFoundIndex);
 }

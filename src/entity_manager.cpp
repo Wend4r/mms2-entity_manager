@@ -99,6 +99,11 @@ CGameEntitySystem *GameEntitySystem()
 	return g_pGameEntitySystem;
 }
 
+CEntityInstance* CEntityHandle::Get() const
+{
+	return GameEntitySystem()->GetEntityInstance( *this );
+}
+
 PLUGIN_EXPOSE(EntityManagerPlugin, s_aEntityManager);
 
 EntityManagerPlugin::EntityManagerPlugin()
