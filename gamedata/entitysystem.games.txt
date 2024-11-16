@@ -1,6 +1,6 @@
 "Games"
 {
-	"cs2"
+	"csgo"
 	{
 		"Signatures"
 		{
@@ -29,9 +29,10 @@
 			// (CBaseEntity *)CEntitySystem::CreateEntity(g_pEntitySystem, (SpawnGroupHandle_t)-1, pClassName, ENTITY_NETWORKING_MODE_DEFAULT, -1, -1, false);
 			"CEntitySystem::CreateEntity"
 			{
-				"library"       "server"
-				"windows64"     "48 8B C4 55 56 48 8B EC"
-				"linux64"       "55 48 89 E5 41 57 4C 8D 7D C8 41 56 41 55 45 89 C5"
+				"library"        "server"
+
+				"win64"          "48 8B C4 55 56 48 8B EC"
+				"linuxsteamrt64" "55 48 89 E5 41 57 4C 8D 7D C8 41 56 41 55 45 89 C5"
 			}
 
 			// Called in 
@@ -51,9 +52,10 @@
 			//         const CEntityKeyValues *pInitializationData)
 			"CEntitySystem::QueueSpawnEntity"
 			{
-				"library"       "server"
-				"windows64"     "40 56 57 41 56 48 83 EC 30"
-				"linux64"       "55 48 89 E5 41 57 41 56 49 89 D6 41 55 49 89 FD 41 54 49 89 F4 53 48 83 EC 18 F6 46 31 08"
+				"library"        "server"
+
+				"win64"          "40 56 57 41 56 48 83 EC 30"
+				"linuxsteamrt64" "55 48 89 E5 41 57 41 56 49 89 D6 41 55 49 89 FD 41 54 49 89 F4 53 48 83 EC 18 F6 46 31 08"
 			}
 
 			// Stacktrace use:
@@ -67,9 +69,10 @@
 			//          CEntityIdentity *pEntity)
 			"CEntitySystem::QueueDestroyEntity"
 			{
-				"library"       "server"
-				"windows64"     "48 85 D2 0F 84 ? ? ? ? 57 48 83 EC 20 48 89 5C 24 ? 48 8B F9 48 8B 5A 10 48 85 DB"
-				"linux64"       "48 85 F6 0F 84 ? ? ? ? 55 48 89 E5 41 55 49 89 FD 41 54 49 89 F4 53"
+				"library"        "server"
+
+				"win64"          "48 85 D2 0F 84 ? ? ? ? 57 48 83 EC 20 48 89 5C 24 ? 48 8B F9 48 8B 5A 10 48 85 DB"
+				"linuxsteamrt64" "48 85 F6 0F 84 ? ? ? ? 55 48 89 E5 41 55 49 89 FD 41 54 49 89 F4 53"
 			}
 
 			// Usually, pair calls with CEntitySystem::QueueSpawnEntity().
@@ -79,9 +82,10 @@
 			//         CEntitySystem *const this)
 			"CEntitySystem::ExecuteQueuedCreation"
 			{
-				"library"       "server"
-				"windows64"     "48 89 5C 24 08 57 48 81 EC 00 01 00 00 FF 81 C8 0B 00 00"
-				"linux64"       "55 48 89 E5 41 56 41 55 41 54 49 89 FC 53 48 81 EC E0 00 00 00 0F 31"
+				"library"        "server"
+
+				"win64"          "48 89 5C 24 08 57 48 81 EC 00 01 00 00 FF 81 C8 0B 00 00"
+				"linuxsteamrt64" "55 48 89 E5 41 56 41 55 41 54 49 89 FC 53 48 81 EC E0 00 00 00 0F 31"
 			}
 
 			// Used in CEntitySystem::QueueDestroyEntity().
@@ -92,9 +96,10 @@
 			//          bool bPerformDeallocation)
 			"CEntitySystem::ExecuteQueuedDeletion"
 			{
-				"library"       "server"
-				"windows64"     "88 54 24 10 48 89 4C 24 ? 55 41 55"
-				"linux64"       "55 48 89 E5 41 57 49 89 FF 41 56 41 55 41 54 53 48 81 EC ? ? ? ? 40 88 B5 ? ? ? ? C7 87 ? ? ? ? ? ? ? ? 40 84 F6"
+				"library"        "server"
+
+				"win64"          "88 54 24 10 48 89 4C 24 ? 55 41 55"
+				"linuxsteamrt64" "55 48 89 E5 41 57 49 89 FF 41 56 41 55 41 54 53 48 81 EC ? ? ? ? 40 88 B5 ? ? ? ? C7 87 ? ? ? ? ? ? ? ? 40 84 F6"
 			}
 
 			// Used in CC_Ent_Create().
@@ -119,9 +124,10 @@
 			//         CUtlDelegate<void (CEntityInstance *, CEntityKeyValues const*)> *handler)
 			"CGameEntitySystem::ListenForEntityInSpawnGroupToFinish"
 			{
-				"library"       "server"
-				"windows64"     "40 53 55 48 83 EC 48 48 89 7C 24 ? 49 8B E9"
-				"linux64"       "55 48 89 E5 41 57 49 89 D7 41 56 49 89 CE 41 55 41 54 41 89 F4 53"
+				"library"        "server"
+
+				"win64"          "40 53 55 48 83 EC 48 48 89 7C 24 ? 49 8B E9"
+				"linuxsteamrt64" "55 48 89 E5 41 57 49 89 D7 41 56 49 89 CE 41 55 41 54 41 89 F4 53"
 			}
 		}
 
@@ -132,16 +138,16 @@
 			//  "CGameResourceService::BuildResourceManifest(finish)"
 			"CGameResourceService::m_pEntitySystem"
 			{
-				"windows64"     "0x58"
-				"linux64"       "0x50"
+				"win64"          "88"
+				"linuxsteamrt64" "80"
 			}
 
 			// Used in CEntitySystem::BuildResourceManifest().
 			// Field type is IEntityResourceManifest * .
 			"CEntitySystem::m_pCurrentManifest"
 			{
-				"windows64"     "8"
-				"linux64"       "8"
+				"win64"          "8"
+				"linuxsteamrt64" "8"
 			}
 
 			// Used in CSpawnGroupMgrGameSystem::SetActiveSpawnGroup()
@@ -150,15 +156,15 @@
 			//     "SV"
 			"CEntitySystem::m_ActiveSpawnGroupHandle"
 			{
-				"windows64"     "0x13B8"
-				"linux64"       "0x13E0"
+				"win64"          "5048"
+				"linuxsteamrt64" "5088"
 			}
 
 			// Passes to CEntityKeyValues::CEntityKeyValues() as argument.
 			"CEntitySystem::m_aEntityKeyValuesAllocator"
 			{
-				"windows64"     "3280"
-				"linux64"       "3304"
+				"win64"          "3280"
+				"linuxsteamrt64" "3304"
 			}
 		}
 	}

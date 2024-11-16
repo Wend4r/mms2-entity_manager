@@ -1,89 +1,29 @@
+# Entity Manager
+# Copyright (C) 2023-2024 Wend4r
+# Licensed under the GPLv3 license. See LICENSE file in the project root for details.
+
 if(NOT SOURCESDK_DIR)
 	message(FATAL_ERROR "SOURCESDK_DIR is empty")
 endif()
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8) # 64-bit
-	add_definitions(
-		-DPLATFORM_64BITS -DX64BITS
-	)
-else()
-	set(SIZEOF_BITS ${CMAKE_SIZEOF_VOID_P})
-	math(EXPR SIZEOF_BITS "${SIZEOF_BITS}*8")
-	message(FATAL_ERROR "${SIZEOF_BITS}-bit platform is not supported")
-endif()
+set(SOURCESDK_BINARY_DIR "sourcesdk")
 
-if(LINUX)
-	set(SOURCESDK_COMPILE_DEFINTIONS
-		${SOURCESDK_COMPILE_DEFINTIONS}
+add_subdirectory(${SOURCESDK_DIR} ${SOURCESDK_BINARY_DIR})
 
-		-D_LINUX -DPOSIX -DLINUX -DCOMPILER_GCC
-		-Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp
-		-Dstrnicmp=strncasecmp -D_snprintf=snprintf
-		-D_vsnprintf=vsnprintf -D_alloca=alloca -Dstrcmpi=strcasecmp
-	)
-endif()
+function(get_sourcesdk_target_property VAR_NAME TARGET PROPERTY)
+	get_target_property(PROPERTY_VALUE ${TARGET} ${PROPERTY})
 
-if(MSVC)
-	set(SOURCESDK_COMPILE_DEFINTIONS
-		${SOURCESDK_COMPILE_DEFINTIONS}
+	if("${PROPERTY_VALUE}" MATCHES "PROPERTY_VALUE-NOTFOUND")
+		set(${VAR_NAME} PARENT_SCOPE)
+	else()
+		set(${VAR_NAME} ${PROPERTY_VALUE} PARENT_SCOPE)
+	endif()
+endfunction()
 
-		-DCOMPILER_MSVC -DCOMPILER_MSVC64
-	)
-endif()
+get_sourcesdk_target_property(SOURCESDK_COMPILE_OPTIONS ${SOURCESDK_BINARY_DIR} COMPILE_OPTIONS)
+get_sourcesdk_target_property(SOURCESDK_LINK_OPTIONS ${SOURCESDK_BINARY_DIR} LINK_OPTIONS)
 
+get_sourcesdk_target_property(SOURCESDK_COMPILE_DEFINITIONS ${SOURCESDK_BINARY_DIR} COMPILE_DEFINITIONS)
+get_sourcesdk_target_property(SOURCESDK_INCLUDE_DIRS ${SOURCESDK_BINARY_DIR} INCLUDE_DIRECTORIES)
 
-set(SOURCESDK_INCLUDE_DIR
-	${SOURCESDK_DIR}/common
-	${SOURCESDK_DIR}/game/shared
-	${SOURCESDK_DIR}/game/server
-	${SOURCESDK_DIR}/public/engine
-	${SOURCESDK_DIR}/public/entity2
-	${SOURCESDK_DIR}/public/game/server
-	${SOURCESDK_DIR}/public/mathlib
-	${SOURCESDK_DIR}/public/tier0
-	${SOURCESDK_DIR}/public/tier1
-	${SOURCESDK_DIR}/public
-	${SOURCESDK_DIR}/thirdparty/protobuf-3.21.8/src
-	${SOURCESDK_DIR}
-)
-
-set(SOURCESDK_SOURCE_FILES
-	${SOURCESDK_SOURCE_FILES}
-	${SOURCESDK_DIR}/entity2/entityidentity.cpp
-	${SOURCESDK_DIR}/entity2/entitysystem.cpp
-	${SOURCESDK_DIR}/entity2/entitykeyvalues.cpp
-	${SOURCESDK_DIR}/tier1/convar.cpp
-)
-
-if(LINUX)
-	set(SOURCESDK_SOURCE_FILES
-		${SOURCESDK_SOURCE_FILES}
-
-		# memoverride.cpp is not usable on CMake Windows, because CMake default link libraries always link ucrt.lib
-		${SOURCESDK_DIR}/public/tier0/memoverride.cpp
-	)
-endif()
-
-set(SOURCESDK_LIB_DIR ${SOURCESDK_DIR}/lib)
-
-if(WINDOWS)
-	set(SOURCESDK_LIB_PLATFORM_DIR "${SOURCESDK_LIB_DIR}/public/win64")
-
-	set(SOURCESDK_LIBRARIES
-		${SOURCESDK_LIB_PLATFORM_DIR}/tier0.lib
-		${SOURCESDK_LIB_PLATFORM_DIR}/tier1.lib
-		${SOURCESDK_LIB_PLATFORM_DIR}/interfaces.lib
-		${SOURCESDK_LIB_PLATFORM_DIR}/mathlib.lib
-	)
-elseif(LINUX)
-	set(SOURCESDK_LIB_PLATFORM_DIR "${SOURCESDK_LIB_DIR}/linux64")
-
-	set(SOURCESDK_LIBRARIES
-		${SOURCESDK_LIB_PLATFORM_DIR}/libtier0.so
-		${SOURCESDK_LIB_PLATFORM_DIR}/tier1.a
-		${SOURCESDK_LIB_PLATFORM_DIR}/interfaces.a
-		${SOURCESDK_LIB_PLATFORM_DIR}/mathlib.a
-	)
-else()
-	message(FATAL_ERROR "Unsupported platform")
-endif()
+get_sourcesdk_target_property(SOURCESDK_LINK_LIBRARIES ${SOURCESDK_BINARY_DIR} LINK_LIBRARIES)

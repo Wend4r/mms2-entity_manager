@@ -1,6 +1,6 @@
 "Games"
 {
-	"cs2"
+	"csgo"
 	{
 		"Offsets"
 		{
@@ -9,8 +9,8 @@
 			// Calls CGameResourceManifest::~CGameResourceManifest(this)
 			"CGameResourceService::DestroyResourceManifest"
 			{
-				"windows64"     "31"
-				"linux64"       "31"
+				"win64"          "31"
+				"linuxsteamrt64" "31"
 			}
 
 			// Used strings:
@@ -27,8 +27,8 @@
 			//         const matrix3x4a_t *const vWorldOffset)
 			"CGameResourceService::PrecacheEntitiesAndConfirmResourcesAreLoaded"
 			{
-				"windows64"     "35"
-				"linux64"       "35"
+				"win64"          "35"
+				"linuxsteamrt64" "35"
 			}
 
 			// Just calls CGameResourceManifest::CGameResourceManifest(this)
@@ -39,8 +39,8 @@
 			//         ResourceManifestLoadPriority_t ePriority)
 			"CGameResourceService::AllocGameResourceManifest"
 			{
-				"windows64"     "38"
-				"linux64"       "38"
+				"win64"          "38"
+				"linuxsteamrt64" "38"
 			}
 
 			// Calls CGameResourceService::BuildResourceManifest() .
@@ -55,20 +55,20 @@
 			//         const matrix3x4a_t *const vWorldOffset)
 			"CGameResourceService::AppendToAndCreateGameResourceManifest"
 			{
-				"windows64"     "43"
-				"linux64"       "44"
+				"win64"          "43"
+				"linuxsteamrt64" "44"
 			}
 
 			// Field in class.
 			// Contains IEntityResourceManifestBuilder * .
 			// 
 			// Near strings (engine):
-			//  "CGameResourceService::BuildResourceManifest(start)"z
+			//  "CGameResourceService::BuildResourceManifest(start)"
 			//  "CGameResourceService::BuildResourceManifest(finish)"
 			"CGameResourceService::m_pEntitySystem"
 			{
-				"windows64"     "88"
-				"linux64"       "80"
+				"win64"          "88"
+				"linuxsteamrt64" "80"
 			}
 
 			// Field in class.
@@ -77,8 +77,8 @@
 			// Created in CGameResourceService::AllocGameResourceManifest() .
 			"CGameResourceManifest::m_pEntityManifest"
 			{
-				"windows64"     "152"
-				"linux64"       "152"
+				"win64"          "152"
+				"linuxsteamrt64" "152"
 			}
 
 			// Field in class.
@@ -87,8 +87,8 @@
 			// Created in CGameResourceService::AllocGameResourceManifest() .
 			"CEntityResourceManifest::`vftable'"
 			{
-				"windows64"     "8"
-				"linux64"       "8"
+				"win64"          "8"
+				"linuxsteamrt64" "8"
 			}
 		}
 	}

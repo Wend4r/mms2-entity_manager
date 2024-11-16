@@ -1,94 +1,94 @@
-#include <provider.hpp>
-#include "provider_agent.hpp"
+#include <entity_manager/provider_agent.hpp>
+#include <entity_manager/provider.hpp>
 
 DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 EntityManager::Provider::GameDataStorage::GameResource::GameResource()
 {
 	{
-		auto &aCallbacks = this->m_aOffsetCallbacks;
+		auto &aCallbacks = m_aOffsetCallbacks;
 
-		aCallbacks.Insert("CGameResourceService::DestroyResourceManifest", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CGameResourceService::DestroyResourceManifest"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
-			this->m_nDestroyResourceManifestOffset = nOffset;
+			m_nDestroyResourceManifestOffset = nOffset;
 		});
-		aCallbacks.Insert("CGameResourceService::PrecacheEntitiesAndConfirmResourcesAreLoaded", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CGameResourceService::PrecacheEntitiesAndConfirmResourcesAreLoaded"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
-			this->m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset = nOffset;
+			m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset = nOffset;
 		});
-		aCallbacks.Insert("CGameResourceService::AllocGameResourceManifest", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CGameResourceService::AllocGameResourceManifest"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
-			this->m_nAllocGameResourceManifestOffset = nOffset;
+			m_nAllocGameResourceManifestOffset = nOffset;
 		});
-		aCallbacks.Insert("CGameResourceService::AppendToAndCreateGameResourceManifest", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CGameResourceService::AppendToAndCreateGameResourceManifest"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
-			this->m_nAppendToAndCreateGameResourceManifestOffset = nOffset;
+			m_nAppendToAndCreateGameResourceManifestOffset = nOffset;
 		});
-		aCallbacks.Insert("CGameResourceService::m_pEntitySystem", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CGameResourceService::m_pEntitySystem"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
-			this->m_nEntitySystemOffset = nOffset;
+			m_nEntitySystemOffset = nOffset;
 			g_pEntityManagerProviderAgent->NotifyEntitySystemUpdated();
 		});
-		aCallbacks.Insert("CGameResourceService::m_pEntityManifest", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CGameResourceService::m_pEntityManifest"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
-			this->m_nEntityManifestOffset = nOffset;
+			m_nEntityManifestOffset = nOffset;
 		});
-		aCallbacks.Insert("CEntityResourceManifest::`vftable'", [this](const std::string &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntityResourceManifest::`vftable'"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
-			this->m_nEntityManifestVFTableOffset = nOffset;
+			m_nEntityManifestVFTableOffset = nOffset;
 		});
 
-		this->m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
+		m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
 	}
 }
 
-bool EntityManager::Provider::GameDataStorage::GameResource::Load(IGameData *pRoot, KeyValues *pGameConfig, char *psError, size_t nMaxLength)
+bool EntityManager::Provider::GameDataStorage::GameResource::Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
-	return this->m_aGameConfig.Load(pRoot, pGameConfig, psError, nMaxLength);
+	return m_aGameConfig.Load(pRoot, pGameConfig, vecMessages);
 }
 
 void EntityManager::Provider::GameDataStorage::GameResource::Reset()
 {
-	this->m_nDestroyResourceManifestOffset = -1;
-	this->m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset = -1;
-	this->m_nAllocGameResourceManifestOffset = -1;
-	this->m_nAppendToAndCreateGameResourceManifestOffset = -1;
-	this->m_nEntitySystemOffset = -1;
-	this->m_nEntityManifestOffset = -1;
-	this->m_nEntityManifestVFTableOffset = -1;
+	m_nDestroyResourceManifestOffset = -1;
+	m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset = -1;
+	m_nAllocGameResourceManifestOffset = -1;
+	m_nAppendToAndCreateGameResourceManifestOffset = -1;
+	m_nEntitySystemOffset = -1;
+	m_nEntityManifestOffset = -1;
+	m_nEntityManifestVFTableOffset = -1;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetDestroyResourceManifestOffset() const
 {
-	return this->m_nDestroyResourceManifestOffset;
+	return m_nDestroyResourceManifestOffset;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetPrecacheEntitiesAndConfirmResourcesAreLoadedOffset() const
 {
-	return this->m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset;
+	return m_nPrecacheEntitiesAndConfirmResourcesAreLoadedOffset;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetAllocGameResourceManifestOffset() const
 {
-	return this->m_nAllocGameResourceManifestOffset;
+	return m_nAllocGameResourceManifestOffset;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetAppendToAndCreateGameResourceManifestOffset() const
 {
-	return this->m_nAppendToAndCreateGameResourceManifestOffset;
+	return m_nAppendToAndCreateGameResourceManifestOffset;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetEntitySystemOffset() const
 {
-	return this->m_nEntitySystemOffset;
+	return m_nEntitySystemOffset;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetEntityManifestOffset() const
 {
-	return this->m_nEntityManifestOffset;
+	return m_nEntityManifestOffset;
 }
 
 ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetEntityManifestVFTableOffset() const
 {
-	return this->m_nEntityManifestVFTableOffset;
+	return m_nEntityManifestVFTableOffset;
 }

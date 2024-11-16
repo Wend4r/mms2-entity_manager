@@ -1,3 +1,7 @@
+# Entity Manger
+# Copyright (C) 2023-2024 Wend4r
+# Licensed under the GPLv3 license. See LICENSE file in the project root for details.
+
 if(UNIX AND NOT APPLE)
 	set(LINUX TRUE)
 endif()
@@ -14,5 +18,3 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING
 	"Only do Release and Debug"
 	FORCE
 )
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)

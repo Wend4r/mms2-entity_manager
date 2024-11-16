@@ -1,6 +1,7 @@
-#include <stdio.h>
+#include <entity_manager/provider_agent.hpp>
+#include <entity_manager/settings.hpp>
 
-#include "settings.hpp"
+#include <stdio.h>
 
 #include <tier0/dbg.h>
 #include <tier0/platform.h>
@@ -9,8 +10,6 @@
 #include <tier0/utlstring.h>
 #include <tier1/utlvector.h>
 #include <filesystem.h>
-
-#include "provider_agent.hpp"
 
 #define ENTITY_MANAGER_MAP_CONFIG_DIR "configs"
 #define ENTITY_MANAGER_MAP_CONFIG_SPAWNGROUPS_DIR "spawngroups"
@@ -22,7 +21,7 @@ DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 bool EntityManager::Settings::Init(char *psError, size_t nMaxLength)
 {
-	this->m_pWorld = new KeyValues("World");
+	m_pWorld = new KeyValues("World");
 
 	return true;
 }
@@ -33,7 +32,7 @@ bool EntityManager::Settings::Load(SpawnGroupHandle_t hSpawnGroup, const char *p
 
 	snprintf((char *)sBaseConfigsDir, sizeof(sBaseConfigsDir), "%s" CORRECT_PATH_SEPARATOR_S "%s" CORRECT_PATH_SEPARATOR_S "%s" CORRECT_PATH_SEPARATOR_S "%s", pszBasePath, ENTITY_MANAGER_MAP_CONFIG_DIR, ENTITY_MANAGER_MAP_CONFIG_SPAWNGROUPS_DIR, pszSpawnGroupName);
 
-	bool bResult = this->LoadWorld(hSpawnGroup, (const char *)sBaseConfigsDir, psError, nMaxLength, pDetails, pWarnings);
+	bool bResult = LoadWorld(hSpawnGroup, (const char *)sBaseConfigsDir, psError, nMaxLength, pDetails, pWarnings);
 
 	if(bResult)
 	{
@@ -50,8 +49,8 @@ void EntityManager::Settings::Clear()
 
 void EntityManager::Settings::Destroy()
 {
-	delete this->m_pWorld;
-	this->m_pWorld = nullptr;
+	delete m_pWorld;
+	m_pWorld = nullptr;
 }
 
 bool EntityManager::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const char *pszBaseConfigsDir, char *psError, size_t nMaxLength, Logger::Scope *pDetails, Logger::Scope *pWarnings)
@@ -60,7 +59,7 @@ bool EntityManager::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const ch
 
 	snprintf((char *)sConfigFile, sizeof(sConfigFile), "%s" CORRECT_PATH_SEPARATOR_S "%s", pszBaseConfigsDir, ENTITY_MANAGER_MAP_CONFIG_WORLD_FILE);
 
-	KeyValues *pWorldValues = this->m_pWorld;
+	KeyValues *pWorldValues = m_pWorld;
 
 	bool bResult = pWorldValues->LoadFromFile(filesystem, (const char *)sConfigFile);
 

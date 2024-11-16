@@ -4,30 +4,47 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - '.github/workflows/**.yml'
+      - '.github/workflows/build-windows.yml'
       - 'cmake/**'
       - 'external/**'
+      - 'include/**'
+      - 'public/**'
       - 'src/**'
+      - 'CMakeLists.txt'
+      - 'CMakePresets.json'
       - 'trigger-build.txt'
   pull_request:
     branches: [ "main" ]
     paths:
-      - '.github/workflows/**.yml'
+      - '.github/workflows/build-windows.yml'
       - 'cmake/**'
       - 'external/**'
+      - 'include/**'
+      - 'public/**'
       - 'src/**'
+      - 'CMakeLists.txt'
+      - 'CMakePresets.json'
       - 'trigger-build.txt'
 
 env:
-  CMAKE_RELEASE_PRESET_NAME: Windows/Release
+  CMAKE_DEBUG_PRESET_NAME: VisualStudio/Debug
+  CMAKE_DEBUG_PRESET_PUBLIC_NAME: Debug
+  CMAKE_DEBUG_CONFIG_NAME: Debug
+  CMAKE_DEBUG_OUTPUT_PATTERN: build/Windows/VisualStudio/Debug/Debug/*
+
+  CMAKE_RELEASE_WITH_DEBUG_INFO_PRESET_NAME: VisualStudio/RelWithDebInfo
+  CMAKE_RELEASE_WITH_DEBUG_INFO_PRESET_PUBLIC_NAME: RelWithDebInfo
+  CMAKE_RELEASE_WITH_DEBUG_INFO_CONFIG_NAME: Debug
+  CMAKE_RELEASE_WITH_DEBUG_INFO_OUTPUT_PATTERN: build/Windows/VisualStudio/RelWithDebInfo/Debug/*
+
+  CMAKE_RELEASE_PRESET_NAME: VisualStudio/Release
   CMAKE_RELEASE_PRESET_PUBLIC_NAME: Release
   CMAKE_RELEASE_CONFIG_NAME: Release
-  CMAKE_RELEASE_OUTPUT_PATTERN: build/Windows/Release/Release/*
-  CL_CC: cl
-  CL_CXX: cl
-  HL2SDK_BRANCH: cs2
-  HL2SDK_ROOT: external\hl2sdk-cs2
-  MMSOURCE_ROOT: external\metamod-source
+  CMAKE_RELEASE_OUTPUT_PATTERN: build/Windows/VisualStudio/Release/Release/*
+
+  MSVC_CC: cl
+  MSVC_CXX: cl
+  MSVC_NAME: MSVC
 
 jobs:
   build:
@@ -39,8 +56,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        submodules: true
+        submodules: recursive
         fetch-depth: 0
+        fetch-tags: true
 
     - name: Set up environment variables
       run: |
@@ -64,28 +82,41 @@ jobs:
         }
       shell: pwsh
 
-    - name: Checkout HL2SDK
-      uses: actions/checkout@v4
-      with:
-        repository: Wend4r/hl2sdk
-        ref: ${{ env.HL2SDK_BRANCH }}
-        fetch-depth: 1
-        path: ${{ env.HL2SDK_ROOT }}
+    - name: Debug - Configure CMake
+      run: >
+        cmake --preset ${{ env.CMAKE_DEBUG_PRESET_NAME }}
+        -DCMAKE_C_COMPILER=${{ env.MSVC_CC }}
+        -DCMAKE_CXX_COMPILER=${{ env.MSVC_CXX }}
 
-    - name: Checkout MetaMod:Source
-      uses: actions/checkout@v4
+    - name: Debug - Build
+      run: cmake --build --preset ${{ env.CMAKE_DEBUG_PRESET_NAME }} --parallel --config ${{ env.CMAKE_DEBUG_CONFIG_NAME }}
+
+    - name: Debug - Upload build artifact
+      uses: actions/upload-artifact@v4
       with:
-        repository: alliedmodders/metamod-source
-        fetch-depth: 1
-        path: ${{ env.MMSOURCE_ROOT }}
+        name: ${{ env.REPOSITORY_NAME }}-${{ env.LATEST_TAG }}-${{ runner.os }}-${{ env.MSVC_NAME }}-${{ env.CMAKE_DEBUG_PRESET_PUBLIC_NAME }}
+        path: ${{ env.CMAKE_DEBUG_OUTPUT_PATTERN }}
+
+    - name: Release With Debug Info - Configure CMake
+      run: >
+        cmake --preset ${{ env.CMAKE_RELEASE_WITH_DEBUG_INFO_PRESET_NAME }}
+        -DCMAKE_C_COMPILER=${{ env.MSVC_CC }}
+        -DCMAKE_CXX_COMPILER=${{ env.MSVC_CXX }}
+
+    - name: Release With Debug Info - Build
+      run: cmake --build --preset ${{ env.CMAKE_RELEASE_WITH_DEBUG_INFO_PRESET_NAME }} --parallel --config ${{ env.CMAKE_RELEASE_WITH_DEBUG_INFO_CONFIG_NAME }}
+
+    - name: Release With Debug Info - Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.REPOSITORY_NAME }}-${{ env.LATEST_TAG }}-${{ runner.os }}-${{ env.MSVC_NAME }}-${{ env.CMAKE_RELEASE_WITH_DEBUG_INFO_PRESET_PUBLIC_NAME }}
+        path: ${{ env.CMAKE_RELEASE_WITH_DEBUG_INFO_OUTPUT_PATTERN }}
 
     - name: Release - Configure CMake
       run: >
         cmake --preset ${{ env.CMAKE_RELEASE_PRESET_NAME }}
-        -DCMAKE_C_COMPILER=${{ env.CL_CC }}
-        -DCMAKE_CXX_COMPILER=${{ env.CL_CXX }}
-        -DSOURCESDK_DIR=${{ env.ABSOLUTE_PATH }}\${{ env.HL2SDK_ROOT }}
-        -DMETAMOD_DIR=${{ env.ABSOLUTE_PATH }}\${{ env.MMSOURCE_ROOT }}
+        -DCMAKE_C_COMPILER=${{ env.MSVC_CC }}
+        -DCMAKE_CXX_COMPILER=${{ env.MSVC_CXX }}
 
     - name: Release - Build
       run: cmake --build --preset ${{ env.CMAKE_RELEASE_PRESET_NAME }} --parallel --config ${{ env.CMAKE_RELEASE_CONFIG_NAME }}
@@ -93,5 +124,6 @@ jobs:
     - name: Release - Upload build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.REPOSITORY_NAME }}-${{ env.LATEST_TAG }}-${{ runner.os }}_${{ env.CMAKE_RELEASE_PRESET_PUBLIC_NAME }}
+        name: ${{ env.REPOSITORY_NAME }}-${{ env.LATEST_TAG }}-${{ runner.os }}-${{ env.MSVC_NAME }}-${{ env.CMAKE_RELEASE_PRESET_PUBLIC_NAME }}
         path: ${{ env.CMAKE_RELEASE_OUTPUT_PATTERN }}
+  

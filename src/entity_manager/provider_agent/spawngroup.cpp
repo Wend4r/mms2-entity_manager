@@ -1,17 +1,17 @@
-#include "spawngroup.hpp"
+#include <entity_manager/provider_agent/spawngroup.hpp>
 
 #include <iserver.h>
 #include <mathlib/mathlib.h>
 
 EntityManager::SpawnGroup::~SpawnGroup()
 {
-	this->Unload();
+	Unload();
 }
 
 /*
 EntityManager::SpawnGroup::Status EntityManager::SpawnGroup::GetStatus()
 {
-	SpawnGroupHandle_t hSpawnGroup = this->m_hSpawnGroup;
+	SpawnGroupHandle_t hSpawnGroup = m_hSpawnGroup;
 
 	if(hSpawnGroup != -1)
 	{
@@ -35,7 +35,7 @@ EntityManager::SpawnGroup::Status EntityManager::SpawnGroup::GetStatus()
 
 int EntityManager::SpawnGroup::GetStatus() const
 {
-	SpawnGroupHandle_t hSpawnGroup = this->m_hSpawnGroup;
+	SpawnGroupHandle_t hSpawnGroup = m_hSpawnGroup;
 
 	if(hSpawnGroup != INVALID_SPAWN_GROUP)
 	{
@@ -71,29 +71,29 @@ bool EntityManager::SpawnGroup::IsResidentOrStreaming(SpawnGroupHandle_t hSpawnG
 
 SpawnGroupHandle_t EntityManager::SpawnGroup::GetAllocatedSpawnGroup() const
 {
-	return this->m_hSpawnGroup;
+	return m_hSpawnGroup;
 }
 
 const char *EntityManager::SpawnGroup::GetLevelName() const
 {
-	return this->m_sLevelName.Get();
+	return m_sLevelName.Get();
 }
 
 const char *EntityManager::SpawnGroup::GetLandmarkName() const
 {
-	return this->m_sLandmarkName.Get();
+	return m_sLandmarkName.Get();
 }
 
 const Vector &EntityManager::SpawnGroup::GetLandmarkOffset() const
 {
-	return this->m_vecLandmarkOffset;
+	return m_vecLandmarkOffset;
 }
 
 bool EntityManager::SpawnGroup::Start(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset)
 {
-	if(this->GetStatus() < 2)
+	if(GetStatus() < 2)
 	{
-		AssertMsg4(0, "Accept to start an already existing spawn group: %s (%s) vs %s (%s)", this->m_sLevelName.Get(), this->m_sLandmarkName.Get(), aDesc.m_sWorldName.Get(), aDesc.m_sDescriptiveName.Get());
+		AssertMsg4(0, "Accept to start an already existing spawn group: %s (%s) vs %s (%s)", m_sLevelName.Get(), m_sLandmarkName.Get(), aDesc.m_sWorldName.Get(), aDesc.m_sDescriptiveName.Get());
 
 		return false;
 	}
@@ -119,9 +119,9 @@ bool EntityManager::SpawnGroup::Start(const SpawnGroupDesc_t &aDesc, const Vecto
 		}
 	}
 
-	this->m_sLevelName = aDesc.m_sWorldName;
-	this->m_sLandmarkName = aDesc.m_sDescriptiveName;
-	this->m_vecLandmarkOffset = vecLandmarkOffset;
+	m_sLevelName = aDesc.m_sWorldName;
+	m_sLandmarkName = aDesc.m_sDescriptiveName;
+	m_vecLandmarkOffset = vecLandmarkOffset;
 
 	SpawnGroupDesc_t aOwnDesc = aDesc;
 
@@ -134,7 +134,7 @@ bool EntityManager::SpawnGroup::Start(const SpawnGroupDesc_t &aDesc, const Vecto
 
 bool EntityManager::SpawnGroup::Unload()
 {
-	SpawnGroupHandle_t hSpawnGroup = this->m_hSpawnGroup;
+	SpawnGroupHandle_t hSpawnGroup = m_hSpawnGroup;
 
 	bool bResult = hSpawnGroup != INVALID_SPAWN_GROUP;
 
@@ -156,7 +156,7 @@ bool EntityManager::SpawnGroup::Unload()
 
 void EntityManager::SpawnGroup::NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
 {
-	this->m_hSpawnGroup = handle;
+	m_hSpawnGroup = handle;
 }
 
 void EntityManager::SpawnGroup::NotifyDestroySpawnGroup(SpawnGroupHandle_t handle)
@@ -169,7 +169,7 @@ matrix3x4_t EntityManager::SpawnGroup::ComputeWorldOrigin(const char *pWorldName
 	matrix3x4_t res;
 
 	res.SetToIdentity();
-	res.SetOrigin(this->GetLandmarkOffset());
+	res.SetOrigin(GetLandmarkOffset());
 
 	return res;
 }

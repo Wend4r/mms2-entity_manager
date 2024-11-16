@@ -1,3 +1,7 @@
+# Entity Manager
+# Copyright (C) 2023-2024 Wend4r
+# Licensed under the GPLv3 license. See LICENSE file in the project root for details.
+
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 if(POLICY CMP0092)
@@ -5,15 +9,16 @@ if(POLICY CMP0092)
 endif()
 
 
-project(entity_manager
+project(mms2-entity_manager
 	VERSION 1.0.1
 	DESCRIPTION "Entity Manager"
-	HOMEPAGE_URL "https://github.com/Wend4r/mms-entity_manager"
+	HOMEPAGE_URL "https://github.com/Wend4r/mms2-entity_manager"
 	LANGUAGES C CXX ASM
 )
 
-string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWER)
-string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
+string(REGEX REPLACE "^[^-]*-" "" PROJECT_NAME_SUBSTRING "${PROJECT_NAME}")
+string(TOLOWER "${PROJECT_NAME_SUBSTRING}" PROJECT_NAME_LOWER)
+string(TOUPPER "${PROJECT_NAME_SUBSTRING}" PROJECT_NAME_UPPER)
 
 set(PROJECT_OUTPUT_NAME "entitymgr")
 
@@ -23,77 +28,95 @@ set(PROJECT_LICENSE "GPLv3")
 string(TIMESTAMP PROJECT_BUILD_DATE "%Y-%m-%d")
 string(TIMESTAMP PROJECT_BUILD_TIME "%H:%M:%S")
 
-if(SOURCESDK_DIR)
-	file(TO_CMAKE_PATH "${SOURCESDK_DIR}" SOURCESDK_DIR)
-else()
-	message(WARNING "SOURCESDK_DIR is empty. Will be used default path")
-	set(SOURCESDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../hl2sdk-wend4r/hl2sdk-cs2)
-endif()
-
-if(METAMOD_DIR)
-	file(TO_CMAKE_PATH "${METAMOD_DIR}" METAMOD_DIR)
-else()
-	message(WARNING "METAMOD_DIR is empty. Will be used default path")
-	set(METAMOD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../metamod-source)
-endif()
-
-set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/${PROJECT_NAME}")
+set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")	
+set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/${PROJECT_NAME_SUBSTRING}")
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
-set(DYNLIBUTILS_DIR "${EXTERNAL_DIR}/memory_utils")
-set(DYNOHOOK_DIR "${EXTERNAL_DIR}/dynohook")
-set(GAMEDATA_DIR "${EXTERNAL_DIR}/gamedata")
-set(LOGGER_DIR "${EXTERNAL_DIR}/logger")
+set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-include("cmake/platform/shared.cmake")
+function(set_or_external_dir VAR_NAME DEFAULT_DIR)
+	if(${VAR_NAME})
+		file(TO_CMAKE_PATH "${${VAR_NAME}}" ${VAR_NAME})
+	else()
+		set(${VAR_NAME} "${EXTERNAL_DIR}/${DEFAULT_DIR}")
+	endif()
+
+	set(${VAR_NAME} "${${VAR_NAME}}" PARENT_SCOPE)
+endfunction()
+
+set_or_external_dir(SOURCESDK_DIR "hl2sdk")
+set_or_external_dir(METAMOD_DIR "metamod-source")
+set_or_external_dir(ANY_CONFIG_DIR "any_config")
+set_or_external_dir(DYNLIBUTILS_DIR "memory_utils")
+set_or_external_dir(DYNOHOOK_DIR "dynohook")
+set_or_external_dir(GAMEDATA_DIR "gamedata")
+set_or_external_dir(LOGGER_DIR "logger")
+
+set(SOURCESDK_PROTOS
+	networkbasetypes
+	netmessages
+	network_connection
+)
+
+include(cmake/platform/shared.cmake)
 
 if(LINUX)
-	include("cmake/platform/linux.cmake")
+	include(cmake/platform/linux.cmake)
 elseif(WINDOWS)
-	include("cmake/platform/windows.cmake")
+	include(cmake/platform/windows.cmake)
 endif()
 
 # Libraries.
-include("cmake/dynlibutils.cmake")
-include("cmake/gamedata.cmake")
-include("cmake/logger.cmake")
-include("cmake/metamod.cmake")
-include("cmake/sourcesdk.cmake")
+include(cmake/any_config.cmake)
+include(cmake/dynlibutils.cmake)
+include(cmake/gamedata.cmake)
+include(cmake/logger.cmake)
+include(cmake/metamod.cmake)
+include(cmake/sourcesdk.cmake)
 
 set(SOURCE_FILES
-	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent/resourcemanifest.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent/spawngroup.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/entitysystem.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/gameresource.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/gamesystem.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/source2server.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamedata/spawngroup.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/entitysystem.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gameresource.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/gamesystem.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/source2server.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider/spawngroup.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider_agent.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/provider.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}/settings.cpp
-	${SOURCE_DIR}/${PROJECT_NAME}.cpp
+	${SOURCE_PROJECT_DIR}/provider_agent/resourcemanifest.cpp
+	${SOURCE_PROJECT_DIR}/provider_agent/spawngroup.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/entitysystem.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/gameresource.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/gamesystem.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/source2server.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/spawngroup.cpp
+	${SOURCE_PROJECT_DIR}/provider/entitysystem.cpp
+	${SOURCE_PROJECT_DIR}/provider/gameresource.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamesystem.cpp
+	${SOURCE_PROJECT_DIR}/provider/source2server.cpp
+	${SOURCE_PROJECT_DIR}/provider/spawngroup.cpp
+	${SOURCE_PROJECT_DIR}/provider_agent.cpp
+	${SOURCE_PROJECT_DIR}/provider.cpp
+	${SOURCE_PROJECT_DIR}/settings.cpp
+	${SOURCE_PROJECT_DIR}.cpp
 )
 
-add_library(${PROJECT_NAME} SHARED ${SOURCESDK_SOURCE_FILES} ${SOURCE_FILES})
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${SOURCESDK_SOURCE_FILES})
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD 17)
-set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD_REQUIRED ON)
-set_property(TARGET ${PROJECT_NAME} PROPERTY C_EXTENSIONS OFF)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	C_STANDARD 17
+	C_STANDARD_REQUIRED ON
+	C_EXTENSIONS OFF
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_EXTENSIONS OFF)
+	CXX_STANDARD 17
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS OFF
+)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_OUTPUT_NAME})
 
-target_compile_options(${PROJECT_NAME} PRIVATE ${PLATFORM_COMPILER_OPTIONS})
-target_link_options(${PROJECT_NAME} PRIVATE ${PLATFORM_LINKER_OPTIONS})
+if(WINDOWS)
+	if(SOURCESDK_MSVC_RUNTIME_LIBRARY)
+		set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	endif()
+elseif(MACOS)
+	set_target_properties(${PROJECT_NAME} PROPERTIES OSX_ARCHITECTURES "x86_64")
+endif()
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE ${PLATFORM_COMPILE_DEFINITIONS} ${METAMOD_COMPILE_DEFINITIONS} ${SOURCESDK_COMPILE_DEFINTIONS})
-target_include_directories(${PROJECT_NAME} PRIVATE ${DYNLIBUTILS_INCLUDE_DIR} ${DYNOHOOK_INCLUDE_DIR} ${GAMEDATA_INCLUDE_DIR} ${LOGGER_INCLUDE_DIR} ${METAMOD_INCLUDE_DIR} ${SOURCESDK_INCLUDE_DIR} ${SOURCE_PROJECT_DIR} ${SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${DYNLIBUTILS_BINARY_DIR} ${DYNOHOOK_BINARY_DIR} ${GAMEDATA_BINARY_DIR} ${LOGGER_BINARY_DIR} ${SOURCESDK_LIBRARIES})
+target_compile_options(${PROJECT_NAME} PRIVATE ${COMPILER_OPTIONS} ${PLATFORM_COMPILER_OPTIONS} ${COMPILE_OPTIONS} ${SOURCESDK_COMPILE_OPTIONS})
+target_link_options(${PROJECT_NAME} PRIVATE ${LINKER_OPTIONS} ${PLATFORM_LINKER_OPTIONS} ${SOURCESDK_LINK_OPTIONS})
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${COMPILER_DEFINITIONS} ${PLATFORM_COMPILE_DEFINITIONS} ${METAMOD_COMPILE_DEFINITIONS} ${SOURCESDK_COMPILE_DEFINTIONS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR} ${ANY_CONFIG_INCLUDE_DIR} ${DYNLIBUTILS_INCLUDE_DIR} ${DYNOHOOK_INCLUDE_DIR} ${GAMEDATA_INCLUDE_DIR} ${LOGGER_INCLUDE_DIR} ${METAMOD_INCLUDE_DIR} ${SOURCESDK_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES} ${ANY_CONFIG_BINARY_DIR} ${DYNLIBUTILS_BINARY_DIR} ${DYNOHOOK_BINARY_DIR} ${GAMEDATA_BINARY_DIR} ${LOGGER_BINARY_DIR} ${SOURCESDK_BINARY_DIR})
