@@ -7,4 +7,6 @@ if(NOT DYNLIBUTILS_DIR)
 endif()
 
 set(DYNLIBUTILS_BINARY_DIR "cpp-memory_utils")
+set(DYNLIBUTILS_INCLUDE_DIR "${DYNLIBUTILS_DIR}/include")
+
 add_subdirectory(${DYNLIBUTILS_DIR} ${DYNLIBUTILS_BINARY_DIR})
