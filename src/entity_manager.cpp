@@ -346,6 +346,11 @@ EntityManagerPlugin::IProviderAgent *EntityManagerPlugin::GetProviderAgent()
 	return dynamic_cast<IProviderAgent *>(&s_aEntityManagerProviderAgent);
 }
 
+CSpawnGroupMgrGameSystem *EntityManagerPlugin::GetSpawnGroupManager()
+{
+	return g_pSpawnGroupMgr;
+}
+
 bool EntityManagerPlugin::InitEntitySystem()
 {
 	bool bResult = s_aEntityManagerProviderAgent.NotifyEntitySystemUpdated();

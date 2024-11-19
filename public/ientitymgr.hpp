@@ -46,6 +46,8 @@ class ISpawnGroup;
 struct SpawnGroupDesc_t;
 class Vector;
 
+class CSpawnGroupMgrGameSystem;
+
 /**
  * @brief A Entity Manager interface.
  * Note: gets with "ismm->MetaFactory(ENTITY_MANAGER_INTERFACE_NAME, NULL, NULL);"
@@ -69,6 +71,8 @@ public: // Provider agent ones.
 			 * @brief Load the spawn group by a description.
 			 * 
 			 * @param aDesc             A spawn group description.
+			 *                          Set `m_sLocalNameFixup` to ENTITY_MANAGER_WORLD_ROOT to spawn queued entities.
+			 * 
 			 * @param vecLandmarkOffset A landmark offset.
 			 * 
 			 * @return                  Returns true if successed added to the queue, 
@@ -328,6 +332,13 @@ public: // Provider agent ones.
 	 * @return                  Returns a provider agent pointer.
 	 */
 	virtual IProviderAgent *GetProviderAgent() = 0;
+
+	/**
+	 * @brief Gets a spawn group manager.
+	 * 
+	 * @return                  Returns a spawn group manager pointer.
+	 */
+	virtual CSpawnGroupMgrGameSystem *GetSpawnGroupManager() = 0;
 }; // IEntityManager
 
 #endif // _INCLUDE_METAMOD_SOURCE_IENTITYMGR_HPP_
