@@ -62,7 +62,6 @@ public: // Provider agent ones.
 			 * @brief Load the spawn group by a description.
 			 * 
 			 * @param aDesc             A spawn group description.
-			 *                          Set `m_sLocalNameFixup` to ENTITY_MANAGER_WORLD_ROOT to spawn queued entities.
 			 * 
 			 * @param vecLandmarkOffset A landmark offset.
 			 * 
