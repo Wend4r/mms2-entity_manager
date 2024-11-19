@@ -29,24 +29,15 @@
 
 #	include <functional>
 
+#	include <tier1/utlmap.h>
 #	include <tier1/utlvector.h>
 #	include <entity2/entityidentity.h>
+#	include <gamesystems/spawngroup_manager.h>
 
 #	define ENTITY_MANAGER_INTERFACE_NAME "Entity Manager v1.0"
 
 #	define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
 #	define ANY_SPAWN_GROUP INVALID_SPAWN_GROUP
-
-class IEntityResourceManifest;
-struct EntitySpawnInfo_t;
-class KeyValues;
-class CEntityKeyValues;
-
-class ISpawnGroup;
-struct SpawnGroupDesc_t;
-class Vector;
-
-class CSpawnGroupMgrGameSystem;
 
 /**
  * @brief A Entity Manager interface.
@@ -327,6 +318,74 @@ public: // Provider agent ones.
 	};
 
 	/**
+	 * @brief A spawn group mamager game system provider.
+	 */
+	class ISpawnGroupMgrProvider : public IGameSpawnGroupMgr
+	{
+	public:
+		/**
+		 * @brief Gets a map spawn group from a handle.
+		 * 
+		 * @return                  Returns the map spawn group pointer.
+		 */
+		virtual CMapSpawnGroup *Get(SpawnGroupHandle_t hSpawnGroup) = 0;
+
+		/**
+		 * @brief Gets a spawn group map.
+		 * 
+		 * @return                  Returns the spawn group map pointer.
+		 */
+		virtual CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups() = 0;
+	};
+
+	class CSpawnGroupMgrProvider : public ISpawnGroupMgrProvider
+	{
+	public:
+		using OnSpawnGroupFound_t = void (SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup);
+
+		int LoopBySpawnGroups(const std::function<OnSpawnGroupFound_t> &funcCallback)
+		{
+			auto *pSpawnGroups = GetSpawnGroups();
+
+			int iSpawnGroupLength = 0;
+
+			{
+				const int iInvalidIndex = pSpawnGroups->InvalidIndex();
+
+				for(int i = pSpawnGroups->FirstInorder(); i != iInvalidIndex; i = pSpawnGroups->NextInorder(i))
+				{
+					funcCallback(pSpawnGroups->Key(i), pSpawnGroups->Element(i));
+					iSpawnGroupLength++;
+				}
+			}
+
+			return iSpawnGroupLength;
+		}
+
+		int FastLoopBySpawnGroups(const std::function<OnSpawnGroupFound_t> &funcCallback)
+		{
+			auto *pSpawnGroups = GetSpawnGroups();
+
+			int iSpawnGroupLength = 0;
+
+			{
+				const int iMaxElement = pSpawnGroups->MaxElement();
+
+				for(int i = 0; i < iMaxElement; ++i)
+				{
+					if(pSpawnGroups->IsValidIndex(i))
+					{
+						funcCallback(pSpawnGroups->Key(i), pSpawnGroups->Element(i));
+						iSpawnGroupLength++;
+					}
+				}
+			}
+
+			return iSpawnGroupLength;
+		}
+	};
+
+	/**
 	 * @brief Gets a provider agent.
 	 * 
 	 * @return                  Returns a provider agent pointer.
@@ -338,7 +397,7 @@ public: // Provider agent ones.
 	 * 
 	 * @return                  Returns a spawn group manager pointer.
 	 */
-	virtual CSpawnGroupMgrGameSystem *GetSpawnGroupManager() = 0;
+	virtual CSpawnGroupMgrProvider *GetSpawnGroupManager() = 0;
 }; // IEntityManager
 
 #endif // _INCLUDE_METAMOD_SOURCE_IENTITYMGR_HPP_

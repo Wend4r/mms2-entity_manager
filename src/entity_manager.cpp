@@ -210,7 +210,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 			// Load by spawn groups now.
 			{
-				auto *pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+				auto *pSpawnGroupMgr = (IEntityManager::CSpawnGroupMgrProvider *)g_pSpawnGroupMgr;
 
 				assert(pSpawnGroupMgr);
 
@@ -346,9 +346,9 @@ EntityManagerPlugin::IProviderAgent *EntityManagerPlugin::GetProviderAgent()
 	return dynamic_cast<IProviderAgent *>(&s_aEntityManagerProviderAgent);
 }
 
-CSpawnGroupMgrGameSystem *EntityManagerPlugin::GetSpawnGroupManager()
+EntityManagerPlugin::CSpawnGroupMgrProvider *EntityManagerPlugin::GetSpawnGroupManager()
 {
-	return g_pSpawnGroupMgr;
+	return dynamic_cast<CSpawnGroupMgrProvider *>(g_pSpawnGroupMgr);
 }
 
 bool EntityManagerPlugin::InitEntitySystem()
@@ -543,7 +543,7 @@ bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, 
 
 		CUtlVector<const char *> vecNamesByPedigree;
 
-		while((hOwner = pOwnerSpawnGroup->GetOwnerSpawnGroup()) != INVALID_SPAWN_GROUP && (pMap = ((EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr)->Get(hOwner)))
+		while((hOwner = pOwnerSpawnGroup->GetOwnerSpawnGroup()) != INVALID_SPAWN_GROUP && (pMap = ((IEntityManager::CSpawnGroupMgrProvider *)g_pSpawnGroupMgr)->Get(hOwner)))
 		{
 			pOwnerSpawnGroup = pMap->GetSpawnGroup();
 
@@ -616,7 +616,7 @@ void EntityManagerPlugin::OnBasePathChanged(const char *pszNewOne)
 	{
 		auto aWarnings = m_aLogger.CreateWarningsScope();
 
-		auto *pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+		auto *pSpawnGroupMgr = (IEntityManager::CSpawnGroupMgrProvider *)g_pSpawnGroupMgr;
 
 		pSpawnGroupMgr->LoopBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void
 		{
@@ -641,7 +641,7 @@ void EntityManagerPlugin::SpawnMyEntities()
 {
 	auto aWarnings = m_aLogger.CreateWarningsScope();
 	
-	auto *pSpawnGroupMgr = (EntityManager::CSpawnGroupMgrGameSystemProvider *)g_pSpawnGroupMgr;
+	auto *pSpawnGroupMgr = (IEntityManager::CSpawnGroupMgrProvider *)g_pSpawnGroupMgr;
 
 	pSpawnGroupMgr->LoopBySpawnGroups([this, &aWarnings](SpawnGroupHandle_t h, CMapSpawnGroup *pMap) -> void
 	{
@@ -875,7 +875,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 	SET_META_RESULT(MRES_HANDLED);
 	SH_GLOB_SHPTR->DoRecall();
 
-	EntityManager::CSpawnGroupMgrGameSystemProvider *pSpawnGroupMgr = reinterpret_cast<EntityManager::CSpawnGroupMgrGameSystemProvider *>(reinterpret_cast<CSpawnGroupMgrGameSystem *>(SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup)));
+	IEntityManager::CSpawnGroupMgrProvider *pSpawnGroupMgr = reinterpret_cast<IEntityManager::CSpawnGroupMgrProvider *>(reinterpret_cast<CSpawnGroupMgrGameSystem *>(SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup)));
 
 	CMapSpawnGroup *pMapSpawnGroup = pSpawnGroupMgr->Get(hSpawnGroup);
 

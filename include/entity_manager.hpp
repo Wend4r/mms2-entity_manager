@@ -72,7 +72,7 @@ public: // IMetamodListener
 
 public: // IEntityManager
 	IProviderAgent *GetProviderAgent() override;
-	CSpawnGroupMgrGameSystem *GetSpawnGroupManager() override;
+	CSpawnGroupMgrProvider *GetSpawnGroupManager() override;
 
 protected:
 	bool InitEntitySystem();

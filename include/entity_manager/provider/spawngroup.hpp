@@ -6,21 +6,6 @@
 
 namespace EntityManager
 {
-	class CSpawnGroupMgrGameSystemProvider : public CSpawnGroupMgrGameSystem
-	{
-	public:
-		CMapSpawnGroup *Get(SpawnGroupHandle_t h);
-
-	public: // Custom methods.
-		typedef void (EachSpawnGroupFunc)(SpawnGroupHandle_t h, CMapSpawnGroup *pSpawnGroup); // Return true to continue, otherwise break.
-		typedef EachSpawnGroupFunc *EachSpawnGroupFuncPtr;
-		void LoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc); // In order.
-		void FastLoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc);
-
-	private:
-		CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups();
-	};
-
 	class CLoadingSpawnGroupProvider : public CLoadingSpawnGroup
 	{
 	public:
