@@ -71,7 +71,7 @@ public: // Provider agent ones.
 			 * @param aDesc             A spawn group description.
 			 * @param vecLandmarkOffset A landmark offset.
 			 * 
-			 * @return                  True if successed added to the queue, 
+			 * @return                  Returns true if successed added to the queue, 
 			 *                          otherwise false if failed to add.
 			 */
 			virtual bool Load(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset) = 0;
@@ -79,7 +79,7 @@ public: // Provider agent ones.
 			/**
 			 * @brief Unload the spawn group.
 			 * 
-			 * @return                  True if successed added to the queue, 
+			 * @return                  Returns true if successed added to the queue, 
 			 *                          otherwise false if failed to add.
 			 */
 			virtual bool Unload() = 0;
@@ -122,42 +122,42 @@ public: // Provider agent ones.
 			/**
 			 * @brief Gets the status of the spawn group.
 			 * 
-			 * @return                  The status value of a spawn group.
+			 * @return                  Returns a status value of the spawn group.
 			 */
 			virtual int GetStatus() const = 0;
 
 			/**
 			 * @brief Gets a spawn group.
 			 * 
-			 * @return                  A spawn group pointer.
+			 * @return                  Returns a spawn group pointer.
 			 */
 			virtual ISpawnGroup *GetSpawnGroup() const = 0;
 
 			/**
 			 * @brief Gets an allocated spawn group handle.
 			 * 
-			 * @return                  A spawn group handle.
+			 * @return                  Returns a spawn group handle.
 			 */
 			virtual SpawnGroupHandle_t GetSpawnGroupHandle() const = 0;
 
 			/**
 			 * @brief Gets a level name string.
 			 * 
-			 * @return                  A string of the name.
+			 * @return                  Returns a string of the name.
 			 */
 			virtual const char *GetLevelName() const = 0;
 
 			/**
 			 * @brief Gets a landmark name string.
 			 * 
-			 * @return                  A string of the landmark name.
+			 * @return                  Returns a string of the landmark name.
 			 */
 			virtual const char *GetLandmarkName() const = 0;
 
 			/**
 			 * @brief Gets a landmark offset.
 			 * 
-			 * @return                  A vector of the offset.
+			 * @return                  Returns a vector of the offset.
 			 */
 			virtual const Vector &GetLandmarkOffset() const = 0;
 		}; // ISpawnGroupInstance
@@ -207,7 +207,7 @@ public: // Provider agent ones.
 		 * @brief Releases a spawn group instance. 
 		 *        To load, use the `Load` method
 		 * 
-		 * @return                  True if spawn group are released, 
+		 * @return                  Returns true if spawn group are released, 
 		 *                          otherwise false if failed to find.
 		 */
 		virtual bool ReleaseSpawnGroup(ISpawnGroupInstance *pSpawnGroupInstance) = 0;
@@ -237,7 +237,7 @@ public: // Provider agent ones.
 		 * @param hSpawnGroup       A filter spawn group.
 		 *                          If ANY_SPAWN_GROUP, will be added all entities.
 		 * 
-		 * @return                  Return the number of added elements.
+		 * @return                  Returns the number of added elements.
 		 */
 		virtual int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
 
@@ -247,7 +247,7 @@ public: // Provider agent ones.
 		 * @param pKeyValues        An entity structure to find.
 		 * @param pResultHandle     An optional spawn group handle pointer of the found entity.
 		 * 
-		 * @return                  True if found the the first entity by the spawn group handle, 
+		 * @return                  Returns true if found the the first entity by the spawn group handle, 
 		 *                          otherwise false if not found.
 		 */
 		virtual bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues, SpawnGroupHandle_t *pResultHandle = nullptr) = 0;
@@ -257,7 +257,7 @@ public: // Provider agent ones.
 		 * 
 		 * @param hSpawnGroup       A spawn group handle to find.
 		 * 
-		 * @return                  True if found the the first entity by the spawn group handle, 
+		 * @return                  Returns true if found the the first entity by the spawn group handle, 
 		 *                          otherwise false if not found.
 		 */
 		virtual bool HasInSpawnQueue(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
@@ -267,7 +267,7 @@ public: // Provider agent ones.
 		 * 
 		 * @param hSpawnGroup       A spawn group filter.
 		 * 
-		 * @return                  Released count of the queued entities.
+		 * @return                  Returns released count of the queued entities.
 		 */
 		virtual int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
 
@@ -279,7 +279,7 @@ public: // Provider agent ones.
 		 * @param pDetails          An optional vector pointer of detailed messages.
 		 * @param pWarnings         An opitonal vector pointer of warning messages.
 		 * 
-		 * @return                  The executed spawn queue length.
+		 * @return                  Returns the executed spawn queue length.
 		 */
 		virtual int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, CUtlVector<CEntityInstance *> *pEntities = nullptr, CUtlVector<CUtlString> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) = 0;
 	};
@@ -287,7 +287,7 @@ public: // Provider agent ones.
 	/**
 	 * @brief Gets a provider agent.
 	 * 
-	 * @return                  A provider agent pointer.
+	 * @return                  Returns a provider agent pointer.
 	 */
 	virtual IProviderAgent *GetProviderAgent() = 0;
 }; // IEntityManager
