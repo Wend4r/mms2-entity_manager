@@ -46,12 +46,22 @@ class EntityManagerPlugin final : public ISmmPlugin, public IMetamodListener
 public:
 	EntityManagerPlugin();
 
-public: // IMetamodListener
+public: // ISmmPlugin
 	bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late) override;
 	bool Unload(char *error, size_t maxlen) override;
 	bool Pause(char *error, size_t maxlen) override;
 	bool Unpause(char *error, size_t maxlen) override;
 	void AllPluginsLoaded() override;
+
+public: // ISmmPlugin
+	const char *GetAuthor() override;
+	const char *GetName() override;
+	const char *GetDescription() override;
+	const char *GetURL() override;
+	const char *GetLicense() override;
+	const char *GetVersion() override;
+	const char *GetDate() override;
+	const char *GetLogTag() override;
 
 protected:
 	bool InitEntitySystem();
