@@ -684,7 +684,7 @@ void EntityManagerPlugin::DestroyMyEntities()
 		s_aEntityManagerProviderAgent.PushDestroyQueue(it);
 	}
 
-	s_aEntityManagerProviderAgent.DestroyQueued();
+	s_aEntityManagerProviderAgent.ExecuteDestroyQueued();
 }
 
 

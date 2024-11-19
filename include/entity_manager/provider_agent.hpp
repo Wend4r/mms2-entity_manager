@@ -75,11 +75,11 @@ namespace EntityManager
 		int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, CUtlVector<CEntityInstance *> *pEntities = nullptr, CUtlVector<CUtlString> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) override;
 
 	public: // Destroy queue methods.
-		void PushDestroyQueue(CEntityInstance *pEntity);
-		void PushDestroyQueue(CEntityIdentity *pEntity);
-		int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> &vecTarget);
-		void ReleaseDestroyQueued();
-		int DestroyQueued();
+		void PushDestroyQueue(CEntityInstance *pEntity) override;
+		void PushDestroyQueue(CEntityIdentity *pEntity) override;
+		int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> &vecTarget) override;
+		void ReleaseDestroyQueued() override;
+		int ExecuteDestroyQueued() override;
 
 	public: // Dumps.
 		enum DumpEntityKeyValuesFlags_t : uint8

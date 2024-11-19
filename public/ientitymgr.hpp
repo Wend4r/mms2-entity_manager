@@ -195,6 +195,7 @@ public: // Provider agent ones.
 		 */
 		virtual IEntityResourceManifest *GetEntityManifest() = 0;
 
+	public: // Spawn group ones.
 		/**
 		 * @brief Creates a spawn group instance. 
 		 *        To load, use the `Load` method
@@ -212,6 +213,7 @@ public: // Provider agent ones.
 		 */
 		virtual bool ReleaseSpawnGroup(ISpawnGroupInstance *pSpawnGroupInstance) = 0;
 
+	public: // Create queued entities.
 		/**
 		 * @brief Push an old entity structure to the spawn queue.
 		 * 
@@ -233,7 +235,7 @@ public: // Provider agent ones.
 		/**
 		 * @brief Adds the spawn queue to a vector.
 		 * 
-		 * @param vecTarget         A vector target.
+		 * @param vecTarget         A vector target to store.
 		 * @param hSpawnGroup       A filter spawn group.
 		 *                          If ANY_SPAWN_GROUP, will be added all entities.
 		 * 
@@ -282,6 +284,42 @@ public: // Provider agent ones.
 		 * @return                  Returns the executed spawn queue length.
 		 */
 		virtual int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, CUtlVector<CEntityInstance *> *pEntities = nullptr, CUtlVector<CUtlString> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) = 0;
+
+	public: // Destory queued entities.
+		/**
+		 * @brief Push a entity instance to destroy queue.
+		 * 
+		 * @param pEntity           An entity instance to destoy.
+		 */
+		virtual void PushDestroyQueue(CEntityInstance *pEntity) = 0;
+
+		/**
+		 * @brief Push a entity identity to destroy queue.
+		 * 
+		 * @param pEntity           An entity identity to destoy.
+		 */
+		virtual void PushDestroyQueue(CEntityIdentity *pEntity) = 0;
+
+		/**
+		 * @brief Adds the destroy queue to a vector.
+		 * 
+		 * @param vecTarget         A vector target to store.
+		 * 
+		 * @return                  Returns the number of added elements.
+		 */
+		virtual int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> &vecTarget) = 0;
+
+		/**
+		 * @brief Release destroy queued entities.
+		 */
+		virtual void ReleaseDestroyQueued() = 0;
+
+		/**
+		 * @brief Execute destory queued entities.
+		 * 
+		 * @return                  Returns the executed spawn queue length.
+		 */
+		virtual int ExecuteDestroyQueued() = 0;
 	};
 
 	/**

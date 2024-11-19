@@ -449,7 +449,7 @@ void EntityManager::ProviderAgent::ReleaseDestroyQueued()
 	m_vecEntityDestroyQueue.Purge();
 }
 
-int EntityManager::ProviderAgent::DestroyQueued()
+int EntityManager::ProviderAgent::ExecuteDestroyQueued()
 {
 	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
 
