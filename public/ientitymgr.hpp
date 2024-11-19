@@ -123,7 +123,7 @@ public: // Provider agent ones.
 
 		/**
 		 * @brief A spawn group instance interface.
-		**/
+		 */
 		class ISpawnGroupInstance : public ISpawnGroupLoader, public ISpawnGroupNotifications, public ISpawnGroupCallbacks
 		{
 		public:
