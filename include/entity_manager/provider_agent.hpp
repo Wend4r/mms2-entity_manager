@@ -66,13 +66,13 @@ namespace EntityManager
 		void OnSpawnGroupDestroyed(SpawnGroupHandle_t handle) override;
 
 	public: // Spawn queue methods.
-		void PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pWarnings = nullptr);
-		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
-		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
-		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues);
-		bool HasInSpawnQueue(SpawnGroupHandle_t hSpawnGroup);
-		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
-		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
+		void PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
+		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
+		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
+		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues, SpawnGroupHandle_t *pResultHandle = nullptr) override;
+		bool HasInSpawnQueue(SpawnGroupHandle_t hSpawnGroup) override;
+		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
+		int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, CUtlVector<CUtlString> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) override;
 
 	public: // Destroy queue methods.
 		void PushDestroyQueue(CEntityInstance *pEntity);
@@ -109,7 +109,6 @@ namespace EntityManager
 			CEntityKeyValues *GetKeyValues() const;
 
 			SpawnGroupHandle_t GetSpawnGroup() const;
-			static SpawnGroupHandle_t GetAnySpawnGroup();
 			bool IsAnySpawnGroup() const;
 
 			void Release();

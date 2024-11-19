@@ -29,12 +29,18 @@
 
 #	include <functional>
 
+#	include <tier1/utlvector.h>
 #	include <entity2/entityidentity.h>
 
 #	define ENTITY_MANAGER_INTERFACE_NAME "Entity Manager v1.0"
 
+#	define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
+#	define ANY_SPAWN_GROUP INVALID_SPAWN_GROUP
+
 class IEntityResourceManifest;
 struct EntitySpawnInfo_t;
+class KeyValues;
+class CEntityKeyValues;
 
 class ISpawnGroup;
 struct SpawnGroupDesc_t;
@@ -49,13 +55,13 @@ class IEntityManager
 public: // Provider agent ones.
 	/**
 	 * @brief A provider agent interface.
-	**/
+	 */
 	class IProviderAgent
 	{
 	public: // Spawn group ones.
 		/**
 		 * @brief A spawn group loader interface.
-		**/
+		 */
 		class ISpawnGroupLoader
 		{
 		public:
@@ -65,21 +71,23 @@ public: // Provider agent ones.
 			 * @param aDesc             A spawn group description.
 			 * @param vecLandmarkOffset A landmark offset.
 			 * 
-			 * @return                  True if successed added to the queue, overwise false if failed to add.
+			 * @return                  True if successed added to the queue, 
+			 *                          otherwise false if failed to add.
 			 */
 			virtual bool Load(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset) = 0;
 
 			/**
 			 * @brief Unload the spawn group.
 			 * 
-			 * @return                  True if successed added to the queue, overwise false if failed to add.
+			 * @return                  True if successed added to the queue, 
+			 *                          otherwise false if failed to add.
 			 */
 			virtual bool Unload() = 0;
 		}; // ISpawnGroupLoader
 
 		/**
 		 * @brief A spawn group notifications interface.
-		**/
+		 */
 		class ISpawnGroupNotifications
 		{
 		public:
@@ -199,17 +207,88 @@ public: // Provider agent ones.
 		 * @brief Releases a spawn group instance. 
 		 *        To load, use the `Load` method
 		 * 
-		 * @return                  True if spawn group are released, overwise false if failed to find.
+		 * @return                  True if spawn group are released, 
+		 *                          otherwise false if failed to find.
 		 */
 		virtual bool ReleaseSpawnGroup(ISpawnGroupInstance *pSpawnGroupInstance) = 0;
+
+		/**
+		 * @brief Push an old entity structure to the spawn queue.
+		 * 
+		 * @param pOldOne           An old entity structure.
+		 * @param hSpawnGroup       A spawn group on which the entity should spawned.
+		 *                          If ANY_SPAWN_GROUP, entity will spawned on the active spawn group.
+		 */
+		virtual void PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
+
+		/**
+		 * @brief Push an entity structure to the spawn queue.
+		 * 
+		 * @param pKeyValues        An entity structure.
+		 * @param hSpawnGroup       A spawn group on which the entity should spawned.
+		 *                          If ANY_SPAWN_GROUP, entity will spawned on the active spawn group.
+		 */
+		virtual void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
+
+		/**
+		 * @brief Adds the spawn queue to a vector.
+		 * 
+		 * @param vecTarget         A vector target.
+		 * @param hSpawnGroup       A filter spawn group.
+		 *                          If ANY_SPAWN_GROUP, will be added all entities.
+		 * 
+		 * @return                  Return the number of added elements.
+		 */
+		virtual int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
+
+		/**
+		 * @brief Checks to has entity structure in the spawn queue.
+		 * 
+		 * @param pKeyValues        An entity structure to find.
+		 * @param pResultHandle     An optional spawn group handle pointer of the found entity.
+		 * 
+		 * @return                  True if found the the first entity by the spawn group handle, 
+		 *                          otherwise false if not found.
+		 */
+		virtual bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues, SpawnGroupHandle_t *pResultHandle = nullptr) = 0;
+
+		/**
+		 * @brief Checks to has spawn group in the spawn queue.
+		 * 
+		 * @param hSpawnGroup       A spawn group handle to find.
+		 * 
+		 * @return                  True if found the the first entity by the spawn group handle, 
+		 *                          otherwise false if not found.
+		 */
+		virtual bool HasInSpawnQueue(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
+
+		/**
+		 * @brief Releases/Destroy spawn queued entities.
+		 * 
+		 * @param hSpawnGroup       A spawn group filter.
+		 * 
+		 * @return                  Released count of the queued entities.
+		 */
+		virtual int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
+
+		/**
+		 * @brief Executes the spawn queued entities.
+		 * 
+		 * @param hSpawnGroup       A spawn group to spawn.
+		 * @param pDetails          An optional vector pointer of detailed messages.
+		 * @param pWarnings         An opitonal vector pointer of warning messages.
+		 * 
+		 * @return                  The executed spawn queue length.
+		 */
+		virtual int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, CUtlVector<CUtlString, int> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) = 0;
 	};
 
 	/**
 	 * @brief Gets a provider agent.
 	 * 
-	 * @param handle            A provider agent pointer.
+	 * @return                  A provider agent pointer.
 	 */
 	virtual IProviderAgent *GetProviderAgent() = 0;
-}; // ISample
+}; // IEntityManager
 
 #endif // _INCLUDE_METAMOD_SOURCE_IENTITYMGR_HPP_

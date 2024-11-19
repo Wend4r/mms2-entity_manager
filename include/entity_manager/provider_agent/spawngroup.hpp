@@ -5,8 +5,6 @@
 #include <gamesystems/spawngroup_manager.h>
 #include <worldrenderer/icomputeworldorigin.h>
 
-#define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
-
 namespace EntityManager
 {
 	class CSpawnGroupInstance : public IEntityManager::IProviderAgent::ISpawnGroupInstance, public IComputeWorldOriginCallback
