@@ -41,8 +41,8 @@
 
 /**
  * @brief A Entity Manager interface.
- * Note: gets with "ismm->MetaFactory(ENTITY_MANAGER_INTERFACE_NAME, NULL, NULL);"
-**/
+ * Note: gets with "reinterpret_cast<IEntityManager *>(ismm->MetaFactory(ENTITY_MANAGER_INTERFACE_NAME, NULL, NULL));"
+ */
 class IEntityManager
 {
 public: // Provider agent ones.
@@ -62,7 +62,6 @@ public: // Provider agent ones.
 			 * @brief Load the spawn group by a description.
 			 * 
 			 * @param aDesc             A spawn group description.
-			 * 
 			 * @param vecLandmarkOffset A landmark offset.
 			 * 
 			 * @return                  Returns true if successed added to the queue, 
