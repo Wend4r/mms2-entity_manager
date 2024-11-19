@@ -12,6 +12,8 @@
 #include <tier1/utlvector.h>
 
 #include "logger.hpp"
+
+#include <ientitymgr.hpp>
 #include "provider_agent/resourcemanifest.hpp"
 #include "provider_agent/spawngroup.hpp"
 
@@ -23,9 +25,12 @@ class CEntityKeyValues;
 
 namespace EntityManager
 {
-	class ProviderAgent : public ISpawnGroupNotifications
+	class ProviderAgent : public IEntityManager::IProviderAgent, public IEntityManager::IProviderAgent::ISpawnGroupNotifications
 	{
 		using This = ProviderAgent;
+
+	public:
+		using ISpawnGroupInstance = IEntityManager::IProviderAgent::ISpawnGroupInstance;
 
 	public:
 		ProviderAgent();
@@ -35,8 +40,8 @@ namespace EntityManager
 		void Destroy();
 
 	public:
-		CUtlSymbolLarge AllocPooledString(const char *pString);
-		CUtlSymbolLarge FindPooledString(const char* pString);
+		CUtlSymbolLarge AllocPooledString(const char *pString) override;
+		CUtlSymbolLarge FindPooledString(const char* pString) override;
 
 	public:
 		virtual bool NotifyGameResourceUpdated();
@@ -46,16 +51,19 @@ namespace EntityManager
 		virtual bool NotifySpawnGroupMgrUpdated();
 
 	public:
-		bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
-		IEntityResourceManifest *GetMyEntityManifest();
+		bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset) override;
+		IEntityResourceManifest *GetEntityManifest() override;
 
 	public:
-		bool CreateSpawnGroup(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset);
+		ISpawnGroupInstance *CreateSpawnGroup() override;
+		bool ReleaseSpawnGroup(ISpawnGroupInstance *pSpawnGroup) override;
+
+	protected:
 		void ReleaseSpawnGroups();
 
-	public: // ISpawnGroupNotifications
-		void NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
-		void NotifyDestroySpawnGroup(SpawnGroupHandle_t handle);
+	public: // IEntityManager::IProviderAgent::ISpawnGroupNotifications
+		void OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) override;
+		void OnSpawnGroupDestroyed(SpawnGroupHandle_t handle) override;
 
 	public: // Spawn queue methods.
 		void PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pWarnings = nullptr);
@@ -133,7 +141,7 @@ namespace EntityManager
 		CUtlVector<DestoryData> m_vecEntityDestroyQueue;
 
 		ResourceManifest m_aResourceManifest;
-		CUtlVector<SpawnGroup *> m_vecSpawnGroups;
+		CUtlVector<ISpawnGroupInstance *> m_vecSpawnGroups;
 	};
 };
 

@@ -22,6 +22,7 @@
 #ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_HPP_
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_HPP_
 
+#include <ientitymgr.hpp>
 #include <entity_manager/provider.hpp>
 #include <entity_manager/provider_agent.hpp>
 #include <entity_manager/settings.hpp>
@@ -41,10 +42,13 @@
 class ISpawnGroup;
 class ISpawnGroupPrerequisiteRegistry;
 
-class EntityManagerPlugin final : public ISmmPlugin, public IMetamodListener
+class EntityManagerPlugin final : public ISmmPlugin, public IMetamodListener, public IEntityManager
 {
 public:
 	EntityManagerPlugin();
+
+public:
+	using IProviderAgent = IEntityManager::IProviderAgent;
 
 public: // ISmmPlugin
 	bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late) override;
@@ -62,6 +66,12 @@ public: // ISmmPlugin
 	const char *GetVersion() override;
 	const char *GetDate() override;
 	const char *GetLogTag() override;
+
+public: // IMetamodListener
+	void *OnMetamodQuery(const char *iface, int *ret) override;
+
+public: // IEntityManager
+	IProviderAgent *GetProviderAgent() override;
 
 protected:
 	bool InitEntitySystem();
@@ -142,16 +152,6 @@ private:
 
 		void FireGameEvent(IGameEvent *pEvent);
 	};
-
-public: // ISmmPlugin
-	const char *GetAuthor() override;
-	const char *GetName() override;
-	const char *GetDescription() override;
-	const char *GetURL() override;
-	const char *GetLicense() override;
-	const char *GetVersion() override;
-	const char *GetDate() override;
-	const char *GetLogTag() override;
 
 private:
 	std::string m_sBasePath = "addons" CORRECT_PATH_SEPARATOR_S META_PLUGIN_PREFIX;

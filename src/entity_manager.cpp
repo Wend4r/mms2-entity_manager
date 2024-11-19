@@ -254,7 +254,10 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 #else
 							{0.0f, 0.0f, 0.0f};
 #endif
-						if(!s_aEntityManagerProviderAgent.CreateSpawnGroup(aDesc, aWorldOrigin))
+
+						auto *pSpawnGroupInstance = s_aEntityManagerProviderAgent.CreateSpawnGroup();
+
+						if(!pSpawnGroupInstance->Load(aDesc, aWorldOrigin))
 						{
 							aWarnings.PushFormat("Failed to start creating JustInTime spawn group for \"%s\" world\n", pOwnerWorldName);
 						}
@@ -317,6 +320,31 @@ const char *EntityManagerPlugin::GetLicense()     { return META_PLUGIN_LICENSE; 
 const char *EntityManagerPlugin::GetVersion()     { return META_PLUGIN_VERSION; }
 const char *EntityManagerPlugin::GetDate()        { return META_PLUGIN_DATE; }
 const char *EntityManagerPlugin::GetLogTag()      { return META_PLUGIN_LOG_TAG; }
+
+void *EntityManagerPlugin::OnMetamodQuery(const char *iface, int *ret)
+{
+	if(!strcmp(iface, ENTITY_MANAGER_INTERFACE_NAME))
+	{
+		if(ret)
+		{
+			*ret = META_IFACE_OK;
+		}
+
+		return static_cast<IEntityManager *>(this);
+	}
+
+	if(ret)
+	{
+		*ret = META_IFACE_FAILED;
+	}
+
+	return nullptr;
+}
+
+EntityManagerPlugin::IProviderAgent *EntityManagerPlugin::GetProviderAgent()
+{
+	return dynamic_cast<IProviderAgent *>(&s_aEntityManagerProviderAgent);
+}
 
 bool EntityManagerPlugin::InitEntitySystem()
 {
@@ -830,7 +858,7 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t hSpawnGrou
 		}
 	}
 
-	s_aEntityManagerProviderAgent.NotifyAllocateSpawnGroup(hSpawnGroup, pSpawnGroup);
+	s_aEntityManagerProviderAgent.OnSpawnGroupAllocated(hSpawnGroup, pSpawnGroup);
 }
 
 ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t hSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)
@@ -958,7 +986,7 @@ void EntityManagerPlugin::OnSpawnGroupShutdownHook(SpawnGroupHandle_t hSpawnGrou
 		m_aLogger.DetailedFormat("EntityManagerPlugin::OnSpawnGroupShutdownHook(%d)\n", hSpawnGroup);
 	}
 
-	s_aEntityManagerProviderAgent.NotifyDestroySpawnGroup(hSpawnGroup);
+	s_aEntityManagerProviderAgent.OnSpawnGroupDestroyed(hSpawnGroup);
 }
 
 void EntityManagerPlugin::ListenLoadingSpawnGroup(SpawnGroupHandle_t hSpawnGroup, const int iCount, const EntitySpawnInfo_t *pEntities, CEntityInstance *pListener)

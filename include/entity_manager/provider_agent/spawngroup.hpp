@@ -1,6 +1,7 @@
 #ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_AGENT_SPAWNGROUP_HPP_
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_AGENT_SPAWNGROUP_HPP_
 
+#include <ientitymgr.hpp>
 #include <gamesystems/spawngroup_manager.h>
 #include <worldrenderer/icomputeworldorigin.h>
 
@@ -8,36 +9,35 @@
 
 namespace EntityManager
 {
-	class ISpawnGroupNotifications
+	class CSpawnGroupInstance : public IEntityManager::IProviderAgent::ISpawnGroupInstance, public IComputeWorldOriginCallback
 	{
 	public:
-		virtual void NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) = 0;
-		virtual void NotifyDestroySpawnGroup(SpawnGroupHandle_t handle) = 0;
-	};
+		~CSpawnGroupInstance() override;
 
-	class SpawnGroup : public ISpawnGroupNotifications, public IComputeWorldOriginCallback
-	{
 	public:
-		~SpawnGroup();
-
-		int GetStatus() const;
 		static bool IsResidentOrStreaming(SpawnGroupHandle_t hSpawnGroup);
-		SpawnGroupHandle_t GetAllocatedSpawnGroup() const;
-		const char *GetLevelName() const;
-		const char *GetLandmarkName() const;
-		const Vector &GetLandmarkOffset() const;
 
-		bool Start(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset);
-		bool Unload();
+	public: // IEntityManager::IProviderAgent::ISpawnGroupLoader
+		bool Load(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset) override;
+		bool Unload() override;
 
-	public:
-		void NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
-		void NotifyDestroySpawnGroup(SpawnGroupHandle_t handle);
+	public: // IEntityManager::IProviderAgent::ISpawnGroupNotifications
+		void OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) override;
+		void OnSpawnGroupDestroyed(SpawnGroupHandle_t handle) override;
+
+	public: // IEntityManager::IProviderAgent::ISpawnGroupInstance
+		int GetStatus() const override;
+		ISpawnGroup *GetSpawnGroup() const override;
+		SpawnGroupHandle_t GetSpawnGroupHandle() const override;
+		const char *GetLevelName() const override;
+		const char *GetLandmarkName() const override;
+		const Vector &GetLandmarkOffset() const override;
 
 	public: // IComputeWorldOriginCallback
-		matrix3x4_t ComputeWorldOrigin(const char *pWorldName, SpawnGroupHandle_t hSpawnGroup, IWorld *pWorld);
+		matrix3x4_t ComputeWorldOrigin(const char *pWorldName, SpawnGroupHandle_t hSpawnGroup, IWorld *pWorld) override;
 
 	private:
+		ISpawnGroup *m_pSpawnGroup = NULL;
 		SpawnGroupHandle_t m_hSpawnGroup = INVALID_SPAWN_GROUP;
 		CUtlString m_sLevelName;
 		CUtlString m_sLandmarkName;

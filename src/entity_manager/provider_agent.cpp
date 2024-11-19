@@ -111,23 +111,26 @@ bool EntityManager::ProviderAgent::ErectResourceManifest(ISpawnGroup *pSpawnGrou
 	return m_aResourceManifest.Erect(pSpawnGroup, nCount, pEntities, vWorldOffset);
 }
 
-IEntityResourceManifest *EntityManager::ProviderAgent::GetMyEntityManifest()
+IEntityResourceManifest *EntityManager::ProviderAgent::GetEntityManifest()
 {
 	return m_aResourceManifest.GetEntityPart();
 }
 
-bool EntityManager::ProviderAgent::CreateSpawnGroup(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset)
+EntityManager::ProviderAgent::ISpawnGroupInstance *EntityManager::ProviderAgent::CreateSpawnGroup()
 {
-	SpawnGroup *aSpawnGroup = new SpawnGroup();
+	CSpawnGroupInstance *pSpawnGroup = new CSpawnGroupInstance();
 
-	bool bResult = aSpawnGroup->Start(aDesc, vecLandmarkOffset);
-
-	if(bResult)
+	if(pSpawnGroup)
 	{
-		m_vecSpawnGroups.AddToTail(aSpawnGroup);
+		m_vecSpawnGroups.AddToTail(pSpawnGroup);
 	}
 
-	return bResult;
+	return dynamic_cast<IEntityManager::IProviderAgent::ISpawnGroupInstance *>(pSpawnGroup);
+}
+
+bool EntityManager::ProviderAgent::ReleaseSpawnGroup(EntityManager::ProviderAgent::ISpawnGroupInstance *pSpawnGroup)
+{
+	return m_vecSpawnGroups.FindAndFastRemove(pSpawnGroup);
 }
 
 void EntityManager::ProviderAgent::ReleaseSpawnGroups()
@@ -135,7 +138,7 @@ void EntityManager::ProviderAgent::ReleaseSpawnGroups()
 	m_vecSpawnGroups.PurgeAndDeleteElements();
 }
 
-void EntityManager::ProviderAgent::NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
+void EntityManager::ProviderAgent::OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
 {
 	const char *pWorldName = pSpawnGroup->GetWorldName();
 
@@ -143,27 +146,27 @@ void EntityManager::ProviderAgent::NotifyAllocateSpawnGroup(SpawnGroupHandle_t h
 	{
 		for(int i = 0; i < m_vecSpawnGroups.Count(); i++)
 		{
-			SpawnGroup *pSpawnGroupAgent = m_vecSpawnGroups[i];
+			ISpawnGroupInstance *pSpawnGroupAgent = m_vecSpawnGroups[i];
 
 			const char *pLevelName = pSpawnGroupAgent->GetLevelName();
 
 			if(pLevelName && pLevelName[0] && !V_strcmp(pWorldName, pLevelName))
 			{
-				pSpawnGroupAgent->NotifyAllocateSpawnGroup(handle, pSpawnGroup);
+				pSpawnGroupAgent->OnSpawnGroupAllocated(handle, pSpawnGroup);
 			}
 		}
 	}
 }
 
-void EntityManager::ProviderAgent::NotifyDestroySpawnGroup(SpawnGroupHandle_t handle)
+void EntityManager::ProviderAgent::OnSpawnGroupDestroyed(SpawnGroupHandle_t handle)
 {
 	for(int i = 0; i < m_vecSpawnGroups.Count(); i++)
 	{
-		SpawnGroup *pSpawnGroupAgent = m_vecSpawnGroups[i];
+		ISpawnGroupInstance *pSpawnGroupAgent = m_vecSpawnGroups[i];
 
-		if(handle == pSpawnGroupAgent->GetAllocatedSpawnGroup())
+		if(handle == pSpawnGroupAgent->GetSpawnGroupHandle())
 		{
-			pSpawnGroupAgent->NotifyDestroySpawnGroup(handle);
+			pSpawnGroupAgent->OnSpawnGroupDestroyed(handle);
 
 			delete pSpawnGroupAgent;
 			m_vecSpawnGroups.FastRemove(i);
