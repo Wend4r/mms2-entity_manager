@@ -315,7 +315,7 @@ public: // Provider agent ones.
 		 * @return                  Returns the executed spawn queue length.
 		 */
 		virtual int ExecuteDestroyQueued() = 0;
-	};
+	}; // ISpawnGroupLoader
 
 	/**
 	 * @brief A spawn group mamager game system provider.
@@ -336,7 +336,7 @@ public: // Provider agent ones.
 		 * @return                  Returns the spawn group map pointer.
 		 */
 		virtual CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups() = 0;
-	};
+	}; // ISpawnGroupMgrProvider
 
 	class CSpawnGroupMgrProvider : public ISpawnGroupMgrProvider
 	{
@@ -383,7 +383,7 @@ public: // Provider agent ones.
 
 			return iSpawnGroupLength;
 		}
-	};
+	}; // CSpawnGroupMgrProvider
 
 	/**
 	 * @brief Gets a provider agent.
