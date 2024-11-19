@@ -338,11 +338,18 @@ public: // Provider agent ones.
 	}; // ISpawnGroupLoader
 
 	/**
-	 * @brief A spawn group mamager provider.
+	 * @brief A spawn group mamager access interface.
 	 */
-	class ISpawnGroupMgrProvider : public IGameSpawnGroupMgr
+	class ISpawnGroupAccess
 	{
 	public:
+		/**
+		 * @brief Gets a spawn group manager.
+		 * 
+		 * @return                  Returns the spawn group manager pointer.
+		 */
+		virtual CSpawnGroupMgrGameSystem *GetManager() = 0;
+
 		/**
 		 * @brief Gets a map spawn group from a handle.
 		 * 
@@ -356,12 +363,12 @@ public: // Provider agent ones.
 		 * @return                  Returns the spawn group map pointer.
 		 */
 		virtual CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups() = 0;
-	}; // ISpawnGroupMgrProvider
+	}; // ISpawnGroupAccess
 
 	/**
-	 * @brief A spawn group mamager provider component.
+	 * @brief A spawn group mamager provider.
 	 */
-	class CSpawnGroupMgrProvider : public ISpawnGroupMgrProvider
+	class CSpawnGroupProvider : public ISpawnGroupAccess
 	{
 	public:
 		/**
@@ -426,7 +433,7 @@ public: // Provider agent ones.
 
 			return iSpawnGroupLength;
 		}
-	}; // CSpawnGroupMgrProvider
+	}; // CSpawnGroupProvider
 
 	/**
 	 * @brief Gets a provider agent.
@@ -440,7 +447,7 @@ public: // Provider agent ones.
 	 * 
 	 * @return                  Returns a spawn group manager pointer.
 	 */
-	virtual CSpawnGroupMgrProvider *GetSpawnGroupManager() = 0;
+	virtual CSpawnGroupProvider *GetSpawnGroupManager() = 0;
 }; // IEntityManager
 
 #endif // _INCLUDE_METAMOD_SOURCE_IENTITYMGR_HPP_

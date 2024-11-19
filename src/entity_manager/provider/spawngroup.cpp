@@ -5,6 +5,37 @@
 
 DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
 
+EntityManager::CSpawnGroupAccess::CSpawnGroupAccess(CSpawnGroupMgrGameSystem *pSpawnGroupManager)
+ :  m_pSpawnGroupManager(pSpawnGroupManager)
+{
+}
+
+CMapSpawnGroup *EntityManager::CSpawnGroupAccess::Get(SpawnGroupHandle_t h)
+{
+	auto *pMgrSpawnGroupMap = GetSpawnGroups();
+
+	pMgrSpawnGroupMap->SetLessFunc(DefLessFunc(SpawnGroupHandle_t));
+
+	auto iFoundIndex = pMgrSpawnGroupMap->Find(h);
+
+	return iFoundIndex == pMgrSpawnGroupMap->InvalidIndex() ? nullptr : pMgrSpawnGroupMap->Element(iFoundIndex);
+}
+
+CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *EntityManager::CSpawnGroupAccess::GetSpawnGroups()
+{
+	return (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)m_pSpawnGroupManager + g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetMgrGameSystemSpawnGroupsOffset());
+}
+
+void EntityManager::CSpawnGroupAccess::SetManager(CSpawnGroupMgrGameSystem *pNewInstance)
+{
+	m_pSpawnGroupManager = pNewInstance;
+}
+
+CSpawnGroupMgrGameSystem *EntityManager::CSpawnGroupAccess::GetManager()
+{
+	return m_pSpawnGroupManager;
+}
+
 int EntityManager::CLoadingSpawnGroupProvider::AddSpawnInfos(int iCount, const EntitySpawnInfo_t *pEntities)
 {
 	return GetSpawnInfo()->AddMultipleToTail(iCount, pEntities);

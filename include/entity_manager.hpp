@@ -72,7 +72,7 @@ public: // IMetamodListener
 
 public: // IEntityManager
 	IProviderAgent *GetProviderAgent() override;
-	CSpawnGroupMgrProvider *GetSpawnGroupManager() override;
+	CSpawnGroupProvider *GetSpawnGroupManager() override;
 
 protected:
 	bool InitEntitySystem();
@@ -87,7 +87,7 @@ protected:
 	bool InitGameSystem();
 	void DestroyGameSystem();
 
-	bool InitSpawnGroup();
+	bool InitSpawnGroup(CSpawnGroupMgrGameSystem *pSpawnGroupManager);
 	void DestroySpawnGroup();
 
 	bool HookEvents(char *psError = NULL, size_t nMaxLength = 0);

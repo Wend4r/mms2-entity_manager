@@ -1,5 +1,6 @@
 #include <entity_manager/provider/entitysystem.hpp>
 #include <entity_manager/provider/source2server.hpp>
+#include <entity_manager/provider/spawngroup.hpp>
 #include <entity_manager/provider_agent.hpp>
 #include <entity_manager/provider.hpp>
 
@@ -15,6 +16,7 @@
 #include <tier1/keyvalues3.h>
 
 DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
+DLL_IMPORT EntityManager::CSpawnGroupAccess *g_pEntityManagerSpawnGroup;
 
 DLL_IMPORT IServerGameDLL *server;
 DLL_IMPORT IGameEventManager2 *gameeventmanager;
@@ -92,7 +94,7 @@ bool EntityManager::ProviderAgent::NotifyGameEventsUpdated()
 	return (gameeventmanager = *(IGameEventManager2 **)g_pEntityManagerProvider->GetGameDataStorage().GetSource2Server().GetGameEventManagerPtr()) != NULL;
 }
 
-bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()
+bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated(CSpawnGroupMgrGameSystem *pSpawnGroupManager)
 {
 	// bool bResult = (g_pSpawnGroupMgr = static_cast<decltype(g_pSpawnGroupMgr)>(g_pGSFactoryCSpawnGroupMgrGameSystem->GetStaticGameSystem())) != NULL;
 
@@ -103,7 +105,12 @@ bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()
 
 	// return bResult;
 
-	return (g_pSpawnGroupMgr = *g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetSpawnGroupMgrAddress()) != NULL;
+	auto *pSpawnGroupManagerResult = pSpawnGroupManager ? pSpawnGroupManager : *g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetSpawnGroupMgrAddress();
+
+	g_pSpawnGroupMgr = pSpawnGroupManagerResult;
+	g_pEntityManagerSpawnGroup->SetManager(pSpawnGroupManagerResult);
+
+	return pSpawnGroupManagerResult != NULL;
 }
 
 bool EntityManager::ProviderAgent::ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset)
@@ -682,8 +689,11 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "\"entity:%d:%s\"" : "\"entity:%d\"", iIndex, pszClassname);
 				}
 				default:
-					AssertMsg1(0, "KV3: Unrealized int subtype is %d\n", pMember->GetSubType());
-					return 0;
+				{
+					// AssertMsg1(0, "KV3: Unrealized int subtype is %d\n", pMember->GetSubType());
+					// return 0;
+					break;
+				}
 			}
 			break;
 		case KV3_TYPEEX_UINT:
@@ -729,8 +739,11 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "\"entity:%d:%s\"" : "\"entity:%d\"", iIndex, pszClassname);
 				}
 				default:
-					AssertMsg1(0, "KV3: Unrealized uint subtype is %d\n", pMember->GetSubType());
-					return 0;
+				{
+					// AssertMsg1(0, "KV3: Unrealized uint subtype is %d\n", pMember->GetSubType());
+					// return 0;
+					break;
+				}
 			}
 			break;
 		case KV3_TYPEEX_DOUBLE:
@@ -742,16 +755,17 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 					return V_snprintf(psBuffer, nMaxLength, "%g", pMember->GetDouble());
 				default:
 				{
-					AssertMsg1(0, "KV3: Unrealized double subtype is %d\n", pMember->GetSubType());
-					return 0;
+					// AssertMsg1(0, "KV3: Unrealized double subtype is %d\n", pMember->GetSubType());
+					// return 0;
+					break;
 				}
 			}
 			break;
 		case KV3_TYPEEX_STRING:
 		case KV3_TYPEEX_STRING_SHORT:
 		case KV3_TYPEEX_STRING_EXTERN:
-		case KV3_TYPEEX_BINARY_BLOB:
-		case KV3_TYPEEX_BINARY_BLOB_EXTERN:
+		// case KV3_TYPEEX_BINARY_BLOB:
+		// case KV3_TYPEEX_BINARY_BLOB_EXTERN:
 			return V_snprintf(psBuffer, nMaxLength, "\"%s\"", pMember->GetString());
 		case KV3_TYPEEX_ARRAY:
 		case KV3_TYPEEX_ARRAY_FLOAT32:
@@ -832,8 +846,10 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 					                                        aMatrix3x4.m_flMatVal[2][0], aMatrix3x4.m_flMatVal[2][1], aMatrix3x4.m_flMatVal[2][2], aMatrix3x4.m_flMatVal[2][3]);
 				}
 				default:
-					AssertMsg1(0, "KV3: Unrealized array subtype is %d", pMember->GetSubType());
+				{
+					// AssertMsg1(0, "KV3: Unrealized array subtype is %d", pMember->GetSubType());
 					return 0;
+				}
 			}
 			break;
 		default:

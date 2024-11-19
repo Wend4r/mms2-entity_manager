@@ -1,11 +1,29 @@
 #ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_SPAWNGROUP_HPP_
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_SPAWNGROUP_HPP_
 
-#include <functional>
+#include <ientitymgr.hpp>
 #include <gamesystems/spawngroup_manager.h>
 
 namespace EntityManager
 {
+	class CSpawnGroupAccess : public IEntityManager::ISpawnGroupAccess
+	{
+	public:
+		CSpawnGroupAccess(CSpawnGroupMgrGameSystem *pSpawnGroupManager = NULL);
+
+	public:
+		void SetManager(CSpawnGroupMgrGameSystem *pNewInstance);
+
+	public: // IEntityManager::IGameSpawnGroupMgrAccess
+		CSpawnGroupMgrGameSystem *GetManager() override;
+
+		CMapSpawnGroup *Get(SpawnGroupHandle_t h) override;
+		CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups() override;
+
+	private:
+		CSpawnGroupMgrGameSystem *m_pSpawnGroupManager;
+	};
+
 	class CLoadingSpawnGroupProvider : public CLoadingSpawnGroup
 	{
 	public:

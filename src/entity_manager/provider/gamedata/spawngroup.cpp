@@ -11,7 +11,7 @@ EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
 		aCallbacks.Insert(m_aGameConfig.GetSymbol("&g_pSpawnGroupMgr"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
 		{
 			m_ppSpawnGroupMgrAddress = pFunction.RCast<decltype(m_ppSpawnGroupMgrAddress)>();
-			// g_pEntityManagerProviderAgent->NotifySpawnGroupMgrUpdated();
+			g_pEntityManagerProviderAgent->NotifySpawnGroupMgrUpdated();
 		});
 
 		m_aGameConfig.GetAddresses().AddListener(&aCallbacks);

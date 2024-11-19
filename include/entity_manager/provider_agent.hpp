@@ -48,7 +48,7 @@ namespace EntityManager
 		virtual bool NotifyGameSystemUpdated();
 		virtual bool NotifyEntitySystemUpdated();
 		virtual bool NotifyGameEventsUpdated();
-		virtual bool NotifySpawnGroupMgrUpdated();
+		virtual bool NotifySpawnGroupMgrUpdated(CSpawnGroupMgrGameSystem *pSpawnGroupManager = NULL);
 
 	public:
 		bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset) override;
