@@ -89,23 +89,44 @@ public: // Provider agent ones.
 			/**
 			 * @brief Calls when spawn group are allocated.
 			 * 
-			 * @param handle            A spawn group handle to destroy.
+			 * @param hSpawnGroup       A spawn group handle to destroy.
 			 * @param pSpawnGroup       A spawn group pointer.
 			 */
-			virtual void OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) = 0;
+			virtual void OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup) = 0;
 
 			/**
 			 * @brief Calls when spawn group are destroyed.
 			 * 
-			 * @param handle            A spawn group handle to destroy.
+			 * @param hSpawnGroup       A spawn group handle to destroy.
 			 */
-			virtual void OnSpawnGroupDestroyed(SpawnGroupHandle_t handle) = 0;
+			virtual void OnSpawnGroupDestroyed(SpawnGroupHandle_t hSpawnGroup) = 0;
 		}; // ISpawnGroupNotifications
+
+		/**
+		 * @brief A spawn group callbacks interface.
+		 */
+		class ISpawnGroupCallbacks
+		{
+		public:
+			/**
+			 * @brief Adds notifications listener callback.
+			 * 
+			 * @param pNotifications    A notifications pointer to listen.
+			 */
+			virtual void AddNotificationsListener(ISpawnGroupNotifications *pNotifications) = 0;
+
+			/**
+			 * @brief Removes notifications listener callback.
+			 * 
+			 * @param pNotifications    A notifications pointer to remove listening.
+			 */
+			virtual bool RemoveNotificationsListener(ISpawnGroupNotifications *pNotifications) = 0;
+		}; // ISpawnGroupCallbacks
 
 		/**
 		 * @brief A spawn group instance interface.
 		**/
-		class ISpawnGroupInstance : public ISpawnGroupLoader, public ISpawnGroupNotifications
+		class ISpawnGroupInstance : public ISpawnGroupLoader, public ISpawnGroupNotifications, public ISpawnGroupCallbacks
 		{
 		public:
 			/**
@@ -318,7 +339,7 @@ public: // Provider agent ones.
 	}; // ISpawnGroupLoader
 
 	/**
-	 * @brief A spawn group mamager game system provider.
+	 * @brief A spawn group mamager provider.
 	 */
 	class ISpawnGroupMgrProvider : public IGameSpawnGroupMgr
 	{
@@ -338,11 +359,27 @@ public: // Provider agent ones.
 		virtual CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups() = 0;
 	}; // ISpawnGroupMgrProvider
 
+	/**
+	 * @brief A spawn group mamager provider component.
+	 */
 	class CSpawnGroupMgrProvider : public ISpawnGroupMgrProvider
 	{
 	public:
+		/**
+		 * @brief A spawn group found function declaration.
+		 * 
+		 * @param hSpawnGroup       A spawn group handle.
+		 * @param pMapSpawnGroup    A map spawn group pointer.
+		 */
 		using OnSpawnGroupFound_t = void (SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup);
 
+		/**
+		 * @brief Loops by a spawn group map.
+		 * 
+		 * @param funcCallback      A callback to call by each spawn group.
+		 * 
+		 * @return                  A count of spawn groups.
+		 */
 		int LoopBySpawnGroups(const std::function<OnSpawnGroupFound_t> &funcCallback)
 		{
 			auto *pSpawnGroups = GetSpawnGroups();
@@ -362,6 +399,13 @@ public: // Provider agent ones.
 			return iSpawnGroupLength;
 		}
 
+		/**
+		 * @brief Fast loops by a spawn group map.
+		 * 
+		 * @param funcCallback      A callback to call by each spawn group.
+		 * 
+		 * @return                  A count of spawn groups.
+		 */
 		int FastLoopBySpawnGroups(const std::function<OnSpawnGroupFound_t> &funcCallback)
 		{
 			auto *pSpawnGroups = GetSpawnGroups();

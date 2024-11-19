@@ -23,6 +23,10 @@ namespace EntityManager
 		void OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) override;
 		void OnSpawnGroupDestroyed(SpawnGroupHandle_t handle) override;
 
+	public: // IEntityManager::IProviderAgent::ISpawnGroupCallbacks
+		void AddNotificationsListener(ISpawnGroupNotifications *pNotifications) override;
+		bool RemoveNotificationsListener(ISpawnGroupNotifications *pNotifications) override;
+
 	public: // IEntityManager::IProviderAgent::ISpawnGroupInstance
 		int GetStatus() const override;
 		ISpawnGroup *GetSpawnGroup() const override;
@@ -40,6 +44,9 @@ namespace EntityManager
 		CUtlString m_sLevelName;
 		CUtlString m_sLandmarkName;
 		Vector m_vecLandmarkOffset;
+
+	private:
+		CUtlVector<ISpawnGroupNotifications *> m_vecNotificationsCallbacks;
 	};
 };
 

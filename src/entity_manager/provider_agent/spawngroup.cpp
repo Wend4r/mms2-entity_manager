@@ -120,15 +120,33 @@ bool EntityManager::CSpawnGroupInstance::Unload()
 	return bResult;
 }
 
-void EntityManager::CSpawnGroupInstance::OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
+void EntityManager::CSpawnGroupInstance::OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup)
 {
 	m_pSpawnGroup = pSpawnGroup;
-	m_hSpawnGroup = handle;
+	m_hSpawnGroup = hSpawnGroup;
+
+	for(auto *it : m_vecNotificationsCallbacks)
+	{
+		it->OnSpawnGroupAllocated(hSpawnGroup, pSpawnGroup);
+	}
 }
 
-void EntityManager::CSpawnGroupInstance::OnSpawnGroupDestroyed(SpawnGroupHandle_t handle)
+void EntityManager::CSpawnGroupInstance::OnSpawnGroupDestroyed(SpawnGroupHandle_t hSpawnGroup)
 {
-	// ...
+	for(auto *it : m_vecNotificationsCallbacks)
+	{
+		it->OnSpawnGroupDestroyed(hSpawnGroup);
+	}
+}
+
+void EntityManager::CSpawnGroupInstance::AddNotificationsListener(ISpawnGroupNotifications *pNotifications)
+{
+	m_vecNotificationsCallbacks.AddToTail(pNotifications);
+}
+
+bool EntityManager::CSpawnGroupInstance::RemoveNotificationsListener(ISpawnGroupNotifications *pNotifications)
+{
+	return m_vecNotificationsCallbacks.FindAndFastRemove(pNotifications);
 }
 
 int EntityManager::CSpawnGroupInstance::GetStatus() const
