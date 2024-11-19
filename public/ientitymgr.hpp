@@ -275,12 +275,13 @@ public: // Provider agent ones.
 		 * @brief Executes the spawn queued entities.
 		 * 
 		 * @param hSpawnGroup       A spawn group to spawn.
+		 * @param pEntities         An optional vector pointer of created entities.
 		 * @param pDetails          An optional vector pointer of detailed messages.
 		 * @param pWarnings         An opitonal vector pointer of warning messages.
 		 * 
 		 * @return                  The executed spawn queue length.
 		 */
-		virtual int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, CUtlVector<CUtlString, int> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) = 0;
+		virtual int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, CUtlVector<CEntityInstance *> *pEntities = nullptr, CUtlVector<CUtlString> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) = 0;
 	};
 
 	/**
