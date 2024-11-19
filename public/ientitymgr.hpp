@@ -31,7 +31,7 @@
 
 #	include <entity2/entityidentity.h>
 
-#	define ENTITY_MANAGER_INTERFACE_NAME "Entity Manager v1.0.3"
+#	define ENTITY_MANAGER_INTERFACE_NAME "Entity Manager v1.0"
 
 class IEntityResourceManifest;
 struct EntitySpawnInfo_t;
