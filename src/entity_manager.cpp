@@ -279,6 +279,8 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 		}
 	}
 
+	g_SMAPI->AddListener(static_cast<ISmmPlugin *>(this), static_cast<IMetamodListener *>(this));
+
 	return true;
 }
 
