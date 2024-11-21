@@ -187,6 +187,13 @@ public: // Provider agent ones.
 			virtual const char *GetLandmarkName() const = 0;
 
 			/**
+			 * @brief Gets a local name fixup name string.
+			 * 
+			 * @return                  Returns a local name fixup name.
+			 */
+			virtual const char *GetLocalFixupName() const = 0;
+
+			/**
 			 * @brief Gets a landmark offset.
 			 * 
 			 * @return                  Returns a vector of the offset.

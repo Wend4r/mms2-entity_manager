@@ -87,6 +87,7 @@ bool EntityManager::CSpawnGroupInstance::Load(const SpawnGroupDesc_t &aDesc, con
 
 	m_sLevelName = aDesc.m_sWorldName;
 	m_sLandmarkName = aDesc.m_sDescriptiveName;
+	m_sLocalFixupName = aDesc.m_sLocalNameFixup;
 	m_vecLandmarkOffset = vecLandmarkOffset;
 
 	SpawnGroupDesc_t aOwnDesc = aDesc;
@@ -200,6 +201,11 @@ const char *EntityManager::CSpawnGroupInstance::GetLevelName() const
 const char *EntityManager::CSpawnGroupInstance::GetLandmarkName() const
 {
 	return m_sLandmarkName.Get();
+}
+
+const char *EntityManager::CSpawnGroupInstance::GetLocalFixupName() const
+{
+	return m_sLocalFixupName.Get();
 }
 
 const Vector &EntityManager::CSpawnGroupInstance::GetLandmarkOffset() const

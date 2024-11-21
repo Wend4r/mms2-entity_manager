@@ -35,6 +35,7 @@ namespace EntityManager
 		SpawnGroupHandle_t GetSpawnGroupHandle() const override;
 		const char *GetLevelName() const override;
 		const char *GetLandmarkName() const override;
+		const char *GetLocalFixupName() const override;
 		const Vector &GetLandmarkOffset() const override;
 
 	public: // IComputeWorldOriginCallback
@@ -46,6 +47,7 @@ namespace EntityManager
 		SpawnGroupHandle_t m_hSpawnGroup = INVALID_SPAWN_GROUP;
 		CUtlString m_sLevelName;
 		CUtlString m_sLandmarkName;
+		CUtlString m_sLocalFixupName;
 		Vector m_vecLandmarkOffset;
 
 	private:
