@@ -432,7 +432,7 @@ int EntityManager::ProviderAgent::ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGr
 		pEntitySystem->ExecuteQueuedCreation();
 	}
 
-	ReleaseSpawnQueued();
+	ReleaseSpawnQueued(hSpawnGroup);
 
 	return iQueueLength;
 }
