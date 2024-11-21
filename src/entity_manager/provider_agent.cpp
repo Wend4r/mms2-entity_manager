@@ -407,7 +407,7 @@ int EntityManager::ProviderAgent::ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGr
 		}
 	}
 
-	if(pWarnings && pWarnings->Count() < m_vecEntitySpawnQueue.Count())
+	if(!pWarnings || pWarnings->Count() < m_vecEntitySpawnQueue.Count())
 	{
 		pEntitySystem->ExecuteQueuedCreation();
 	}
