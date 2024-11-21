@@ -912,8 +912,11 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 			if(s_aEntityManagerProviderAgent.HasInSpawnQueue(hTargetSpawnGroup))
 			{
 				s_aEntityManagerProviderAgent.AddSpawnQueueToTail(vecLayerEntities, hTargetSpawnGroup);
-				pKeyValues = &vecLayerEntities;
 			}
+
+			s_aEntityManagerProviderAgent.OnSpawnGroupCreateLoading(hSpawnGroup, pMapSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, vecLayerEntities);
+
+			pKeyValues = &vecLayerEntities;
 		}
 	}
 

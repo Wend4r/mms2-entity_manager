@@ -21,6 +21,7 @@ namespace EntityManager
 
 	public: // IEntityManager::IProviderAgent::ISpawnGroupNotifications
 		void OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) override;
+		void OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues) override;
 		void OnSpawnGroupDestroyed(SpawnGroupHandle_t handle) override;
 
 	public: // IEntityManager::IProviderAgent::ISpawnGroupCallbacks
@@ -30,6 +31,7 @@ namespace EntityManager
 	public: // IEntityManager::IProviderAgent::ISpawnGroupInstance
 		int GetStatus() const override;
 		ISpawnGroup *GetSpawnGroup() const override;
+		CMapSpawnGroup *GetMapSpawnGroup() const override;
 		SpawnGroupHandle_t GetSpawnGroupHandle() const override;
 		const char *GetLevelName() const override;
 		const char *GetLandmarkName() const override;
@@ -40,6 +42,7 @@ namespace EntityManager
 
 	private:
 		ISpawnGroup *m_pSpawnGroup = NULL;
+		CMapSpawnGroup *m_pMapSpawnGroup = NULL;
 		SpawnGroupHandle_t m_hSpawnGroup = INVALID_SPAWN_GROUP;
 		CUtlString m_sLevelName;
 		CUtlString m_sLandmarkName;

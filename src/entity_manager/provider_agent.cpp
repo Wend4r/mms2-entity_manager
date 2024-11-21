@@ -165,6 +165,26 @@ void EntityManager::ProviderAgent::OnSpawnGroupAllocated(SpawnGroupHandle_t hand
 	}
 }
 
+void EntityManager::ProviderAgent::OnSpawnGroupCreateLoading(SpawnGroupHandle_t handle, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues)
+{
+	const char *pWorldName = pMapSpawnGroup->GetWorldName();
+
+	if(pWorldName && pWorldName[0])
+	{
+		for(int i = 0; i < m_vecSpawnGroups.Count(); i++)
+		{
+			ISpawnGroupInstance *pSpawnGroupAgent = m_vecSpawnGroups[i];
+
+			const char *pLevelName = pSpawnGroupAgent->GetLevelName();
+
+			if(pLevelName && pLevelName[0] && !V_strcmp(pWorldName, pLevelName))
+			{
+				pSpawnGroupAgent->OnSpawnGroupCreateLoading(handle, pMapSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, vecKeyValues);
+			}
+		}
+	}
+}
+
 void EntityManager::ProviderAgent::OnSpawnGroupDestroyed(SpawnGroupHandle_t handle)
 {
 	for(int i = 0; i < m_vecSpawnGroups.Count(); i++)

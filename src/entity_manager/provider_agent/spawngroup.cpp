@@ -131,6 +131,17 @@ void EntityManager::CSpawnGroupInstance::OnSpawnGroupAllocated(SpawnGroupHandle_
 	}
 }
 
+
+void EntityManager::CSpawnGroupInstance::OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues)
+{
+	m_pMapSpawnGroup = pMapSpawnGroup;
+
+	for(auto *it : m_vecNotificationsCallbacks)
+	{
+		it->OnSpawnGroupCreateLoading(hSpawnGroup, pMapSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, vecKeyValues);
+	}
+}
+
 void EntityManager::CSpawnGroupInstance::OnSpawnGroupDestroyed(SpawnGroupHandle_t hSpawnGroup)
 {
 	for(auto *it : m_vecNotificationsCallbacks)
@@ -169,6 +180,11 @@ int EntityManager::CSpawnGroupInstance::GetStatus() const
 ISpawnGroup *EntityManager::CSpawnGroupInstance::GetSpawnGroup() const
 {
 	return m_pSpawnGroup;
+}
+
+CMapSpawnGroup *EntityManager::CSpawnGroupInstance::GetMapSpawnGroup() const
+{
+	return m_pMapSpawnGroup;
 }
 
 SpawnGroupHandle_t EntityManager::CSpawnGroupInstance::GetSpawnGroupHandle() const

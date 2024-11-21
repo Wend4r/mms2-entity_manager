@@ -93,6 +93,17 @@ public: // Provider agent ones.
 			virtual void OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup) = 0;
 
 			/**
+			 * @brief Calls when spawn group are create loading one.
+			 * 
+			 * @param hSpawnGroup       A spawn group handle to create loading.
+			 * @param pMapSpawnGroup    A map spawn group pointer.
+			 * @param bSynchronouslySpawnEntities   Are spawn group entities will create synchronously.
+			 * @param bConfirmResourcesLoaded       A connfirm resource are loaded.
+			 * @param vecKeyValues      A spawn group entity key values to add/remove.
+			 */
+			virtual void OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues) = 0;
+
+			/**
 			 * @brief Calls when spawn group are destroyed.
 			 * 
 			 * @param hSpawnGroup       A spawn group handle to destroy.
@@ -146,6 +157,13 @@ public: // Provider agent ones.
 			 * @return                  Returns a spawn group pointer.
 			 */
 			virtual ISpawnGroup *GetSpawnGroup() const = 0;
+
+			/**
+			 * @brief Gets a map spawn group.
+			 * 
+			 * @return                  Returns a map spawn group pointer.
+			 */
+			virtual CMapSpawnGroup *GetMapSpawnGroup() const = 0;
 
 			/**
 			 * @brief Gets an allocated spawn group handle.

@@ -63,6 +63,7 @@ namespace EntityManager
 
 	public: // IEntityManager::IProviderAgent::ISpawnGroupNotifications
 		void OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) override;
+		void OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues) override;
 		void OnSpawnGroupDestroyed(SpawnGroupHandle_t handle) override;
 
 	public: // Spawn queue methods.
