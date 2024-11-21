@@ -167,7 +167,7 @@ void EntityManager::ProviderAgent::OnSpawnGroupAllocated(SpawnGroupHandle_t hand
 
 void EntityManager::ProviderAgent::OnSpawnGroupCreateLoading(SpawnGroupHandle_t handle, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues)
 {
-	const char *pSpawnGroupLocalNameFixup = pMapSpawnGroup->GetWorldName();
+	const char *pSpawnGroupLocalNameFixup = pMapSpawnGroup->GetLocalNameFixup();
 
 	if(pSpawnGroupLocalNameFixup && pSpawnGroupLocalNameFixup[0])
 	{
