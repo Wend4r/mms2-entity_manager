@@ -1,0 +1,15 @@
+{
+	"$schema": "https://raw.githubusercontent.com/Wend4r/s2u-gamedata/a786686e7a5083a889ba28bbf3af18fb6883804f/gamedata/schema.json",
+
+	"csgo":
+	{
+		"Offsets":
+		{
+			"CEntityResourceManifest::AddResource":
+			{
+				"windows64": 2,
+				"linux64": 0
+			}
+		}
+	}
+}
