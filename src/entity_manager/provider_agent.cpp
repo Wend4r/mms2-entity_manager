@@ -201,8 +201,10 @@ void EntityManager::ProviderAgent::OnSpawnGroupCreateLoading(SpawnGroupHandle_t 
 
 void EntityManager::ProviderAgent::OnSpawnGroupDestroyed(SpawnGroupHandle_t handle)
 {
-	for(auto *pSpawnGroupAgent : m_vecSpawnGroups)
+	FOR_EACH_VEC(m_vecSpawnGroups, i)
 	{
+		ISpawnGroupInstance *pSpawnGroupAgent = m_vecSpawnGroups[i];
+
 		if(handle == pSpawnGroupAgent->GetSpawnGroupHandle())
 		{
 			pSpawnGroupAgent->OnSpawnGroupDestroyed(handle);
