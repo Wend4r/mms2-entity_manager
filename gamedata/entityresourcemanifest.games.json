@@ -7,8 +7,8 @@
 		{
 			"CEntityResourceManifest::AddResource":
 			{
-				"windows64": 2,
-				"linux64": 0
+				"win64": 2,
+				"linuxsteamrt64": 0
 			}
 		}
 	}
