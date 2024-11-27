@@ -46,6 +46,7 @@ namespace EntityManager
 			bool Load(IGameData *pRoot, const char *pszBaseConfigDir, GameData::CBufferStringVector &vecMessages);
 
 		protected:
+			bool LoadEntityResourceManifest(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
 			bool LoadEntitySystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
 			bool LoadGameResource(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
 			bool LoadGameSystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
@@ -53,6 +54,26 @@ namespace EntityManager
 			bool LoadEntitySpawnGroup(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
 
 		public:
+			class EntityResourceManifest
+			{
+			public:
+				EntityResourceManifest();
+
+			public:
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+				void Reset();
+
+			public:
+				void AddResource(IEntityResourceManifest *pEntityManifest, const char *pszPath) const;
+
+			private:
+				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
+				GameData::Config m_aGameConfig;
+
+			private: // Offsets.
+				ptrdiff_t m_nAddResourceIndex = -1;
+			};
+
 			class EntitySystem
 			{
 			public:
@@ -208,6 +229,7 @@ namespace EntityManager
 				GameData::Config m_aGameConfig;
 			};
 
+			const EntityResourceManifest &GetEntityResourceManifest() const;
 			const EntitySystem &GetEntitySystem() const;
 			const GameResource &GetGameResource() const;
 			const GameSystem &GetGameSystem() const;
@@ -215,6 +237,7 @@ namespace EntityManager
 			const SpawnGroup &GetSpawnGroup() const;
 
 		private:
+			EntityResourceManifest m_aEntityResourceManifest;
 			EntitySystem m_aEntitySystem;
 			GameResource m_aGameResource;
 			GameSystem m_aGameSystem;

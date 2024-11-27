@@ -20,9 +20,10 @@ namespace EntityManager
 		bool Unload() override;
 
 	public: // IEntityManager::IProviderAgent::ISpawnGroupNotifications
-		void OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) override;
+		void OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup) override;
+		void OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) override;
 		void OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues) override;
-		void OnSpawnGroupDestroyed(SpawnGroupHandle_t handle) override;
+		void OnSpawnGroupDestroyed(SpawnGroupHandle_t hSpawnGroup) override;
 
 	public: // IEntityManager::IProviderAgent::ISpawnGroupCallbacks
 		void AddNotificationsListener(ISpawnGroupNotifications *pNotifications) override;

@@ -82,6 +82,7 @@ include(cmake/sourcesdk.cmake)
 set(SOURCE_FILES
 	${SOURCE_PROJECT_DIR}/provider_agent/resourcemanifest.cpp
 	${SOURCE_PROJECT_DIR}/provider_agent/spawngroup.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/entityresourcemanifest.cpp
 	${SOURCE_PROJECT_DIR}/provider/gamedata/entitysystem.cpp
 	${SOURCE_PROJECT_DIR}/provider/gamedata/gameresource.cpp
 	${SOURCE_PROJECT_DIR}/provider/gamedata/gamesystem.cpp

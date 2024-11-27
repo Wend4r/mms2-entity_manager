@@ -132,6 +132,13 @@ void EntityManager::CSpawnGroupInstance::OnSpawnGroupAllocated(SpawnGroupHandle_
 	}
 }
 
+void EntityManager::CSpawnGroupInstance::OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry)
+{
+	for(auto *it : m_vecNotificationsCallbacks)
+	{
+		it->OnSpawnGroupInit(hSpawnGroup, pManifest, pConfig, pRegistry);
+	}
+}
 
 void EntityManager::CSpawnGroupInstance::OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues)
 {

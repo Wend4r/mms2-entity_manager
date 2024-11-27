@@ -53,6 +53,7 @@ namespace EntityManager
 	public:
 		bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset) override;
 		IEntityResourceManifest *GetEntityManifest() override;
+		void AddResourceToEntityManifest(IEntityResourceManifest *pManifest, const char *pszPath) override;
 
 	public:
 		ISpawnGroupInstance *CreateSpawnGroup() override;
@@ -62,7 +63,8 @@ namespace EntityManager
 		void ReleaseSpawnGroups();
 
 	public: // IEntityManager::IProviderAgent::ISpawnGroupNotifications
-		void OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) override;
+		void OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup) override;
+		void OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) override;
 		void OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues) override;
 		void OnSpawnGroupDestroyed(SpawnGroupHandle_t handle) override;
 

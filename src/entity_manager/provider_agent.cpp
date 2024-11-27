@@ -123,6 +123,11 @@ IEntityResourceManifest *EntityManager::ProviderAgent::GetEntityManifest()
 	return m_aResourceManifest.GetEntityPart();
 }
 
+void EntityManager::ProviderAgent::AddResourceToEntityManifest(IEntityResourceManifest *pManifest, const char *pszPath)
+{
+	g_pEntityManagerProvider->GetGameDataStorage().GetEntityResourceManifest().AddResource(pManifest, pszPath);
+}
+
 EntityManager::ProviderAgent::ISpawnGroupInstance *EntityManager::ProviderAgent::CreateSpawnGroup()
 {
 	CSpawnGroupInstance *pSpawnGroup = new CSpawnGroupInstance();
@@ -145,7 +150,7 @@ void EntityManager::ProviderAgent::ReleaseSpawnGroups()
 	m_vecSpawnGroups.PurgeAndDeleteElements();
 }
 
-void EntityManager::ProviderAgent::OnSpawnGroupAllocated(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
+void EntityManager::ProviderAgent::OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup)
 {
 	const char *pSpawnGroupLocalNameFixup = pSpawnGroup->GetLocalNameFixup();
 
@@ -159,27 +164,36 @@ void EntityManager::ProviderAgent::OnSpawnGroupAllocated(SpawnGroupHandle_t hand
 
 			if(pLocalFixupName && pLocalFixupName[0] && !V_strcmp(pSpawnGroupLocalNameFixup, pLocalFixupName))
 			{
-				pSpawnGroupAgent->OnSpawnGroupAllocated(handle, pSpawnGroup);
+				pSpawnGroupAgent->OnSpawnGroupAllocated(hSpawnGroup, pSpawnGroup);
 			}
 		}
 	}
 }
 
-void EntityManager::ProviderAgent::OnSpawnGroupCreateLoading(SpawnGroupHandle_t handle, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues)
+void EntityManager::ProviderAgent::OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry)
+{
+	for(auto *pSpawnGroupAgent : m_vecSpawnGroups)
+	{
+		if(hSpawnGroup == pSpawnGroupAgent->GetSpawnGroupHandle())
+		{
+			pSpawnGroupAgent->OnSpawnGroupInit(hSpawnGroup, pManifest, pConfig, pRegistry);
+		}
+	}
+}
+
+void EntityManager::ProviderAgent::OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues)
 {
 	const char *pSpawnGroupLocalNameFixup = pMapSpawnGroup->GetLocalNameFixup();
 
 	if(pSpawnGroupLocalNameFixup && pSpawnGroupLocalNameFixup[0])
 	{
-		for(int i = 0; i < m_vecSpawnGroups.Count(); i++)
+		for(auto *pSpawnGroupAgent : m_vecSpawnGroups)
 		{
-			ISpawnGroupInstance *pSpawnGroupAgent = m_vecSpawnGroups[i];
-
 			const char *pLocalFixupName = pSpawnGroupAgent->GetLocalFixupName();
 
 			if(pLocalFixupName && pLocalFixupName[0] && !V_strcmp(pSpawnGroupLocalNameFixup, pLocalFixupName))
 			{
-				pSpawnGroupAgent->OnSpawnGroupCreateLoading(handle, pMapSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, vecKeyValues);
+				pSpawnGroupAgent->OnSpawnGroupCreateLoading(hSpawnGroup, pMapSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, vecKeyValues);
 			}
 		}
 	}
@@ -187,10 +201,8 @@ void EntityManager::ProviderAgent::OnSpawnGroupCreateLoading(SpawnGroupHandle_t 
 
 void EntityManager::ProviderAgent::OnSpawnGroupDestroyed(SpawnGroupHandle_t handle)
 {
-	for(int i = 0; i < m_vecSpawnGroups.Count(); i++)
+	for(auto *pSpawnGroupAgent : m_vecSpawnGroups)
 	{
-		ISpawnGroupInstance *pSpawnGroupAgent = m_vecSpawnGroups[i];
-
 		if(handle == pSpawnGroupAgent->GetSpawnGroupHandle())
 		{
 			pSpawnGroupAgent->OnSpawnGroupDestroyed(handle);

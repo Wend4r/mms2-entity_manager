@@ -453,6 +453,7 @@ bool EntityManagerPlugin::InitSpawnGroup(CSpawnGroupMgrGameSystem *pSpawnGroupMa
 	if(bResult)
 	{
 		SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, pSpawnGroupManager, this, &EntityManagerPlugin::OnAllocateSpawnGroupHook, true);
+		SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, SpawnGroupInit, pSpawnGroupManager, this, &EntityManagerPlugin::OnSpawnGroupInitHook, true);
 		SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, pSpawnGroupManager, this, &EntityManagerPlugin::OnCreateLoadingSpawnGroupHook, false);
 		SH_ADD_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, SpawnGroupShutdown, pSpawnGroupManager, this, &EntityManagerPlugin::OnSpawnGroupShutdownHook, true);
 	}
@@ -874,6 +875,16 @@ void EntityManagerPlugin::OnAllocateSpawnGroupHook(SpawnGroupHandle_t hSpawnGrou
 	}
 
 	s_aEntityManagerProviderAgent.OnSpawnGroupAllocated(hSpawnGroup, pSpawnGroup);
+}
+
+void EntityManagerPlugin::OnSpawnGroupInitHook(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry)
+{
+	if(m_aLogger.IsChannelEnabled(LV_DETAILED))
+	{
+		m_aLogger.DetailedFormat("EntityManagerPlugin::OnSpawnGroupInitHook(%d, %p, %p, %p)\n", hSpawnGroup, pManifest, pConfig, pRegistry);
+	}
+
+	s_aEntityManagerProviderAgent.OnSpawnGroupInit(hSpawnGroup, pManifest, pConfig, pRegistry);
 }
 
 ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGroupHandle_t hSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, const CUtlVector<const CEntityKeyValues *> *pKeyValues)

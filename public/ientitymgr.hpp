@@ -61,7 +61,8 @@ public: // Provider agent ones.
 			/**
 			 * @brief Load the spawn group by a description.
 			 * 
-			 * @param aDesc             A spawn group description.
+			 * @param aDesc             A spawn group description. 
+			 *                          Set an unique name to `aDesc.m_sLocalNameFixup` field.
 			 * @param vecLandmarkOffset A landmark offset.
 			 * 
 			 * @return                  Returns true if successed added to the queue, 
@@ -87,10 +88,20 @@ public: // Provider agent ones.
 			/**
 			 * @brief Calls when spawn group are allocated.
 			 * 
-			 * @param hSpawnGroup       A spawn group handle to destroy.
+			 * @param hSpawnGroup       A spawn group handle to allocate.
 			 * @param pSpawnGroup       A spawn group pointer.
 			 */
 			virtual void OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup) = 0;
+
+			/**
+			 * @brief Calls when spawn group are initialize.
+			 * 
+			 * @param hSpawnGroup       A spawn group handle to initialize.
+			 * @param pManifest         A entity resource manifest pointer.
+			 * @param pConfig           A entity precache configuration pointer.
+			 * @param pRegistry         A spawn group prerequisite registry pointer.
+			 */
+			virtual void OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) = 0;
 
 			/**
 			 * @brief Calls when spawn group are create loading one.
@@ -233,6 +244,14 @@ public: // Provider agent ones.
 		 * @return                  An entity manifest pointer.
 		 */
 		virtual IEntityResourceManifest *GetEntityManifest() = 0;
+
+		/**
+		 * @brief Adds a resource to the entity resource manifest.
+		 * 
+		 * @param pManifest         A entity resource manifest pointer.
+		 * @param pszPath           A path of the resource (models, matarials and etc.).
+		 */
+		virtual void AddResourceToEntityManifest(IEntityResourceManifest *pManifest, const char *pszPath) = 0;
 
 	public: // Spawn group ones.
 		/**
