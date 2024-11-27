@@ -31,5 +31,5 @@ void EntityManager::Provider::GameDataStorage::EntityResourceManifest::Reset()
 
 void EntityManager::Provider::GameDataStorage::EntityResourceManifest::AddResource(IEntityResourceManifest *pManifest, const char *pszPath) const
 {
-	reinterpret_cast<DynLibUtils::VirtualTable *>(pManifest)->CallMethod<void, IEntityResourceManifest *, const char *>(m_nAddResourceIndex, pManifest, pszPath);
+	reinterpret_cast<DynLibUtils::VirtualTable *>(pManifest)->CallMethod<void, const char *>(m_nAddResourceIndex, pszPath);
 }
