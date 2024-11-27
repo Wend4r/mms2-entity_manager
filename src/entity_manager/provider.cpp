@@ -9,6 +9,7 @@
 #include <any_config.hpp>
 
 #define GAMECONFIG_FOLDER_DIR "gamedata"
+#define GAMECONFIG_ENTITYRESOURCEMANIFEST_FILENAME "entityresourcemanifest.games.*"
 #define GAMECONFIG_ENTITYSYSTEM_FILENAME "entitysystem.games.*"
 #define GAMECONFIG_GAMERESOURCE_FILENAME "gameresource.games.*"
 #define GAMECONFIG_GAMESYSTEM_FILENAME "gamesystem.games.*"
@@ -116,6 +117,10 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 	} aConfigs[] =
 	{
 		{
+			GAMECONFIG_ENTITYRESOURCEMANIFEST_FILENAME,
+			&GameDataStorage::LoadEntityResourceManifest
+		},
+		{
 			GAMECONFIG_ENTITYSYSTEM_FILENAME,
 			&GameDataStorage::LoadEntitySystem
 		},
@@ -184,6 +189,11 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 	return bResult;
 }
 
+bool EntityManager::Provider::GameDataStorage::LoadEntityResourceManifest(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
+{
+	return m_aEntityResourceManifest.Load(pRoot, pGameConfig, vecMessages);
+}
+
 bool EntityManager::Provider::GameDataStorage::LoadEntitySystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
 	return m_aEntitySystem.Load(pRoot, pGameConfig, vecMessages);
@@ -207,6 +217,11 @@ bool EntityManager::Provider::GameDataStorage::LoadSource2Server(IGameData *pRoo
 bool EntityManager::Provider::GameDataStorage::LoadEntitySpawnGroup(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
 {
 	return m_aSpawnGroup.Load(pRoot, pGameConfig, vecMessages);
+}
+
+const EntityManager::Provider::GameDataStorage::EntityResourceManifest &EntityManager::Provider::GameDataStorage::GetEntityResourceManifest() const
+{
+	return m_aEntityResourceManifest;
 }
 
 const EntityManager::Provider::GameDataStorage::EntitySystem &EntityManager::Provider::GameDataStorage::GetEntitySystem() const
