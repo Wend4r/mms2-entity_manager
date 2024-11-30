@@ -3,13 +3,16 @@
 #include <iserver.h>
 #include <mathlib/mathlib.h>
 
-EntityManager::SpawnGroup::~SpawnGroup()
+EntityManager::CSpawnGroupInstance::~CSpawnGroupInstance()
 {
-	Unload();
+	if(m_hSpawnGroup != INVALID_SPAWN_GROUP)
+	{
+		Unload();
+	}
 }
 
 /*
-EntityManager::SpawnGroup::Status EntityManager::SpawnGroup::GetStatus()
+EntityManager::CSpawnGroupInstance::Status EntityManager::CSpawnGroupInstance::GetStatus()
 {
 	SpawnGroupHandle_t hSpawnGroup = m_hSpawnGroup;
 
@@ -33,31 +36,14 @@ EntityManager::SpawnGroup::Status EntityManager::SpawnGroup::GetStatus()
 }
 */
 
-int EntityManager::SpawnGroup::GetStatus() const
-{
-	SpawnGroupHandle_t hSpawnGroup = m_hSpawnGroup;
-
-	if(hSpawnGroup != INVALID_SPAWN_GROUP)
-	{
-		INetworkGameServer *pNewServer = g_pNetworkServerService->GetIGameServer();
-
-		if(pNewServer)
-		{
-			return pNewServer->GetSpawnGroupLoadingStatus(hSpawnGroup);
-		}
-	}
-
-	return 2;
-}
-
 /*
-bool EntityManager::SpawnGroup::IsResidentOrStreaming(SpawnGroupHandle_t hSpawnGroup)
+bool EntityManager::CSpawnGroupInstance::IsResidentOrStreaming(SpawnGroupHandle_t hSpawnGroup)
 {
 	return engine->IsSpawnGroupLoading(hSpawnGroup) || engine->IsSpawnGroupLoaded(hSpawnGroup);
 }
 */
 
-bool EntityManager::SpawnGroup::IsResidentOrStreaming(SpawnGroupHandle_t hSpawnGroup)
+bool EntityManager::CSpawnGroupInstance::IsResidentOrStreaming(SpawnGroupHandle_t hSpawnGroup)
 {
 	INetworkGameServer *pNewServer = g_pNetworkServerService->GetIGameServer();
 
@@ -69,27 +55,7 @@ bool EntityManager::SpawnGroup::IsResidentOrStreaming(SpawnGroupHandle_t hSpawnG
 	return false;
 }
 
-SpawnGroupHandle_t EntityManager::SpawnGroup::GetAllocatedSpawnGroup() const
-{
-	return m_hSpawnGroup;
-}
-
-const char *EntityManager::SpawnGroup::GetLevelName() const
-{
-	return m_sLevelName.Get();
-}
-
-const char *EntityManager::SpawnGroup::GetLandmarkName() const
-{
-	return m_sLandmarkName.Get();
-}
-
-const Vector &EntityManager::SpawnGroup::GetLandmarkOffset() const
-{
-	return m_vecLandmarkOffset;
-}
-
-bool EntityManager::SpawnGroup::Start(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset)
+bool EntityManager::CSpawnGroupInstance::Load(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset)
 {
 	if(GetStatus() < 2)
 	{
@@ -121,6 +87,7 @@ bool EntityManager::SpawnGroup::Start(const SpawnGroupDesc_t &aDesc, const Vecto
 
 	m_sLevelName = aDesc.m_sWorldName;
 	m_sLandmarkName = aDesc.m_sDescriptiveName;
+	m_sLocalFixupName = aDesc.m_sLocalNameFixup;
 	m_vecLandmarkOffset = vecLandmarkOffset;
 
 	SpawnGroupDesc_t aOwnDesc = aDesc;
@@ -132,7 +99,7 @@ bool EntityManager::SpawnGroup::Start(const SpawnGroupDesc_t &aDesc, const Vecto
 	return true;
 }
 
-bool EntityManager::SpawnGroup::Unload()
+bool EntityManager::CSpawnGroupInstance::Unload()
 {
 	SpawnGroupHandle_t hSpawnGroup = m_hSpawnGroup;
 
@@ -154,17 +121,107 @@ bool EntityManager::SpawnGroup::Unload()
 	return bResult;
 }
 
-void EntityManager::SpawnGroup::NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
+void EntityManager::CSpawnGroupInstance::OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup)
 {
-	m_hSpawnGroup = handle;
+	m_pSpawnGroup = pSpawnGroup;
+	m_hSpawnGroup = hSpawnGroup;
+
+	for(auto *it : m_vecNotificationsCallbacks)
+	{
+		it->OnSpawnGroupAllocated(hSpawnGroup, pSpawnGroup);
+	}
 }
 
-void EntityManager::SpawnGroup::NotifyDestroySpawnGroup(SpawnGroupHandle_t handle)
+void EntityManager::CSpawnGroupInstance::OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry)
 {
-	// ...
+	for(auto *it : m_vecNotificationsCallbacks)
+	{
+		it->OnSpawnGroupInit(hSpawnGroup, pManifest, pConfig, pRegistry);
+	}
 }
 
-matrix3x4_t EntityManager::SpawnGroup::ComputeWorldOrigin(const char *pWorldName, SpawnGroupHandle_t hSpawnGroup, IWorld *pWorld)
+void EntityManager::CSpawnGroupInstance::OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues)
+{
+	m_pMapSpawnGroup = pMapSpawnGroup;
+
+	for(auto *it : m_vecNotificationsCallbacks)
+	{
+		it->OnSpawnGroupCreateLoading(hSpawnGroup, pMapSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, vecKeyValues);
+	}
+}
+
+void EntityManager::CSpawnGroupInstance::OnSpawnGroupDestroyed(SpawnGroupHandle_t hSpawnGroup)
+{
+	for(auto *it : m_vecNotificationsCallbacks)
+	{
+		it->OnSpawnGroupDestroyed(hSpawnGroup);
+	}
+}
+
+void EntityManager::CSpawnGroupInstance::AddNotificationsListener(ISpawnGroupNotifications *pNotifications)
+{
+	m_vecNotificationsCallbacks.AddToTail(pNotifications);
+}
+
+bool EntityManager::CSpawnGroupInstance::RemoveNotificationsListener(ISpawnGroupNotifications *pNotifications)
+{
+	return m_vecNotificationsCallbacks.FindAndFastRemove(pNotifications);
+}
+
+int EntityManager::CSpawnGroupInstance::GetStatus() const
+{
+	SpawnGroupHandle_t hSpawnGroup = m_hSpawnGroup;
+
+	if(hSpawnGroup != INVALID_SPAWN_GROUP)
+	{
+		INetworkGameServer *pNewServer = g_pNetworkServerService->GetIGameServer();
+
+		if(pNewServer)
+		{
+			return pNewServer->GetSpawnGroupLoadingStatus(hSpawnGroup);
+		}
+	}
+
+	return 2;
+}
+
+ISpawnGroup *EntityManager::CSpawnGroupInstance::GetSpawnGroup() const
+{
+	return m_pSpawnGroup;
+}
+
+CMapSpawnGroup *EntityManager::CSpawnGroupInstance::GetMapSpawnGroup() const
+{
+	return m_pMapSpawnGroup;
+}
+
+SpawnGroupHandle_t EntityManager::CSpawnGroupInstance::GetSpawnGroupHandle() const
+{
+	return m_hSpawnGroup;
+}
+
+const char *EntityManager::CSpawnGroupInstance::GetLevelName() const
+{
+	return m_sLevelName.Get();
+}
+
+const char *EntityManager::CSpawnGroupInstance::GetLandmarkName() const
+{
+	return m_sLandmarkName.Get();
+}
+
+const char *EntityManager::CSpawnGroupInstance::GetLocalFixupName() const
+{
+	return m_sLocalFixupName.Get();
+}
+
+const Vector &EntityManager::CSpawnGroupInstance::GetLandmarkOffset() const
+{
+	return m_vecLandmarkOffset;
+}
+
+
+matrix3x4_t EntityManager::CSpawnGroupInstance::ComputeWorldOrigin(const char *pWorldName, SpawnGroupHandle_t hSpawnGroup, IWorld *pWorld)
 {
 	matrix3x4_t res;
 

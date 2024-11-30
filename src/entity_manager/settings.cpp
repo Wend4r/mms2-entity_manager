@@ -91,7 +91,7 @@ bool EntityManager::Settings::LoadWorld(SpawnGroupHandle_t hSpawnGroup, const ch
 					}
 				}
 
-				g_pEntityManagerProviderAgent->PushSpawnQueueOld(pSubValues, hSpawnGroup, pWarnings);
+				g_pEntityManagerProviderAgent->PushSpawnQueueOld(pSubValues, hSpawnGroup);
 			}
 			else
 			{
