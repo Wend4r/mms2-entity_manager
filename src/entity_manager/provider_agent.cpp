@@ -374,7 +374,7 @@ int EntityManager::ProviderAgent::ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGr
 	return iQueueLengthBefore - vecEntitySpawnQueue.Count();
 }
 
-int EntityManager::ProviderAgent::ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup, CUtlVector<CEntityInstance *> *pEntities, CUtlVector<CUtlString> *pDetails, CUtlVector<CUtlString> *pWarnings)
+int EntityManager::ProviderAgent::ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup, IEntityListener *pListener, CUtlVector<CEntityInstance *> *pEntities, CUtlVector<CUtlString> *pDetails, CUtlVector<CUtlString> *pWarnings)
 {
 	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
 
@@ -382,11 +382,9 @@ int EntityManager::ProviderAgent::ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGr
 
 	const int iQueueLength = vecEntitySpawnQueue.Count();
 
-	const char szClassnameKey[] = "classname";
-
 	const CEntityIndex iForceEdictIndex = CEntityIndex(-1);
 
-	const EntityKeyId_t aClassnameKey {MakeStringToken(szClassnameKey).GetHashCode(), szClassnameKey};
+	const EntityKeyId_t aClassnameKey {"classname"};
 
 	CBufferStringGrowable<256> sBuffer;
 
@@ -409,6 +407,11 @@ int EntityManager::ProviderAgent::ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGr
 					if(pEntities)
 					{
 						pEntities->AddToTail(pEntity);
+					}
+
+					if(pListener)
+					{
+						pListener->OnEntityCreated(pEntity, pKeyValues);
 					}
 
 					if(pEntity)

@@ -212,6 +212,21 @@ public: // Provider agent ones.
 			virtual const Vector &GetLandmarkOffset() const = 0;
 		}; // ISpawnGroupInstance
 
+		/**
+		 * @brief A entity listener interface.
+		 */
+		class IEntityListener
+		{
+		public:
+			/**
+			 * @brief Calls when an entity are created.
+			 * 
+			 * @param pEntity           An entity who created.
+			 * @param pKeyValues        Entity key values.
+			 */
+			virtual void OnEntityCreated(CEntityInstance *pEntity, CEntityKeyValues *pKeyValues) = 0;
+		}; // IEntityListener
+
 	public: // A entity system things.
 		/**
 		 * @brief Allocates a pooled string of the entity system.
@@ -335,13 +350,14 @@ public: // Provider agent ones.
 		 * @brief Executes the spawn queued entities.
 		 * 
 		 * @param hSpawnGroup       A spawn group to spawn.
+		 * @param pListener         A listener to call the entity events while.
 		 * @param pEntities         An optional vector pointer of created entities.
 		 * @param pDetails          An optional vector pointer of detailed messages.
 		 * @param pWarnings         An opitonal vector pointer of warning messages.
 		 * 
 		 * @return                  Returns the executed spawn queue length.
 		 */
-		virtual int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, CUtlVector<CEntityInstance *> *pEntities = nullptr, CUtlVector<CUtlString> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) = 0;
+		virtual int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, IEntityListener *pListener = nullptr, CUtlVector<CEntityInstance *> *pEntities = nullptr, CUtlVector<CUtlString> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) = 0;
 
 	public: // Destory queued entities.
 		/**
