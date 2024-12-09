@@ -374,7 +374,7 @@ int EntityManager::ProviderAgent::ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGr
 	return iQueueLengthBefore - vecEntitySpawnQueue.Count();
 }
 
-int EntityManager::ProviderAgent::ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup, IEntityListener *pListener, CUtlVector<CEntityInstance *> *pEntities, CUtlVector<CUtlString> *pDetails, CUtlVector<CUtlString> *pWarnings)
+int EntityManager::ProviderAgent::ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup, CUtlVector<CEntityInstance *> *pEntities, IEntityListener *pListener, CUtlVector<CUtlString> *pDetails, CUtlVector<CUtlString> *pWarnings)
 {
 	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
 

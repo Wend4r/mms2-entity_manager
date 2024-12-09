@@ -75,7 +75,7 @@ namespace EntityManager
 		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues, SpawnGroupHandle_t *pResultHandle = nullptr) override;
 		bool HasInSpawnQueue(SpawnGroupHandle_t hSpawnGroup) override;
 		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
-		int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, IEntityListener *pListener = nullptr, CUtlVector<CEntityInstance *> *pEntities = nullptr, CUtlVector<CUtlString> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) override;
+		int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, CUtlVector<CEntityInstance *> *pEntities = nullptr, IEntityListener *pListener = nullptr, CUtlVector<CUtlString> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) override;
 
 	public: // Destroy queue methods.
 		void PushDestroyQueue(CEntityInstance *pEntity) override;
