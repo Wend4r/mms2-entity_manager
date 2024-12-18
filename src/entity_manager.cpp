@@ -113,7 +113,7 @@ EntityManagerPlugin::EntityManagerPlugin()
  :  m_aLogger(GetName(), [](LoggingChannelID_t nTagChannelID)
     {
     	LoggingSystem_AddTagToChannel(nTagChannelID, s_aEntityManager.GetLogTag());
-    }, 0, LV_DEFAULT, ENTITY_MANAGER_LOGGINING_COLOR)
+    }, 0, LV_DETAILED, ENTITY_MANAGER_LOGGINING_COLOR)
 {
 }
 
@@ -920,14 +920,21 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 			SpawnGroupHandle_t hTargetSpawnGroup = bIsMySpawnGroup ? pMapSpawnGroup->GetOwnerSpawnGroup() : hSpawnGroup;
 
-			if(s_aEntityManagerProviderAgent.HasInSpawnQueue(hTargetSpawnGroup))
+			bool bHasInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(hTargetSpawnGroup);
+
+			if(bHasInSpawnQueue)
 			{
 				s_aEntityManagerProviderAgent.AddSpawnQueueToTail(vecLayerEntities, hTargetSpawnGroup);
 			}
 
+			int iOldEntitiesCount = vecLayerEntities.Count();
+
 			s_aEntityManagerProviderAgent.OnSpawnGroupCreateLoading(hSpawnGroup, pMapSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, vecLayerEntities);
 
-			pKeyValues = &vecLayerEntities;
+			if(bHasInSpawnQueue || iOldEntitiesCount != vecLayerEntities.Count())
+			{
+				pKeyValues = &vecLayerEntities;
+			}
 		}
 	}
 
