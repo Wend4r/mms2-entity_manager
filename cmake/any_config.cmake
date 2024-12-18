@@ -9,4 +9,8 @@ endif()
 set(ANY_CONFIG_BINARY_DIR "s2u-any_config")
 set(ANY_CONFIG_INCLUDE_DIR "${ANY_CONFIG_DIR}/include")
 
+set(ANY_CONFIG_INCLUDE_DIRS
+	${ANY_CONFIG_INCLUDE_DIR}
+)
+
 add_subdirectory(${ANY_CONFIG_DIR} ${ANY_CONFIG_BINARY_DIR})
