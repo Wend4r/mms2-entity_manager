@@ -9,4 +9,8 @@ endif()
 set(GAMEDATA_BINARY_DIR "s2u-gamedata")
 set(GAMEDATA_INCLUDE_DIR "${GAMEDATA_DIR}/include")
 
+set(GAMEDATA_INCLUDE_DIRS
+	${GAMEDATA_INCLUDE_DIR}
+)
+
 add_subdirectory(${GAMEDATA_DIR} ${GAMEDATA_BINARY_DIR})

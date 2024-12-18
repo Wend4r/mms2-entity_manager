@@ -3,7 +3,7 @@
 
 #include <dynlibutils/virtual.hpp>
 
-DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
+extern EntityManager::Provider *g_pEntityManagerProvider;
 
 void EntityManager::CGameResourceServiceProvider::DestroyResourceManifest(CGameResourceManifest *pTarget)
 {

@@ -5,30 +5,30 @@ EntityManager::Provider::GameDataStorage::EntitySystem::EntitySystem()
 	{
 		auto &aCallbacks = m_aAddressCallbacks;
 
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::CreateEntity"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::CreateEntity"), {[this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
 		{
 			m_pfnCreateEntity = pFunction.RCast<decltype(m_pfnCreateEntity)>();
-		});
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::QueueSpawnEntity"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
+		}});
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::QueueSpawnEntity"), {[this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
 		{
 			m_pfnQueueSpawnEntity = pFunction.RCast<decltype(m_pfnQueueSpawnEntity)>();
-		});
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::QueueDestroyEntity"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
+		}});
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::QueueDestroyEntity"), {[this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
 		{
 			m_pfnQueueDestroyEntity = pFunction.RCast<decltype(m_pfnQueueDestroyEntity)>();
-		});
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::ExecuteQueuedCreation"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
+		}});
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::ExecuteQueuedCreation"), {[this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
 		{
 			m_pfnExecuteQueuedCreation = pFunction.RCast<decltype(m_pfnExecuteQueuedCreation)>();
-		});
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::ExecuteQueuedDeletion"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
+		}});
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::ExecuteQueuedDeletion"), {[this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
 		{
 			m_pfnExecuteQueuedDeletion = pFunction.RCast<decltype(m_pfnExecuteQueuedDeletion)>();
-		});
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CGameEntitySystem::ListenForEntityInSpawnGroupToFinish"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
+		}});
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CGameEntitySystem::ListenForEntityInSpawnGroupToFinish"), {[this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
 		{
 			m_pfnListenForEntityInSpawnGroupToFinish = pFunction.RCast<decltype(m_pfnListenForEntityInSpawnGroupToFinish)>();
-		});
+		}});
 
 		m_aGameConfig.GetAddresses().AddListener(&aCallbacks);
 	}
@@ -36,14 +36,14 @@ EntityManager::Provider::GameDataStorage::EntitySystem::EntitySystem()
 	{
 		auto &aCallbacks = m_aOffsetCallbacks;
 
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::m_pCurrentManifest"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::m_pCurrentManifest"), {[this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			m_nCurrentManifestOffset = nOffset;
-		});
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::m_aEntityKeyValuesAllocator"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
+		}});
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntitySystem::m_aEntityKeyValuesAllocator"), {[this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			m_nEntityKeyValuesAllocatorOffset = nOffset;
-		});
+		}});
 
 		m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
 	}

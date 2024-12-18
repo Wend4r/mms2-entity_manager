@@ -5,15 +5,15 @@ EntityManager::Provider::GameDataStorage::GameSystem::GameSystem()
 	{
 		auto &aCallbacks = m_aAddressCallbacks;
 
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CBaseGameSystemFactory::sm_pFirst"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &aAddress)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CBaseGameSystemFactory::sm_pFirst"), {[this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &aAddress)
 		{
 			m_pBaseGameSystemFactoryFirst = aAddress.RCast<decltype(m_pBaseGameSystemFactoryFirst)>();
-		});
+		}});
 
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("IGameSystem::InitAllSystems"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &aAddress)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("IGameSystem::InitAllSystems"), {[this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &aAddress)
 		{
 			m_pfnGameSystemInit = aAddress.UCast<decltype(m_pfnGameSystemInit)>();
-		});
+		}});
 
 		m_aGameConfig.GetAddresses().AddListener(&aCallbacks);
 	}
