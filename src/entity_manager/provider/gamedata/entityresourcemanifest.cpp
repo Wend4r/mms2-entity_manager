@@ -3,7 +3,7 @@
 
 #include <dynlibutils/virtual.hpp>
 
-DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
+extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 EntityManager::Provider::GameDataStorage::EntityResourceManifest::EntityResourceManifest()
 {

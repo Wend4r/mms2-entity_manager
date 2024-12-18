@@ -15,19 +15,19 @@
 #include <tier1/generichash.h>
 #include <tier1/keyvalues3.h>
 
-DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
-DLL_IMPORT EntityManager::CSpawnGroupAccess *g_pEntityManagerSpawnGroup;
+extern EntityManager::Provider *g_pEntityManagerProvider;
+extern EntityManager::CSpawnGroupAccess *g_pEntityManagerSpawnGroup;
 
-DLL_IMPORT IServerGameDLL *server;
-DLL_IMPORT IGameEventManager2 *gameeventmanager;
+extern IServerGameDLL *server;
+extern IGameEventManager2 *gameeventmanager;
 
-DLL_EXPORT CEntitySystem *g_pEntitySystem = NULL;
-DLL_EXPORT CGameEntitySystem *g_pGameEntitySystem = NULL;
+CEntitySystem *g_pEntitySystem = NULL;
+CGameEntitySystem *g_pGameEntitySystem = NULL;
 
 CBaseGameSystemFactory **CBaseGameSystemFactory::sm_pFirst = NULL;
 
-DLL_EXPORT CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem = NULL;
-DLL_EXPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
+CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem = NULL;
+CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
 EntityManager::ProviderAgent::ProviderAgent()
 {

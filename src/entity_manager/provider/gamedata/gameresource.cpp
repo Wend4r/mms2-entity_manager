@@ -1,7 +1,7 @@
 #include <entity_manager/provider_agent.hpp>
 #include <entity_manager/provider.hpp>
 
-DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
+extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 EntityManager::Provider::GameDataStorage::GameResource::GameResource()
 {

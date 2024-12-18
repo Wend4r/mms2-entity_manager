@@ -63,27 +63,27 @@ SH_DECL_HOOK4(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, SH_NOATTRIB, 0,
 SH_DECL_HOOK1_void(CSpawnGroupMgrGameSystem, SpawnGroupShutdown, SH_NOATTRIB, 0, SpawnGroupHandle_t);
 
 static EntityManagerPlugin s_aEntityManager;
-DLL_EXPORT EntityManagerPlugin *g_pEntityManager = &s_aEntityManager;  // To extern usage.
+EntityManagerPlugin *g_pEntityManager = &s_aEntityManager;  // To extern usage.
 
 static EntityManager::Provider s_aEntityManagerProvider;
-DLL_EXPORT EntityManager::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
+EntityManager::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
 
 static EntityManager::ProviderAgent s_aEntityManagerProviderAgent;
-DLL_EXPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent = &s_aEntityManagerProviderAgent;
+EntityManager::ProviderAgent *g_pEntityManagerProviderAgent = &s_aEntityManagerProviderAgent;
 
 static EntityManager::CSpawnGroupAccess s_aEntityManagerSpawnGroup;
-DLL_EXPORT EntityManager::CSpawnGroupAccess *g_pEntityManagerSpawnGroup = &s_aEntityManagerSpawnGroup;
+EntityManager::CSpawnGroupAccess *g_pEntityManagerSpawnGroup = &s_aEntityManagerSpawnGroup;
 
-DLL_EXPORT IVEngineServer *engine = NULL;
-DLL_EXPORT ICvar *icvar = NULL;
-DLL_EXPORT IFileSystem *filesystem = NULL;
-DLL_EXPORT IServerGameDLL *server = NULL;
-DLL_EXPORT IGameEventManager2 *gameeventmanager = NULL;
+IVEngineServer *engine = NULL;
+ICvar *icvar = NULL;
+IFileSystem *filesystem = NULL;
+IServerGameDLL *server = NULL;
+IGameEventManager2 *gameeventmanager = NULL;
 
-DLL_IMPORT CGameEntitySystem *g_pGameEntitySystem;
+extern CGameEntitySystem *g_pGameEntitySystem;
 
-DLL_IMPORT CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem;
-DLL_IMPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
+extern CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem;
+extern CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr;
 
 // Should only be called within the active game loop (i e map should be loaded and active)
 // otherwise that'll be nullptr!

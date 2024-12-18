@@ -16,9 +16,9 @@
 #define GAMECONFIG_SOURCE2SERVER_FILENAME "source2server.games.*"
 #define GAMECONFIG_SPAWNGROUP_FILENAME "spawngroup.games.*"
 
-DLL_IMPORT IFileSystem *filesystem;
-DLL_IMPORT IVEngineServer *engine;
-DLL_IMPORT IServerGameDLL *server;
+extern IFileSystem *filesystem;
+extern IVEngineServer *engine;
+extern IServerGameDLL *server;
 
 DynLibUtils::CModule g_aLibEngine, 
                      g_aLibServer;

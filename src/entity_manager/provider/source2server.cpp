@@ -5,7 +5,7 @@
 
 class CGameEventManager;
 
-DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
+extern EntityManager::Provider *g_pEntityManagerProvider;
 
 IGameEventManager2 *EntityManager::CSource2ServerProvider::GetGameEventManager()
 {
