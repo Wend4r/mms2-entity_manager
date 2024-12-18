@@ -71,7 +71,7 @@ namespace EntityManager
 	public: // Spawn queue methods.
 		void PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
 		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
-		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
+		int CopySpawnQueueWithEntitySystemOwnership(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
 		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues, SpawnGroupHandle_t *pResultHandle = nullptr) override;
 		bool HasInSpawnQueue(SpawnGroupHandle_t hSpawnGroup) override;
 		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
@@ -109,7 +109,7 @@ namespace EntityManager
 			SpawnData(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup);
 			~SpawnData();
 
-			CEntityKeyValues *GetKeyValues() const;
+			const CEntityKeyValues *GetKeyValues() const;
 
 			SpawnGroupHandle_t GetSpawnGroup() const;
 			bool IsAnySpawnGroup() const;

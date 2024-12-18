@@ -924,7 +924,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 			if(bHasInSpawnQueue)
 			{
-				s_aEntityManagerProviderAgent.AddSpawnQueueToTail(vecLayerEntities, hTargetSpawnGroup);
+				s_aEntityManagerProviderAgent.CopySpawnQueueWithEntitySystemOwnership(vecLayerEntities, hTargetSpawnGroup);
 			}
 
 			int iOldEntitiesCount = vecLayerEntities.Count();
@@ -969,16 +969,16 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 			{
 				const auto &aEntity = pEntities[i];
 
-				const CEntityKeyValues *pKeyValues = aEntity.m_pKeyValues;
+				const CEntityKeyValues *pEntityKeyValues = aEntity.m_pKeyValues;
 
-				bool bInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(pKeyValues);
+				bool bInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(pEntityKeyValues);
 
 #ifdef _DEBUG
 				aDetails.Push(pszMyEntityMessages[bInSpawnQueue]);
 
 				auto aEntityDetails = Logger::Scope(LOGGER_COLOR_ENTITY_KV3, "\t");
 
-				if(s_aEntityManagerProviderAgent.DumpEntityKeyValues(pKeyValues, EntityManager::ProviderAgent::s_eDefaultDEKVFlags, aEntityDetails, &aEntityDetails))
+				if(s_aEntityManagerProviderAgent.DumpEntityKeyValues(pEntityKeyValues, EntityManager::ProviderAgent::s_eDefaultDEKVFlags, aEntityDetails, &aEntityDetails))
 				{
 					aDetails.PushFormat(LOGGER_COLOR_ENTITY_KV3, "%s = ", aEntity.m_pEntity->GetClassname());
 					aDetails.Push(LOGGER_COLOR_ENTITY_KV3, "{");

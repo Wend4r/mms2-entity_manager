@@ -224,7 +224,7 @@ public: // Provider agent ones.
 			 * @param pEntity           An entity who created.
 			 * @param pKeyValues        Entity key values.
 			 */
-			virtual void OnEntityCreated(CEntityInstance *pEntity, CEntityKeyValues *pKeyValues) = 0;
+			virtual void OnEntityCreated(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues) = 0;
 		}; // IEntityListener
 
 	public: // A entity system things.
@@ -306,15 +306,15 @@ public: // Provider agent ones.
 		virtual void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
 
 		/**
-		 * @brief Adds the spawn queue to a vector.
+		 * @brief Copies the spawn queue to a vector with an entity system ownership.
 		 * 
 		 * @param vecTarget         A vector target to store.
-		 * @param hSpawnGroup       A filter spawn group.
+		 * @param hSpawnGroup       An optional filter spawn group.
 		 *                          If ANY_SPAWN_GROUP, will be added all entities.
 		 * 
 		 * @return                  Returns the number of added elements.
 		 */
-		virtual int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
+		virtual int CopySpawnQueueWithEntitySystemOwnership(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) = 0;
 
 		/**
 		 * @brief Checks to has entity structure in the spawn queue.
