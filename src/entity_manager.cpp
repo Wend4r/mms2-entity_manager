@@ -1081,7 +1081,10 @@ bool EntityManagerPlugin::BaseEvent::Init(char *psError, size_t nMaxLength)
 
 void EntityManagerPlugin::BaseEvent::Destroy()
 {
-	gameeventmanager->RemoveListener(this);
+	if(gameeventmanager)
+	{
+		gameeventmanager->RemoveListener(this);
+	}
 }
 
 const char *EntityManagerPlugin::BaseEvent::GetName()
