@@ -533,7 +533,7 @@ bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, 
 		return false;
 	}
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	Logger::Scope aDetails = m_aLogger.CreateDetailsScope();
 #endif
 	Logger::Scope aWarnings = m_aLogger.CreateWarningsScope();
@@ -579,7 +579,7 @@ bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, 
 	V_FixSlashes((char *)sSpawnGroupName);
 
 	bool bResult = m_aSettings.Load(pSpawnGroup->GetHandle(), m_sBasePath.c_str(), (const char *)sSpawnGroupName, psError, nMaxLength,
-#ifdef DEBUG
+#ifdef _DEBUG
 	                                      &aDetails,
 #else
 	                                      nullptr,
@@ -588,7 +588,7 @@ bool EntityManagerPlugin::LoadSettings(ISpawnGroup *pSpawnGroup, char *psError, 
 
 	if(bResult)
 	{
-#ifdef DEBUG
+#ifdef _DEBUG
 		aDetails.SendColor([this](Color rgba, const CUtlString &sContext)
 		{
 			m_aLogger.Detailed(rgba, sContext);
@@ -777,7 +777,7 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 		m_aLogger.DetailedFormat("EntityManagerPlugin::OnEntitySystemSpawnHook(%d, %p)\n", iCount, pInfo);
 	}
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	auto aDetails = m_aLogger.CreateDetailsScope();
 #endif
 
@@ -788,7 +788,7 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 
 			CEntityIdentity *pEntity = aInfoOne.m_pEntity;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 			int iEntity = pEntity->GetEntityIndex().Get();
 
 			const CEntityKeyValues *pKeyValues = aInfoOne.m_pKeyValues;
@@ -816,7 +816,7 @@ void EntityManagerPlugin::OnEntitySystemSpawnHook(int iCount, const EntitySpawnI
 		}
 	}
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	aDetails.SendColor([this](Color rgba, const CUtlString &sContent)
 	{
 		m_aLogger.Detailed(rgba, sContent);
@@ -937,7 +937,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 	if(iCount)
 	{
-#ifdef DEBUG
+#ifdef _DEBUG
 		auto aDetails = m_aLogger.CreateDetailsScope();
 #endif
 
@@ -948,7 +948,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 			const EntitySpawnInfo_t *pEntities = pLoading->GetEntities();
 
-#ifdef DEBUG
+#ifdef _DEBUG
 			aDetails.Push("- Loading entities -");
 
 			static const char *pszMyEntityMessages[] = 
@@ -966,7 +966,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 				bool bInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(pKeyValues);
 
-#ifdef DEBUG
+#ifdef _DEBUG
 				aDetails.Push(pszMyEntityMessages[bInSpawnQueue]);
 
 				auto aEntityDetails = Logger::Scope(LOGGER_COLOR_ENTITY_KV3, "\t");
@@ -994,7 +994,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 			while(i < iCount);
 		}
 
-#ifdef DEBUG
+#ifdef _DEBUG
 		aDetails.SendColor([this](Color rgba, const CUtlString &sContext)
 		{
 			m_aLogger.Detailed(rgba, sContext);
