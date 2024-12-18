@@ -65,12 +65,6 @@ set(SOURCESDK_PROTOS
 
 include(cmake/platform/shared.cmake)
 
-if(LINUX)
-	include(cmake/platform/linux.cmake)
-elseif(WINDOWS)
-	include(cmake/platform/windows.cmake)
-endif()
-
 # Libraries.
 include(cmake/any_config.cmake)
 include(cmake/dynlibutils.cmake)
@@ -114,9 +108,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_OUTPUT_NAME})
 
 if(WINDOWS)
-	if(SOURCESDK_MSVC_RUNTIME_LIBRARY)
-		set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-	endif()
+	set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif(MACOS)
 	set_target_properties(${PROJECT_NAME} PROPERTIES OSX_ARCHITECTURES "x86_64")
 endif()

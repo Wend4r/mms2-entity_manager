@@ -10,10 +10,10 @@ EntityManager::Provider::GameDataStorage::EntityResourceManifest::EntityResource
 	{
 		auto &aCallbacks = m_aOffsetCallbacks;
 
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntityResourceManifest::AddResource"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CEntityResourceManifest::AddResource"), {[this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			m_nAddResourceIndex = nOffset;
-		});
+		}});
 
 		m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
 	}
