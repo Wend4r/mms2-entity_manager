@@ -113,7 +113,7 @@ EntityManagerPlugin::EntityManagerPlugin()
  :  m_aLogger(GetName(), [](LoggingChannelID_t nTagChannelID)
     {
     	LoggingSystem_AddTagToChannel(nTagChannelID, s_aEntityManager.GetLogTag());
-    }, 0, LV_DETAILED, ENTITY_MANAGER_LOGGINING_COLOR)
+    }, 0, LV_DEFAULT, ENTITY_MANAGER_LOGGINING_COLOR)
 {
 }
 
