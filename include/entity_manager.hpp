@@ -153,6 +153,11 @@ private:
 	};
 
 private:
+	// Components.
+	EntityManager::PathResolver m_aPathResolver;
+	EntityManager::Settings m_aSettings;
+	Logger m_aLogger;
+
 	std::string m_sBasePath = "addons" CORRECT_PATH_SEPARATOR_S META_PLUGIN_PREFIX;
 	std::string m_sCurrentMap = "\0";
 
@@ -162,10 +167,6 @@ private:
 	bool m_bIsHookedEvents = false;
 	RoundPreStartEvent m_aRoundPreStart;
 	RoundStartEvent m_aRoundStart;
-
-	EntityManager::PathResolver m_aPathResolver;
-	EntityManager::Settings m_aSettings;
-	Logger m_aLogger;
 
 	int m_iLoadEventsFromFileId;
 };

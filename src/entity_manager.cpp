@@ -142,6 +142,30 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 	g_pCVar = icvar;
 	ConVar_Register(FCVAR_RELEASE | FCVAR_GAMEDLL);
 
+	// Initialize a path resolver.
+	{
+		if(!m_aPathResolver.Init())
+		{
+			snprintf(error, maxlen, "Failed to init a path resolver");
+
+			return false;
+		}
+
+		m_sBasePath = m_aPathResolver.ExtractSubpath();
+	}
+
+	// Initialize a settings.
+	{
+		char sSettingsError[256];
+
+		if(!m_aSettings.Init(sSettingsError, sizeof(sSettingsError)))
+		{
+			snprintf(error, maxlen, "Failed to init a settings: %s", sSettingsError);
+
+			return false;
+		}
+	}
+
 	// Initialize and load a provider.
 	{
 		GameData::CBufferStringVector vecMessages;
@@ -184,30 +208,6 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 		if(!s_aEntityManagerProviderAgent.Init())
 		{
 			snprintf(error, maxlen, "Failed to init a provider agent");
-
-			return false;
-		}
-	}
-
-	// Initialize a path resolver.
-	{
-		if(!m_aPathResolver.Init())
-		{
-			snprintf(error, maxlen, "Failed to init a path resolver");
-
-			return false;
-		}
-
-		m_sBasePath = m_aPathResolver.ExtractSubpath();
-	}
-
-	// Initialize a settings.
-	{
-		char sSettingsError[256];
-
-		if(!m_aSettings.Init(sSettingsError, sizeof(sSettingsError)))
-		{
-			snprintf(error, maxlen, "Failed to init a settings: %s", sSettingsError);
 
 			return false;
 		}

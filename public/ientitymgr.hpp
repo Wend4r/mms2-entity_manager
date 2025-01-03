@@ -153,7 +153,7 @@ public: // Provider agent ones.
 			 * @brief Destructor of the instance, which calls the unload of the spawn group. 
 			 *        Used internally, call `ReleaseSpawnGroup` instead.
 			 */
-			virtual ~ISpawnGroupInstance() {};
+			virtual ~ISpawnGroupInstance() = default;
 
 			/**
 			 * @brief Gets the status of the spawn group.
