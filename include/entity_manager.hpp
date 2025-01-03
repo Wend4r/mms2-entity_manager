@@ -23,6 +23,7 @@
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_HPP_
 
 #include <ientitymgr.hpp>
+#include <entity_manager/path_resolver.hpp>
 #include <entity_manager/provider.hpp>
 #include <entity_manager/provider_agent.hpp>
 #include <entity_manager/settings.hpp>
@@ -105,9 +106,6 @@ public:
 protected:
 	bool EraseMyEntity(CEntityInstance *pEntityInst);
 
-private: // Commands.
-	CON_COMMAND_MEMBER_F(EntityManagerPlugin, "mm_" PREFIX_ENTITY_MANAGER "_set_basepath", OnSetBasePathCommand, "Set base path for Entity Manager", FCVAR_LINKED_CONCOMMAND);
-
 public: // SourceHooks.
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *);
 	int OnLoadEventsFromFileHook(const char *pszFilename, bool bSearchAll);
@@ -165,6 +163,7 @@ private:
 	RoundPreStartEvent m_aRoundPreStart;
 	RoundStartEvent m_aRoundStart;
 
+	EntityManager::PathResolver m_aPathResolver;
 	EntityManager::Settings m_aSettings;
 	Logger m_aLogger;
 

@@ -110,10 +110,11 @@ CEntityInstance* CEntityHandle::Get() const
 PLUGIN_EXPOSE(EntityManagerPlugin, s_aEntityManager);
 
 EntityManagerPlugin::EntityManagerPlugin()
- :  m_aLogger(GetName(), [](LoggingChannelID_t nTagChannelID)
+ :  m_aPathResolver(this),
+    m_aLogger(GetName(), [](LoggingChannelID_t nTagChannelID)
     {
     	LoggingSystem_AddTagToChannel(nTagChannelID, s_aEntityManager.GetLogTag());
-    }, 0, LV_DEFAULT, ENTITY_MANAGER_LOGGINING_COLOR)
+    }, 0, LV_DETAILED, ENTITY_MANAGER_LOGGINING_COLOR)
 {
 }
 
@@ -186,6 +187,18 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 			return false;
 		}
+	}
+
+	// Initialize a path resolver.
+	{
+		if(!m_aPathResolver.Init())
+		{
+			snprintf(error, maxlen, "Failed to init a path resolver");
+
+			return false;
+		}
+
+		m_sBasePath = m_aPathResolver.ExtractSubpath();
 	}
 
 	// Initialize a settings.
@@ -719,19 +732,6 @@ bool EntityManagerPlugin::EraseMyEntity(CEntityInstance *pEntity)
 	}
 
 	return bResult;
-}
-
-void EntityManagerPlugin::OnSetBasePathCommand(const CCommandContext &context, const CCommand &args)
-{
-	if(args.ArgC() != 2)
-	{
-		Msg("Usage: %s <base path>\n", args[0]);
-
-		return;
-	}
-
-	OnBasePathChanged(args[1]);
-	Msg("Base path is \"%s\"\n", m_sBasePath.c_str());
 }
 
 void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *)

@@ -87,6 +87,7 @@ set(SOURCE_FILES
 	${SOURCE_PROJECT_DIR}/provider/gamesystem.cpp
 	${SOURCE_PROJECT_DIR}/provider/source2server.cpp
 	${SOURCE_PROJECT_DIR}/provider/spawngroup.cpp
+	${SOURCE_PROJECT_DIR}/path_resolver.cpp
 	${SOURCE_PROJECT_DIR}/provider_agent.cpp
 	${SOURCE_PROJECT_DIR}/provider.cpp
 	${SOURCE_PROJECT_DIR}/settings.cpp
