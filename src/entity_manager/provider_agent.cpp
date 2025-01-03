@@ -779,31 +779,34 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 					{
 						KeyValues3 **pArray = pMember->GetArrayBase();
 
-						const int iArrayLength = pMember->GetArrayElementCount();
-
-						if(iArrayLength > 0)
+						if(pArray)
 						{
-							psBuffer[0] = '[';
-							iBufCur = 1;
+							const int iArrayLength = pMember->GetArrayElementCount();
 
-							int i = 0;
-
-							char *pArrayBuf = (char *)stackalloc(nMaxLength);
-
-							do
+							if(iArrayLength > 0)
 							{
-								if(ProviderAgent::DumpEntityKeyValue(pArray[i], pArrayBuf, nMaxLength))
+								psBuffer[0] = '[';
+								iBufCur = 1;
+
+								int i = 0;
+
+								char *pArrayBuf = (char *)stackalloc(nMaxLength);
+
+								do
 								{
-									iBufCur += V_snprintf(&psBuffer[iBufCur], nMaxLength - iBufCur, "%s, ", pArrayBuf);
+									if(ProviderAgent::DumpEntityKeyValue(pArray[i], pArrayBuf, nMaxLength))
+									{
+										iBufCur += V_snprintf(&psBuffer[iBufCur], nMaxLength - iBufCur, "%s, ", pArrayBuf);
+									}
+
+									i++;
 								}
+								while(i < iArrayLength);
 
-								i++;
+								iBufCur -= 2; // Strip ", " of end.
+								psBuffer[iBufCur++] = ']';
+								psBuffer[iBufCur] = '\0';
 							}
-							while(i < iArrayLength);
-
-							iBufCur -= 2; // Strip ", " of end.
-							psBuffer[iBufCur++] = ']';
-							psBuffer[iBufCur] = '\0';
 						}
 					}
 
