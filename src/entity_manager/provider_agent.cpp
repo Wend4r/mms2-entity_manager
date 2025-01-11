@@ -50,16 +50,6 @@ void EntityManager::ProviderAgent::Destroy()
 	Clear();
 }
 
-CUtlSymbolLarge EntityManager::ProviderAgent::AllocPooledString(const char *pString)
-{
-	return g_pEntitySystem->AllocPooledString(pString);
-}
-
-CUtlSymbolLarge EntityManager::ProviderAgent::FindPooledString(const char* pString)
-{
-	return g_pEntitySystem->FindPooledString(pString);
-}
-
 bool EntityManager::ProviderAgent::NotifyGameResourceUpdated()
 {
 	bool bResult = m_aResourceManifest.Reinit(RESOURCE_MANIFEST_LOAD_STREAMING_DATA, __FUNCTION__, RESOURCE_MANIFEST_LOAD_PRIORITY_HIGH /* Run-time entities update at players view */);
@@ -111,6 +101,13 @@ bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated(CSpawnGroupMgrGame
 	g_pEntityManagerSpawnGroup->SetManager(pSpawnGroupManagerResult);
 
 	return pSpawnGroupManagerResult != NULL;
+}
+
+CGameEntitySystem *EntityManager::ProviderAgent::GetSystem()
+{
+	NotifyEntitySystemUpdated();
+
+	return g_pGameEntitySystem;
 }
 
 bool EntityManager::ProviderAgent::ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset)

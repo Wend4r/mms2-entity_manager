@@ -40,19 +40,20 @@ namespace EntityManager
 		void Destroy();
 
 	public:
-		CUtlSymbolLarge AllocPooledString(const char *pString) override;
-		CUtlSymbolLarge FindPooledString(const char* pString) override;
-
-	public:
 		virtual bool NotifyGameResourceUpdated();
 		virtual bool NotifyGameSystemUpdated();
 		virtual bool NotifyEntitySystemUpdated();
 		virtual bool NotifyGameEventsUpdated();
 		virtual bool NotifySpawnGroupMgrUpdated(CSpawnGroupMgrGameSystem *pSpawnGroupManager = NULL);
 
+	public: // IEntityManager::IProviderAgent
+		CGameEntitySystem *GetSystem() override;
+
 	public:
-		bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset) override;
-		IEntityResourceManifest *GetResouceManifest() override;
+		bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
+		IEntityResourceManifest *GetResouceManifest();
+
+	public:
 		void AddResourceToEntityManifest(IEntityResourceManifest *pManifest, const char *pszPath) override;
 
 	public:

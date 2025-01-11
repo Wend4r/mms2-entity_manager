@@ -40,6 +40,8 @@
 #	define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
 #	define ANY_SPAWN_GROUP INVALID_SPAWN_GROUP
 
+class CGameEntitySystem;
+
 /**
  * @brief A Entity Manager interface.
  * Note: gets with "reinterpret_cast<IEntityManager *>(ismm->MetaFactory(ENTITY_MANAGER_INTERFACE_NAME, NULL, NULL));"
@@ -78,7 +80,7 @@ public: // Provider agent ones.
 			 *                          otherwise false if failed to add.
 			 */
 			virtual bool Unload() = 0;
-		}; // ISpawnGroupLoader
+		}; // IEntityManager::IProviderAgent::ISpawnGroupLoader
 
 		/**
 		 * @brief A spawn group notifications interface.
@@ -121,7 +123,7 @@ public: // Provider agent ones.
 			 * @param hSpawnGroup       A spawn group handle to destroy.
 			 */
 			virtual void OnSpawnGroupDestroyed(SpawnGroupHandle_t hSpawnGroup) {}
-		}; // ISpawnGroupNotifications
+		}; // IEntityManager::IProviderAgent::ISpawnGroupNotifications
 
 		/**
 		 * @brief A spawn group callbacks interface.
@@ -142,7 +144,7 @@ public: // Provider agent ones.
 			 * @param pNotifications    A notifications pointer to remove listening.
 			 */
 			virtual bool RemoveNotificationsListener(ISpawnGroupNotifications *pNotifications) = 0;
-		}; // ISpawnGroupCallbacks
+		}; // IEntityManager::IProviderAgent::ISpawnGroupCallbacks
 
 		/**
 		 * @brief A spawn group instance interface.
@@ -211,7 +213,7 @@ public: // Provider agent ones.
 			 * @return                  Returns a vector of the offset.
 			 */
 			virtual const Vector &GetLandmarkOffset() const = 0;
-		}; // ISpawnGroupInstance
+		}; // IEntityManager::IProviderAgent::ISpawnGroupInstance
 
 		/**
 		 * @brief A entity listener interface.
@@ -226,41 +228,17 @@ public: // Provider agent ones.
 			 * @param pKeyValues        Entity key values.
 			 */
 			virtual void OnEntityCreated(CEntityInstance *pEntity, const CEntityKeyValues *pKeyValues) = 0;
-		}; // IEntityListener
+		}; // IEntityManager::IProviderAgent::IEntityListener
 
-	public: // A entity system things.
+	public: // A game entity system.
 		/**
-		 * @brief Allocates a pooled string of the entity system.
+		 * @brief Gets a game entity system.
 		 * 
-		 * @param pString           A string to allocate.
+		 * @return                  Returns a game entity system.
 		 */
-		virtual CUtlSymbolLarge AllocPooledString(const char *pString) = 0;
+		virtual CGameEntitySystem *GetSystem() = 0;
 
-		/**
-		 * @brief Find a pooled string in the entity system.
-		 * 
-		 * @param pString           A string to find.
-		 */
-		virtual CUtlSymbolLarge FindPooledString(const char* pString) = 0;
-
-	public:
-		/**
-		 * @brief Erect a resourse manifest with a spawn group.
-		 * 
-		 * @param pSpawnGroup       A spawn group.
-		 * @param nCount            A count of entities.
-		 * @param pEntities         A spawn infos of entities.
-		 * @param vWorldOffset      A world offset.
-		 */
-		virtual bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset) = 0;
-
-		/**
-		 * @brief Gets an entity manifest.
-		 * 
-		 * @return                  An entity manifest pointer.
-		 */
-		virtual IEntityResourceManifest *GetResouceManifest() = 0;
-
+	public: // An entity resource manifest.
 		/**
 		 * @brief Adds a resource to the entity resource manifest.
 		 * 
@@ -269,7 +247,7 @@ public: // Provider agent ones.
 		 */
 		virtual void AddResourceToEntityManifest(IEntityResourceManifest *pManifest, const char *pszPath) = 0;
 
-	public: // Spawn group ones.
+	public: // A spawn group instance.
 		/**
 		 * @brief Creates a spawn group instance. 
 		 *        To load, use the `Load` method
@@ -395,7 +373,7 @@ public: // Provider agent ones.
 		 * @return                  Returns the executed spawn queue length.
 		 */
 		virtual int ExecuteDestroyQueued() = 0;
-	}; // ISpawnGroupLoader
+	}; // IEntityManager::IProviderAgent
 
 	/**
 	 * @brief A spawn group mamager access interface.
@@ -423,7 +401,7 @@ public: // Provider agent ones.
 		 * @return                  Returns the spawn group map pointer.
 		 */
 		virtual CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups() = 0;
-	}; // ISpawnGroupAccessor
+	}; // IEntityManager::ISpawnGroupAccessor
 
 	/**
 	 * @brief A spawn group mamager provider.
@@ -493,7 +471,7 @@ public: // Provider agent ones.
 
 			return nSpawnGroupLength;
 		}
-	}; // CSpawnGroupProvider
+	}; // IEntityManager::CSpawnGroupProvider
 
 	/**
 	 * @brief Gets a provider agent.
