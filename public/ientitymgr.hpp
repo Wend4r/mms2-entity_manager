@@ -43,18 +43,18 @@
 class CGameEntitySystem;
 
 /**
- * @brief A Entity Manager interface.
+ * @brief An Entity Manager interface.
  * Note: gets with "reinterpret_cast<IEntityManager *>(ismm->MetaFactory(ENTITY_MANAGER_INTERFACE_NAME, NULL, NULL));"
  */
 class IEntityManager
 {
-public: // Provider agent ones.
+public: // A provider agent.
 	/**
 	 * @brief A provider agent interface.
 	 */
 	class IProviderAgent
 	{
-	public: // Spawn group ones.
+	public: // A spawn group interfaces.
 		/**
 		 * @brief A spawn group loader interface.
 		 */
@@ -375,8 +375,9 @@ public: // Provider agent ones.
 		virtual int ExecuteDestroyQueued() = 0;
 	}; // IEntityManager::IProviderAgent
 
+public: // A spawn group provider.
 	/**
-	 * @brief A spawn group mamager access interface.
+	 * @brief A spawn group mamager accessor interface.
 	 */
 	class ISpawnGroupAccessor
 	{
@@ -404,7 +405,7 @@ public: // Provider agent ones.
 	}; // IEntityManager::ISpawnGroupAccessor
 
 	/**
-	 * @brief A spawn group mamager provider.
+	 * @brief A spawn group provider.
 	 */
 	class CSpawnGroupProvider : public ISpawnGroupAccessor
 	{
@@ -481,11 +482,11 @@ public: // Provider agent ones.
 	virtual IProviderAgent *GetProviderAgent() = 0;
 
 	/**
-	 * @brief Gets a spawn group manager.
+	 * @brief Gets a spawn group provider.
 	 * 
-	 * @return                  Returns a spawn group manager pointer.
+	 * @return                  Returns a spawn group provider pointer.
 	 */
-	virtual CSpawnGroupProvider *GetSpawnGroupManager() = 0;
+	virtual CSpawnGroupProvider *GetSpawnGroupProvider() = 0;
 }; // IEntityManager
 
 #endif // _INCLUDE_METAMOD_SOURCE_IENTITYMGR_HPP_

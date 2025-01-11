@@ -364,7 +364,7 @@ EntityManagerPlugin::IProviderAgent *EntityManagerPlugin::GetProviderAgent()
 	return dynamic_cast<IProviderAgent *>(g_pEntityManagerProviderAgent);
 }
 
-EntityManagerPlugin::CSpawnGroupProvider *EntityManagerPlugin::GetSpawnGroupManager()
+EntityManagerPlugin::CSpawnGroupProvider *EntityManagerPlugin::GetSpawnGroupProvider()
 {
 	return reinterpret_cast<CSpawnGroupProvider *>(g_pEntityManagerSpawnGroup);
 }
