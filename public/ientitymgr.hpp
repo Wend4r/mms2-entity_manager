@@ -29,6 +29,7 @@
 
 #	include <functional>
 
+#	include <tier0/basetypes.h>
 #	include <tier1/utlmap.h>
 #	include <tier1/utlvector.h>
 #	include <entity2/entityidentity.h>
@@ -445,23 +446,23 @@ public: // Provider agent ones.
 		 * 
 		 * @return                  A count of spawn groups.
 		 */
-		int LoopBySpawnGroups(const std::function<OnSpawnGroupFound_t> &funcCallback)
+		uint LoopBySpawnGroups(const std::function<OnSpawnGroupFound_t> &funcCallback)
 		{
 			auto *pSpawnGroups = GetSpawnGroups();
 
-			int iSpawnGroupLength = 0;
+			uint nSpawnGroupLength = 0;
 
 			{
-				const int iInvalidIndex = pSpawnGroups->InvalidIndex();
+				const auto iInvalidIndex = pSpawnGroups->InvalidIndex();
 
-				for(int i = pSpawnGroups->FirstInorder(); i != iInvalidIndex; i = pSpawnGroups->NextInorder(i))
+				for(auto i = pSpawnGroups->FirstInorder(); i != iInvalidIndex; i = pSpawnGroups->NextInorder(i))
 				{
 					funcCallback(pSpawnGroups->Key(i), pSpawnGroups->Element(i));
-					iSpawnGroupLength++;
+					nSpawnGroupLength++;
 				}
 			}
 
-			return iSpawnGroupLength;
+			return nSpawnGroupLength;
 		}
 
 		/**
@@ -471,26 +472,26 @@ public: // Provider agent ones.
 		 * 
 		 * @return                  A count of spawn groups.
 		 */
-		int FastLoopBySpawnGroups(const std::function<OnSpawnGroupFound_t> &funcCallback)
+		uint FastLoopBySpawnGroups(const std::function<OnSpawnGroupFound_t> &funcCallback)
 		{
 			auto *pSpawnGroups = GetSpawnGroups();
 
-			int iSpawnGroupLength = 0;
+			uint nSpawnGroupLength = 0;
 
 			{
-				const int iMaxElement = pSpawnGroups->MaxElement();
+				auto iMaxElement = pSpawnGroups->MaxElement();
 
-				for(int i = 0; i < iMaxElement; ++i)
+				for(decltype(iMaxElement) i = 0; i < iMaxElement; ++i)
 				{
 					if(pSpawnGroups->IsValidIndex(i))
 					{
 						funcCallback(pSpawnGroups->Key(i), pSpawnGroups->Element(i));
-						iSpawnGroupLength++;
+						nSpawnGroupLength++;
 					}
 				}
 			}
 
-			return iSpawnGroupLength;
+			return nSpawnGroupLength;
 		}
 	}; // CSpawnGroupProvider
 
