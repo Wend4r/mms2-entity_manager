@@ -6,10 +6,10 @@
 
 namespace EntityManager
 {
-	class CSpawnGroupAccess : public IEntityManager::ISpawnGroupAccess
+	class CSpawnGroupAccessor : public IEntityManager::ISpawnGroupAccessor
 	{
 	public:
-		CSpawnGroupAccess(CSpawnGroupMgrGameSystem *pSpawnGroupManager = NULL);
+		CSpawnGroupAccessor(CSpawnGroupMgrGameSystem *pSpawnGroupManager = NULL);
 
 	public:
 		void SetManager(CSpawnGroupMgrGameSystem *pNewInstance);

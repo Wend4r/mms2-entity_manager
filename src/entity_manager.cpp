@@ -71,8 +71,8 @@ EntityManager::Provider *g_pEntityManagerProvider = &s_aEntityManagerProvider;
 static EntityManager::ProviderAgent s_aEntityManagerProviderAgent;
 EntityManager::ProviderAgent *g_pEntityManagerProviderAgent = &s_aEntityManagerProviderAgent;
 
-static EntityManager::CSpawnGroupAccess s_aEntityManagerSpawnGroup;
-EntityManager::CSpawnGroupAccess *g_pEntityManagerSpawnGroup = &s_aEntityManagerSpawnGroup;
+static EntityManager::CSpawnGroupAccessor s_aEntityManagerSpawnGroup;
+EntityManager::CSpawnGroupAccessor *g_pEntityManagerSpawnGroup = &s_aEntityManagerSpawnGroup;
 
 IVEngineServer *engine = NULL;
 ICvar *icvar = NULL;
@@ -898,7 +898,7 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 	auto *pSpawnGroupMgr = reinterpret_cast<CSpawnGroupMgrGameSystem *>(SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup));
 
-	auto aSpawnGroupMgr = EntityManager::CSpawnGroupAccess(pSpawnGroupMgr);
+	auto aSpawnGroupMgr = EntityManager::CSpawnGroupAccessor(pSpawnGroupMgr);
 
 	CMapSpawnGroup *pMapSpawnGroup = aSpawnGroupMgr.Get(hSpawnGroup);
 

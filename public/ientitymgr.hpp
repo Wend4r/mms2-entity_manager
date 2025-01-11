@@ -400,7 +400,7 @@ public: // Provider agent ones.
 	/**
 	 * @brief A spawn group mamager access interface.
 	 */
-	class ISpawnGroupAccess
+	class ISpawnGroupAccessor
 	{
 	public:
 		/**
@@ -423,12 +423,12 @@ public: // Provider agent ones.
 		 * @return                  Returns the spawn group map pointer.
 		 */
 		virtual CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *GetSpawnGroups() = 0;
-	}; // ISpawnGroupAccess
+	}; // ISpawnGroupAccessor
 
 	/**
 	 * @brief A spawn group mamager provider.
 	 */
-	class CSpawnGroupProvider : public ISpawnGroupAccess
+	class CSpawnGroupProvider : public ISpawnGroupAccessor
 	{
 	public:
 		/**

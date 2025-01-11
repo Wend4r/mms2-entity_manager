@@ -5,12 +5,12 @@
 
 extern EntityManager::Provider *g_pEntityManagerProvider;
 
-EntityManager::CSpawnGroupAccess::CSpawnGroupAccess(CSpawnGroupMgrGameSystem *pSpawnGroupManager)
+EntityManager::CSpawnGroupAccessor::CSpawnGroupAccessor(CSpawnGroupMgrGameSystem *pSpawnGroupManager)
  :  m_pSpawnGroupManager(pSpawnGroupManager)
 {
 }
 
-CMapSpawnGroup *EntityManager::CSpawnGroupAccess::Get(SpawnGroupHandle_t h)
+CMapSpawnGroup *EntityManager::CSpawnGroupAccessor::Get(SpawnGroupHandle_t h)
 {
 	auto *pMgrSpawnGroupMap = GetSpawnGroups();
 
@@ -21,17 +21,17 @@ CMapSpawnGroup *EntityManager::CSpawnGroupAccess::Get(SpawnGroupHandle_t h)
 	return iFoundIndex == pMgrSpawnGroupMap->InvalidIndex() ? nullptr : pMgrSpawnGroupMap->Element(iFoundIndex);
 }
 
-CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *EntityManager::CSpawnGroupAccess::GetSpawnGroups()
+CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *EntityManager::CSpawnGroupAccessor::GetSpawnGroups()
 {
 	return (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)m_pSpawnGroupManager + g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetMgrGameSystemSpawnGroupsOffset());
 }
 
-void EntityManager::CSpawnGroupAccess::SetManager(CSpawnGroupMgrGameSystem *pNewInstance)
+void EntityManager::CSpawnGroupAccessor::SetManager(CSpawnGroupMgrGameSystem *pNewInstance)
 {
 	m_pSpawnGroupManager = pNewInstance;
 }
 
-CSpawnGroupMgrGameSystem *EntityManager::CSpawnGroupAccess::GetManager()
+CSpawnGroupMgrGameSystem *EntityManager::CSpawnGroupAccessor::GetManager()
 {
 	return m_pSpawnGroupManager;
 }

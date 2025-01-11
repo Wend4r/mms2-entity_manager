@@ -16,7 +16,7 @@
 #include <tier1/keyvalues3.h>
 
 extern EntityManager::Provider *g_pEntityManagerProvider;
-extern EntityManager::CSpawnGroupAccess *g_pEntityManagerSpawnGroup;
+extern EntityManager::CSpawnGroupAccessor *g_pEntityManagerSpawnGroup;
 
 extern IServerGameDLL *server;
 extern IGameEventManager2 *gameeventmanager;
