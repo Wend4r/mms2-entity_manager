@@ -3,9 +3,14 @@
 
 #include <tier1/utlmap.h>
 
-DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
+extern EntityManager::Provider *g_pEntityManagerProvider;
 
-CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupHandle_t h)
+EntityManager::CSpawnGroupAccessor::CSpawnGroupAccessor(CSpawnGroupMgrGameSystem *pSpawnGroupManager)
+ :  m_pSpawnGroupManager(pSpawnGroupManager)
+{
+}
+
+CMapSpawnGroup *EntityManager::CSpawnGroupAccessor::Get(SpawnGroupHandle_t h)
 {
 	auto *pMgrSpawnGroupMap = GetSpawnGroups();
 
@@ -16,40 +21,19 @@ CMapSpawnGroup *EntityManager::CSpawnGroupMgrGameSystemProvider::Get(SpawnGroupH
 	return iFoundIndex == pMgrSpawnGroupMap->InvalidIndex() ? nullptr : pMgrSpawnGroupMap->Element(iFoundIndex);
 }
 
-void EntityManager::CSpawnGroupMgrGameSystemProvider::LoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
+CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *EntityManager::CSpawnGroupAccessor::GetSpawnGroups()
 {
-	auto *pMgrSpawnGroupMap = GetSpawnGroups();
-
-	{
-		const int iInvalidIndex = pMgrSpawnGroupMap->InvalidIndex();
-
-		for(int i = pMgrSpawnGroupMap->FirstInorder(); i != iInvalidIndex; i = pMgrSpawnGroupMap->NextInorder(i))
-		{
-			funcEachFunc(pMgrSpawnGroupMap->Key(i), pMgrSpawnGroupMap->Element(i));
-		}
-	}
+	return (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)m_pSpawnGroupManager + g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetMgrGameSystemSpawnGroupsOffset());
 }
 
-void EntityManager::CSpawnGroupMgrGameSystemProvider::FastLoopBySpawnGroups(std::function<EachSpawnGroupFunc> funcEachFunc)
+void EntityManager::CSpawnGroupAccessor::SetManager(CSpawnGroupMgrGameSystem *pNewInstance)
 {
-	auto *pMgrSpawnGroupMap = GetSpawnGroups();
-
-	{
-		const int iMaxElement = pMgrSpawnGroupMap->MaxElement();
-
-		for(int i = 0; i < iMaxElement; ++i)
-		{
-			if(pMgrSpawnGroupMap->IsValidIndex(i))
-			{
-				funcEachFunc(pMgrSpawnGroupMap->Key(i), pMgrSpawnGroupMap->Element(i));
-			}
-		}
-	}
+	m_pSpawnGroupManager = pNewInstance;
 }
 
-CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *EntityManager::CSpawnGroupMgrGameSystemProvider::GetSpawnGroups()
+CSpawnGroupMgrGameSystem *EntityManager::CSpawnGroupAccessor::GetManager()
 {
-	return (CUtlMap<SpawnGroupHandle_t, CMapSpawnGroup *> *)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetMgrGameSystemSpawnGroupsOffset());
+	return m_pSpawnGroupManager;
 }
 
 int EntityManager::CLoadingSpawnGroupProvider::AddSpawnInfos(int iCount, const EntitySpawnInfo_t *pEntities)

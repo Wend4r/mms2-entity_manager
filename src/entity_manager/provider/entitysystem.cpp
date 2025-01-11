@@ -3,7 +3,7 @@
 
 #include <entity2/entitykeyvalues.h>
 
-DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
+extern EntityManager::Provider *g_pEntityManagerProvider;
 
 IEntityResourceManifest *EntityManager::CEntitySystemProvider::GetCurrentManifest()
 {

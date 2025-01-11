@@ -22,6 +22,8 @@
 #ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_HPP_
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_HPP_
 
+#include <ientitymgr.hpp>
+#include <entity_manager/path_resolver.hpp>
 #include <entity_manager/provider.hpp>
 #include <entity_manager/provider_agent.hpp>
 #include <entity_manager/settings.hpp>
@@ -41,17 +43,37 @@
 class ISpawnGroup;
 class ISpawnGroupPrerequisiteRegistry;
 
-class EntityManagerPlugin final : public ISmmPlugin, public IMetamodListener
+class EntityManagerPlugin final : public ISmmPlugin, public IMetamodListener, public IEntityManager
 {
 public:
 	EntityManagerPlugin();
 
-public: // IMetamodListener
+public:
+	using IProviderAgent = IEntityManager::IProviderAgent;
+
+public: // ISmmPlugin
 	bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late) override;
 	bool Unload(char *error, size_t maxlen) override;
 	bool Pause(char *error, size_t maxlen) override;
 	bool Unpause(char *error, size_t maxlen) override;
 	void AllPluginsLoaded() override;
+
+public: // ISmmPlugin
+	const char *GetAuthor() override;
+	const char *GetName() override;
+	const char *GetDescription() override;
+	const char *GetURL() override;
+	const char *GetLicense() override;
+	const char *GetVersion() override;
+	const char *GetDate() override;
+	const char *GetLogTag() override;
+
+public: // IMetamodListener
+	void *OnMetamodQuery(const char *iface, int *ret) override;
+
+public: // IEntityManager
+	IProviderAgent *GetProviderAgent() override;
+	CSpawnGroupProvider *GetSpawnGroupProvider() override;
 
 protected:
 	bool InitEntitySystem();
@@ -66,7 +88,7 @@ protected:
 	bool InitGameSystem();
 	void DestroyGameSystem();
 
-	bool InitSpawnGroup();
+	bool InitSpawnGroup(CSpawnGroupMgrGameSystem *pSpawnGroupManager);
 	void DestroySpawnGroup();
 
 	bool HookEvents(char *psError = NULL, size_t nMaxLength = 0);
@@ -83,9 +105,6 @@ public:
 
 protected:
 	bool EraseMyEntity(CEntityInstance *pEntityInst);
-
-private: // Commands.
-	CON_COMMAND_MEMBER_F(EntityManagerPlugin, "mm_" PREFIX_ENTITY_MANAGER "_set_basepath", OnSetBasePathCommand, "Set base path for Entity Manager", FCVAR_LINKED_CONCOMMAND);
 
 public: // SourceHooks.
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *);
@@ -133,17 +152,12 @@ private:
 		void FireGameEvent(IGameEvent *pEvent);
 	};
 
-public: // ISmmPlugin
-	const char *GetAuthor() override;
-	const char *GetName() override;
-	const char *GetDescription() override;
-	const char *GetURL() override;
-	const char *GetLicense() override;
-	const char *GetVersion() override;
-	const char *GetDate() override;
-	const char *GetLogTag() override;
-
 private:
+	// Components.
+	EntityManager::PathResolver m_aPathResolver;
+	EntityManager::Settings m_aSettings;
+	Logger m_aLogger;
+
 	std::string m_sBasePath = "addons" CORRECT_PATH_SEPARATOR_S META_PLUGIN_PREFIX;
 	std::string m_sCurrentMap = "\0";
 
@@ -154,15 +168,12 @@ private:
 	RoundPreStartEvent m_aRoundPreStart;
 	RoundStartEvent m_aRoundStart;
 
-	EntityManager::Settings m_aSettings;
-	Logger m_aLogger;
-
 	int m_iLoadEventsFromFileId;
 };
 
-DLL_IMPORT EntityManagerPlugin *g_pEntityManager;
-DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
-DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
+extern EntityManagerPlugin *g_pEntityManager;
+extern EntityManager::Provider *g_pEntityManagerProvider;
+extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 PLUGIN_GLOBALVARS();
 

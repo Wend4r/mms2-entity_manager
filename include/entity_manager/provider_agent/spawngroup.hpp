@@ -1,47 +1,58 @@
 #ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_AGENT_SPAWNGROUP_HPP_
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_AGENT_SPAWNGROUP_HPP_
 
+#include <ientitymgr.hpp>
 #include <gamesystems/spawngroup_manager.h>
 #include <worldrenderer/icomputeworldorigin.h>
 
-#define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
-
 namespace EntityManager
 {
-	class ISpawnGroupNotifications
+	class CSpawnGroupInstance : public IEntityManager::IProviderAgent::ISpawnGroupInstance, public IComputeWorldOriginCallback
 	{
 	public:
-		virtual void NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup) = 0;
-		virtual void NotifyDestroySpawnGroup(SpawnGroupHandle_t handle) = 0;
-	};
+		~CSpawnGroupInstance() override;
 
-	class SpawnGroup : public ISpawnGroupNotifications, public IComputeWorldOriginCallback
-	{
 	public:
-		~SpawnGroup();
-
-		int GetStatus() const;
 		static bool IsResidentOrStreaming(SpawnGroupHandle_t hSpawnGroup);
-		SpawnGroupHandle_t GetAllocatedSpawnGroup() const;
-		const char *GetLevelName() const;
-		const char *GetLandmarkName() const;
-		const Vector &GetLandmarkOffset() const;
 
-		bool Start(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset);
-		bool Unload();
+	public: // IEntityManager::IProviderAgent::ISpawnGroupLoader
+		bool Load(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset) override;
+		bool Unload() override;
 
-	public:
-		void NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
-		void NotifyDestroySpawnGroup(SpawnGroupHandle_t handle);
+	public: // IEntityManager::IProviderAgent::ISpawnGroupNotifications
+		void OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup) override;
+		void OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) override;
+		void OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues) override;
+		void OnSpawnGroupDestroyed(SpawnGroupHandle_t hSpawnGroup) override;
+
+	public: // IEntityManager::IProviderAgent::ISpawnGroupCallbacks
+		void AddNotificationsListener(ISpawnGroupNotifications *pNotifications) override;
+		bool RemoveNotificationsListener(ISpawnGroupNotifications *pNotifications) override;
+
+	public: // IEntityManager::IProviderAgent::ISpawnGroupInstance
+		int GetStatus() const override;
+		ISpawnGroup *GetSpawnGroup() const override;
+		CMapSpawnGroup *GetMapSpawnGroup() const override;
+		SpawnGroupHandle_t GetSpawnGroupHandle() const override;
+		const char *GetLevelName() const override;
+		const char *GetLandmarkName() const override;
+		const char *GetLocalFixupName() const override;
+		const Vector &GetLandmarkOffset() const override;
 
 	public: // IComputeWorldOriginCallback
-		matrix3x4_t ComputeWorldOrigin(const char *pWorldName, SpawnGroupHandle_t hSpawnGroup, IWorld *pWorld);
+		matrix3x4_t ComputeWorldOrigin(const char *pWorldName, SpawnGroupHandle_t hSpawnGroup, IWorld *pWorld) override;
 
 	private:
+		ISpawnGroup *m_pSpawnGroup = NULL;
+		CMapSpawnGroup *m_pMapSpawnGroup = NULL;
 		SpawnGroupHandle_t m_hSpawnGroup = INVALID_SPAWN_GROUP;
 		CUtlString m_sLevelName;
 		CUtlString m_sLandmarkName;
+		CUtlString m_sLocalFixupName;
 		Vector m_vecLandmarkOffset;
+
+	private:
+		CUtlVector<ISpawnGroupNotifications *> m_vecNotificationsCallbacks;
 	};
 };
 

@@ -12,6 +12,8 @@
 #include <tier1/utlvector.h>
 
 #include "logger.hpp"
+
+#include <ientitymgr.hpp>
 #include "provider_agent/resourcemanifest.hpp"
 #include "provider_agent/spawngroup.hpp"
 
@@ -23,9 +25,12 @@ class CEntityKeyValues;
 
 namespace EntityManager
 {
-	class ProviderAgent : public ISpawnGroupNotifications
+	class ProviderAgent : public IEntityManager::IProviderAgent, public IEntityManager::IProviderAgent::ISpawnGroupNotifications
 	{
 		using This = ProviderAgent;
+
+	public:
+		using ISpawnGroupInstance = IEntityManager::IProviderAgent::ISpawnGroupInstance;
 
 	public:
 		ProviderAgent();
@@ -35,43 +40,50 @@ namespace EntityManager
 		void Destroy();
 
 	public:
-		CUtlSymbolLarge AllocPooledString(const char *pString);
-		CUtlSymbolLarge FindPooledString(const char* pString);
-
-	public:
 		virtual bool NotifyGameResourceUpdated();
 		virtual bool NotifyGameSystemUpdated();
 		virtual bool NotifyEntitySystemUpdated();
 		virtual bool NotifyGameEventsUpdated();
-		virtual bool NotifySpawnGroupMgrUpdated();
+		virtual bool NotifySpawnGroupMgrUpdated(CSpawnGroupMgrGameSystem *pSpawnGroupManager = NULL);
+
+	public: // IEntityManager::IProviderAgent
+		CGameEntitySystem *GetSystem() override;
 
 	public:
 		bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset);
-		IEntityResourceManifest *GetMyEntityManifest();
+		IEntityResourceManifest *GetResouceManifest();
 
 	public:
-		bool CreateSpawnGroup(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset);
+		void AddResourceToEntityManifest(IEntityResourceManifest *pManifest, const char *pszPath) override;
+
+	public:
+		ISpawnGroupInstance *CreateSpawnGroup() override;
+		bool ReleaseSpawnGroup(ISpawnGroupInstance *pSpawnGroup) override;
+
+	protected:
 		void ReleaseSpawnGroups();
 
-	public: // ISpawnGroupNotifications
-		void NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup);
-		void NotifyDestroySpawnGroup(SpawnGroupHandle_t handle);
+	public: // IEntityManager::IProviderAgent::ISpawnGroupNotifications
+		void OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup) override;
+		void OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) override;
+		void OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues) override;
+		void OnSpawnGroupDestroyed(SpawnGroupHandle_t handle) override;
 
 	public: // Spawn queue methods.
-		void PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pWarnings = nullptr);
-		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
-		int AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
-		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues);
-		bool HasInSpawnQueue(SpawnGroupHandle_t hSpawnGroup);
-		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP);
-		int SpawnQueued(SpawnGroupHandle_t hSpawnGroup = INVALID_SPAWN_GROUP, Logger::Scope *pDetails = nullptr, Logger::Scope *pWarnings = nullptr);
+		void PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
+		void PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
+		int CopySpawnQueueWithEntitySystemOwnership(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
+		bool HasInSpawnQueue(const CEntityKeyValues *pKeyValues, SpawnGroupHandle_t *pResultHandle = nullptr) override;
+		bool HasInSpawnQueue(SpawnGroupHandle_t hSpawnGroup) override;
+		int ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP) override;
+		int ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup = ANY_SPAWN_GROUP, CUtlVector<CEntityInstance *> *pEntities = nullptr, IEntityListener *pListener = nullptr, CUtlVector<CUtlString> *pDetails = nullptr, CUtlVector<CUtlString> *pWarnings = nullptr) override;
 
 	public: // Destroy queue methods.
-		void PushDestroyQueue(CEntityInstance *pEntity);
-		void PushDestroyQueue(CEntityIdentity *pEntity);
-		int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> &vecTarget);
-		void ReleaseDestroyQueued();
-		int DestroyQueued();
+		void PushDestroyQueue(CEntityInstance *pEntity) override;
+		void PushDestroyQueue(CEntityIdentity *pEntity) override;
+		int AddDestroyQueueToTail(CUtlVector<const CEntityIdentity *> &vecTarget) override;
+		void ReleaseDestroyQueued() override;
+		int ExecuteDestroyQueued() override;
 
 	public: // Dumps.
 		enum DumpEntityKeyValuesFlags_t : uint8
@@ -98,10 +110,9 @@ namespace EntityManager
 			SpawnData(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup);
 			~SpawnData();
 
-			CEntityKeyValues *GetKeyValues() const;
+			const CEntityKeyValues *GetKeyValues() const;
 
 			SpawnGroupHandle_t GetSpawnGroup() const;
-			static SpawnGroupHandle_t GetAnySpawnGroup();
 			bool IsAnySpawnGroup() const;
 
 			void Release();
@@ -133,7 +144,7 @@ namespace EntityManager
 		CUtlVector<DestoryData> m_vecEntityDestroyQueue;
 
 		ResourceManifest m_aResourceManifest;
-		CUtlVector<SpawnGroup *> m_vecSpawnGroups;
+		CUtlVector<ISpawnGroupInstance *> m_vecSpawnGroups;
 	};
 };
 

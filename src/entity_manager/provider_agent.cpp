@@ -1,5 +1,6 @@
 #include <entity_manager/provider/entitysystem.hpp>
 #include <entity_manager/provider/source2server.hpp>
+#include <entity_manager/provider/spawngroup.hpp>
 #include <entity_manager/provider_agent.hpp>
 #include <entity_manager/provider.hpp>
 
@@ -14,18 +15,19 @@
 #include <tier1/generichash.h>
 #include <tier1/keyvalues3.h>
 
-DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
+extern EntityManager::Provider *g_pEntityManagerProvider;
+extern EntityManager::CSpawnGroupAccessor *g_pEntityManagerSpawnGroup;
 
-DLL_IMPORT IServerGameDLL *server;
-DLL_IMPORT IGameEventManager2 *gameeventmanager;
+extern IServerGameDLL *server;
+extern IGameEventManager2 *gameeventmanager;
 
-DLL_EXPORT CEntitySystem *g_pEntitySystem = NULL;
-DLL_EXPORT CGameEntitySystem *g_pGameEntitySystem = NULL;
+CEntitySystem *g_pEntitySystem = NULL;
+CGameEntitySystem *g_pGameEntitySystem = NULL;
 
 CBaseGameSystemFactory **CBaseGameSystemFactory::sm_pFirst = NULL;
 
-DLL_EXPORT CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem = NULL;
-DLL_EXPORT CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
+CBaseGameSystemFactory *g_pGSFactoryCSpawnGroupMgrGameSystem = NULL;
+CSpawnGroupMgrGameSystem *g_pSpawnGroupMgr = NULL;
 
 EntityManager::ProviderAgent::ProviderAgent()
 {
@@ -46,16 +48,6 @@ void EntityManager::ProviderAgent::Clear()
 void EntityManager::ProviderAgent::Destroy()
 {
 	Clear();
-}
-
-CUtlSymbolLarge EntityManager::ProviderAgent::AllocPooledString(const char *pString)
-{
-	return g_pEntitySystem->AllocPooledString(pString);
-}
-
-CUtlSymbolLarge EntityManager::ProviderAgent::FindPooledString(const char* pString)
-{
-	return g_pEntitySystem->FindPooledString(pString);
 }
 
 bool EntityManager::ProviderAgent::NotifyGameResourceUpdated()
@@ -92,7 +84,7 @@ bool EntityManager::ProviderAgent::NotifyGameEventsUpdated()
 	return (gameeventmanager = *(IGameEventManager2 **)g_pEntityManagerProvider->GetGameDataStorage().GetSource2Server().GetGameEventManagerPtr()) != NULL;
 }
 
-bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()
+bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated(CSpawnGroupMgrGameSystem *pSpawnGroupManager)
 {
 	// bool bResult = (g_pSpawnGroupMgr = static_cast<decltype(g_pSpawnGroupMgr)>(g_pGSFactoryCSpawnGroupMgrGameSystem->GetStaticGameSystem())) != NULL;
 
@@ -103,7 +95,19 @@ bool EntityManager::ProviderAgent::NotifySpawnGroupMgrUpdated()
 
 	// return bResult;
 
-	return (g_pSpawnGroupMgr = *g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetSpawnGroupMgrAddress()) != NULL;
+	auto *pSpawnGroupManagerResult = pSpawnGroupManager ? pSpawnGroupManager : *g_pEntityManagerProvider->GetGameDataStorage().GetSpawnGroup().GetSpawnGroupMgrAddress();
+
+	g_pSpawnGroupMgr = pSpawnGroupManagerResult;
+	g_pEntityManagerSpawnGroup->SetManager(pSpawnGroupManagerResult);
+
+	return pSpawnGroupManagerResult != NULL;
+}
+
+CGameEntitySystem *EntityManager::ProviderAgent::GetSystem()
+{
+	NotifyEntitySystemUpdated();
+
+	return g_pGameEntitySystem;
 }
 
 bool EntityManager::ProviderAgent::ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset)
@@ -111,23 +115,31 @@ bool EntityManager::ProviderAgent::ErectResourceManifest(ISpawnGroup *pSpawnGrou
 	return m_aResourceManifest.Erect(pSpawnGroup, nCount, pEntities, vWorldOffset);
 }
 
-IEntityResourceManifest *EntityManager::ProviderAgent::GetMyEntityManifest()
+IEntityResourceManifest *EntityManager::ProviderAgent::GetResouceManifest()
 {
 	return m_aResourceManifest.GetEntityPart();
 }
 
-bool EntityManager::ProviderAgent::CreateSpawnGroup(const SpawnGroupDesc_t &aDesc, const Vector &vecLandmarkOffset)
+void EntityManager::ProviderAgent::AddResourceToEntityManifest(IEntityResourceManifest *pManifest, const char *pszPath)
 {
-	SpawnGroup *aSpawnGroup = new SpawnGroup();
+	g_pEntityManagerProvider->GetGameDataStorage().GetEntityResourceManifest().AddResource(pManifest, pszPath);
+}
 
-	bool bResult = aSpawnGroup->Start(aDesc, vecLandmarkOffset);
+EntityManager::ProviderAgent::ISpawnGroupInstance *EntityManager::ProviderAgent::CreateSpawnGroup()
+{
+	CSpawnGroupInstance *pSpawnGroup = new CSpawnGroupInstance();
 
-	if(bResult)
+	if(pSpawnGroup)
 	{
-		m_vecSpawnGroups.AddToTail(aSpawnGroup);
+		m_vecSpawnGroups.AddToTail(pSpawnGroup);
 	}
 
-	return bResult;
+	return dynamic_cast<IEntityManager::IProviderAgent::ISpawnGroupInstance *>(pSpawnGroup);
+}
+
+bool EntityManager::ProviderAgent::ReleaseSpawnGroup(EntityManager::ProviderAgent::ISpawnGroupInstance *pSpawnGroup)
+{
+	return m_vecSpawnGroups.FindAndFastRemove(pSpawnGroup);
 }
 
 void EntityManager::ProviderAgent::ReleaseSpawnGroups()
@@ -135,35 +147,64 @@ void EntityManager::ProviderAgent::ReleaseSpawnGroups()
 	m_vecSpawnGroups.PurgeAndDeleteElements();
 }
 
-void EntityManager::ProviderAgent::NotifyAllocateSpawnGroup(SpawnGroupHandle_t handle, ISpawnGroup *pSpawnGroup)
+void EntityManager::ProviderAgent::OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup)
 {
-	const char *pWorldName = pSpawnGroup->GetWorldName();
+	const char *pSpawnGroupLocalNameFixup = pSpawnGroup->GetLocalNameFixup();
 
-	if(pWorldName && pWorldName[0])
+	if(pSpawnGroupLocalNameFixup && pSpawnGroupLocalNameFixup[0])
 	{
 		for(int i = 0; i < m_vecSpawnGroups.Count(); i++)
 		{
-			SpawnGroup *pSpawnGroupAgent = m_vecSpawnGroups[i];
+			ISpawnGroupInstance *pSpawnGroupAgent = m_vecSpawnGroups[i];
 
-			const char *pLevelName = pSpawnGroupAgent->GetLevelName();
+			const char *pLocalFixupName = pSpawnGroupAgent->GetLocalFixupName();
 
-			if(pLevelName && pLevelName[0] && !V_strcmp(pWorldName, pLevelName))
+			if(pLocalFixupName && pLocalFixupName[0] && !V_strcmp(pSpawnGroupLocalNameFixup, pLocalFixupName))
 			{
-				pSpawnGroupAgent->NotifyAllocateSpawnGroup(handle, pSpawnGroup);
+				pSpawnGroupAgent->OnSpawnGroupAllocated(hSpawnGroup, pSpawnGroup);
 			}
 		}
 	}
 }
 
-void EntityManager::ProviderAgent::NotifyDestroySpawnGroup(SpawnGroupHandle_t handle)
+void EntityManager::ProviderAgent::OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry)
 {
-	for(int i = 0; i < m_vecSpawnGroups.Count(); i++)
+	for(auto *pSpawnGroupAgent : m_vecSpawnGroups)
 	{
-		SpawnGroup *pSpawnGroupAgent = m_vecSpawnGroups[i];
-
-		if(handle == pSpawnGroupAgent->GetAllocatedSpawnGroup())
+		if(hSpawnGroup == pSpawnGroupAgent->GetSpawnGroupHandle())
 		{
-			pSpawnGroupAgent->NotifyDestroySpawnGroup(handle);
+			pSpawnGroupAgent->OnSpawnGroupInit(hSpawnGroup, pManifest, pConfig, pRegistry);
+		}
+	}
+}
+
+void EntityManager::ProviderAgent::OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues)
+{
+	const char *pSpawnGroupLocalNameFixup = pMapSpawnGroup->GetLocalNameFixup();
+
+	if(pSpawnGroupLocalNameFixup && pSpawnGroupLocalNameFixup[0])
+	{
+		for(auto *pSpawnGroupAgent : m_vecSpawnGroups)
+		{
+			const char *pLocalFixupName = pSpawnGroupAgent->GetLocalFixupName();
+
+			if(pLocalFixupName && pLocalFixupName[0] && !V_strcmp(pSpawnGroupLocalNameFixup, pLocalFixupName))
+			{
+				pSpawnGroupAgent->OnSpawnGroupCreateLoading(hSpawnGroup, pMapSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, vecKeyValues);
+			}
+		}
+	}
+}
+
+void EntityManager::ProviderAgent::OnSpawnGroupDestroyed(SpawnGroupHandle_t handle)
+{
+	FOR_EACH_VEC(m_vecSpawnGroups, i)
+	{
+		ISpawnGroupInstance *pSpawnGroupAgent = m_vecSpawnGroups[i];
+
+		if(handle == pSpawnGroupAgent->GetSpawnGroupHandle())
+		{
+			pSpawnGroupAgent->OnSpawnGroupDestroyed(handle);
 
 			delete pSpawnGroupAgent;
 			m_vecSpawnGroups.FastRemove(i);
@@ -171,9 +212,9 @@ void EntityManager::ProviderAgent::NotifyDestroySpawnGroup(SpawnGroupHandle_t ha
 	}
 }
 
-void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup, Logger::Scope *pWarnings)
+void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGroupHandle_t hSpawnGroup)
 {
-	CEntityKeyValues *pNewKeyValues = new CEntityKeyValues(/* (CEntitySystemProvider *)g_pGameEntitySystem)->GetKeyValuesContextAllocator(), EKV_ALLOCATOR_EXTERNAL */ &m_aEntityAllocator, EKV_ALLOCATOR_EXTERNAL);
+	CEntityKeyValues *pNewKeyValues = new CEntityKeyValues(&m_aEntityAllocator, EKV_ALLOCATOR_EXTERNAL);
 
 	// Parse attributes.
 	{
@@ -185,24 +226,16 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 		{
 			FOR_EACH_VALUE(pAttributeValues, pAttrKeyValue)
 			{
-				const char *pszAttrKey = pAttrKeyValue->GetName();
-
-				const EntityKeyId_t &aAttrKey {MakeStringToken(pszAttrKey).GetHashCode(), pszAttrKey};
-
-				pNewKeyValues->SetString(aAttrKey, pAttrKeyValue->GetString(), true);
+				pNewKeyValues->SetString(CKV3MemberName::Make(pAttrKeyValue->GetName()), pAttrKeyValue->GetString(), true);
 			}
 
-			pOldOne->RemoveSubKey(pAttributeValues, true, true);
+			// pOldOne->RemoveSubKey(pAttributeValues, true, true);
 		}
 	}
 
 	FOR_EACH_VALUE(pOldOne, pKeyValue)
 	{
-		const char *pszKey = pKeyValue->GetName();
-
-		const EntityKeyId_t &aKey {MakeStringToken(pszKey).GetHashCode(), pszKey};
-
-		pNewKeyValues->SetString(aKey, pKeyValue->GetString());
+		pNewKeyValues->SetString(CKV3MemberName::Make(pKeyValue->GetName()), pKeyValue->GetString());
 	}
 
 	PushSpawnQueue(pNewKeyValues, hSpawnGroup);
@@ -210,62 +243,32 @@ void EntityManager::ProviderAgent::PushSpawnQueueOld(KeyValues *pOldOne, SpawnGr
 
 void EntityManager::ProviderAgent::PushSpawnQueue(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup)
 {
-	g_pGameEntitySystem->AddRefKeyValues(pKeyValues);
+	SpawnData aSpawn {pKeyValues, hSpawnGroup};
 
-	m_vecEntitySpawnQueue.AddToTail({pKeyValues, hSpawnGroup});
+	pKeyValues->AddRef();
+	m_vecEntitySpawnQueue.AddToTail(aSpawn);
 }
 
-int EntityManager::ProviderAgent::AddSpawnQueueToTail(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup)
+int EntityManager::ProviderAgent::CopySpawnQueueWithEntitySystemOwnership(CUtlVector<const CEntityKeyValues *> &vecTarget, SpawnGroupHandle_t hSpawnGroup)
 {
-	const auto &vecEntitySpawnQueue = m_vecEntitySpawnQueue;
+	const int nOldCount = vecTarget.Count();
 
-	int iQueueLength = vecEntitySpawnQueue.Count();
-
-	CEntityKeyValues **ppKeyValuesArr = (CEntityKeyValues **)MemAlloc_Alloc(iQueueLength * sizeof(CEntityKeyValues *));
-
-	// Fill ppKeyValuesArr from .
+	for(const auto &aSpawnEntity : m_vecEntitySpawnQueue)
 	{
-		CEntityKeyValues **ppKeyValuesCur = ppKeyValuesArr;
-
-		if(hSpawnGroup == SpawnData::GetAnySpawnGroup())
+		if(hSpawnGroup == ANY_SPAWN_GROUP || hSpawnGroup == aSpawnEntity.GetSpawnGroup())
 		{
-			for(int i = 0; i < iQueueLength; i++)
-			{
-				CEntityKeyValues *pKeyValues = vecEntitySpawnQueue[i].GetKeyValues();
+			CEntityKeyValues *pESKeyValues = new CEntityKeyValues(g_pGameEntitySystem->GetEntityKeyValuesAllocator(), EKV_ALLOCATOR_EXTERNAL);
 
-				g_pGameEntitySystem->AddRefKeyValues(pKeyValues);
-
-				*ppKeyValuesCur = pKeyValues;
-				ppKeyValuesCur++;
-			}
-		}
-		else
-		{
-			for(int i = 0; i < iQueueLength; i++)
-			{
-				const auto &aSpawn = vecEntitySpawnQueue[i];
-
-				if(hSpawnGroup == aSpawn.GetSpawnGroup())
-				{
-					CEntityKeyValues *pKeyValues = aSpawn.GetKeyValues();
-
-					g_pGameEntitySystem->AddRefKeyValues(pKeyValues);
-
-					*ppKeyValuesCur = pKeyValues;
-					ppKeyValuesCur++;
-				}
-			}
+			pESKeyValues->CopyFrom(aSpawnEntity.GetKeyValues());
+			g_pGameEntitySystem->AddRefKeyValues(pESKeyValues);
+			vecTarget.AddToTail(pESKeyValues);
 		}
 	}
 
-	int iResult = vecTarget.AddMultipleToTail(iQueueLength, ppKeyValuesArr);
-
-	MemAlloc_Free(ppKeyValuesArr);
-
-	return iResult;
+	return vecTarget.Count() - nOldCount;
 }
 
-bool EntityManager::ProviderAgent::HasInSpawnQueue(const CEntityKeyValues *pKeyValues)
+bool EntityManager::ProviderAgent::HasInSpawnQueue(const CEntityKeyValues *pKeyValues, SpawnGroupHandle_t *pResultHandle)
 {
 	FOR_EACH_VEC(m_vecEntitySpawnQueue, i)
 	{
@@ -273,6 +276,11 @@ bool EntityManager::ProviderAgent::HasInSpawnQueue(const CEntityKeyValues *pKeyV
 
 		if(aSpawn.GetKeyValues() == pKeyValues)
 		{
+			if(pResultHandle)
+			{
+				*pResultHandle = aSpawn.GetSpawnGroup();
+			}
+
 			return true;
 		}
 	}
@@ -299,53 +307,48 @@ int EntityManager::ProviderAgent::ReleaseSpawnQueued(SpawnGroupHandle_t hSpawnGr
 {
 	auto &vecEntitySpawnQueue = m_vecEntitySpawnQueue;
 
-	const int iQueueLengthBefore = vecEntitySpawnQueue.Count();
+	const int nOldCount = vecEntitySpawnQueue.Count();
 
 	// Find and fast remove.
 	{
-		if(hSpawnGroup == SpawnData::GetAnySpawnGroup())
+		if(hSpawnGroup == ANY_SPAWN_GROUP)
 		{
-			vecEntitySpawnQueue.RemoveAll();
+			vecEntitySpawnQueue.Purge();
 		}
 		else
 		{
-			for(int i = 0; i < vecEntitySpawnQueue.Count(); i++)
+			FOR_EACH_VEC_BACK(vecEntitySpawnQueue, i)
 			{
 				auto &aSpawn = vecEntitySpawnQueue[i];
 
 				if(hSpawnGroup == aSpawn.GetSpawnGroup())
 				{
 					vecEntitySpawnQueue.FastRemove(i);
-					i--;
 				}
 			}
 		}
 	}
 
-	return iQueueLengthBefore - vecEntitySpawnQueue.Count();
+	return vecEntitySpawnQueue.Count() - nOldCount;
 }
 
-int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup, Logger::Scope *pDetails, Logger::Scope *pWarnings)
+int EntityManager::ProviderAgent::ExecuteSpawnQueued(SpawnGroupHandle_t hSpawnGroup, CUtlVector<CEntityInstance *> *pEntities, IEntityListener *pListener, CUtlVector<CUtlString> *pDetails, CUtlVector<CUtlString> *pWarnings)
 {
+	int nExecutedQueueLength = 0;
+
 	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
-
-	auto &vecEntitySpawnQueue = m_vecEntitySpawnQueue;
-
-	const int iQueueLength = vecEntitySpawnQueue.Count();
-
-	const char szClassnameKey[] = "classname";
 
 	const CEntityIndex iForceEdictIndex = CEntityIndex(-1);
 
-	const EntityKeyId_t aClassnameKey {MakeStringToken(szClassnameKey).GetHashCode(), szClassnameKey};
+	const EntityKeyId_t aClassnameKey {"classname"};
 
-	for(int i = 0; i < iQueueLength; i++)
+	CBufferStringGrowable<256> sBuffer;
+
+	for(const auto &aSpawn : m_vecEntitySpawnQueue)
 	{
-		const auto &aSpawn = vecEntitySpawnQueue[i];
-
-		if(hSpawnGroup == SpawnData::GetAnySpawnGroup() || hSpawnGroup == aSpawn.GetSpawnGroup())
+		if(hSpawnGroup == ANY_SPAWN_GROUP || hSpawnGroup == aSpawn.GetSpawnGroup())
 		{
-			CEntityKeyValues *pKeyValues = aSpawn.GetKeyValues();
+			const auto *pKeyValues = aSpawn.GetKeyValues();
 
 			if(pKeyValues)
 			{
@@ -355,40 +358,55 @@ int EntityManager::ProviderAgent::SpawnQueued(SpawnGroupHandle_t hSpawnGroup, Lo
 				{
 					CEntityInstance *pEntity = pEntitySystem->CreateEntity(aSpawn.GetSpawnGroup(), pszClassname, ENTITY_NETWORKING_MODE_DEFAULT, iForceEdictIndex, -1, false);
 
+					if(pEntities)
+					{
+						pEntities->AddToTail(pEntity);
+					}
+
+					if(pListener)
+					{
+						pListener->OnEntityCreated(pEntity, pKeyValues);
+					}
+
 					if(pEntity)
 					{
 						if(pDetails)
 						{
-							pDetails->PushFormat("Created \"%s\" (force edict index is %d, result index is %d) entity", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+							sBuffer.Format("Created \"%s\" (force edict index is %d, result index is %d) entity", pszClassname, iForceEdictIndex.Get(), pEntity->m_pEntity->m_EHandle.GetEntryIndex());
+							pDetails->AddToTail(sBuffer);
 						}
 
 						pEntitySystem->QueueSpawnEntity(pEntity->m_pEntity, pKeyValues);
+						nExecutedQueueLength++;
 					}
 					else if(pWarnings)
 					{
-						pWarnings->PushFormat("Failed to create \"%s\" entity (queue number is %d)", pszClassname, i);
+						sBuffer.Format("Failed to create \"%s\" entity", pszClassname);
+						pWarnings->AddToTail(sBuffer);
 					}
 				}
 				else if(pWarnings)
 				{
-					pWarnings->PushFormat("Empty entity \"%s\" key (queue number is %d)", aClassnameKey.GetString(), i);
+					sBuffer.Format("Empty entity \"%s\" key", pszClassname);
+					pWarnings->AddToTail(sBuffer);
 				}
 			}
 			else if(pWarnings)
 			{
-				pWarnings->PushFormat("Failed to get \"%s\" entity key (queue number is %d)", aClassnameKey.GetString(), i);
+				sBuffer.Format("Empty entity \"%s\" key", aClassnameKey.GetString());
+				pWarnings->AddToTail(sBuffer);
 			}
 		}
 	}
 
-	if(pWarnings && pWarnings->Count() < m_vecEntitySpawnQueue.Count())
+	if(!pWarnings || pWarnings->Count() < m_vecEntitySpawnQueue.Count())
 	{
 		pEntitySystem->ExecuteQueuedCreation();
 	}
 
-	ReleaseSpawnQueued();
+	ReleaseSpawnQueued(hSpawnGroup);
 
-	return iQueueLength;
+	return nExecutedQueueLength;
 }
 
 void EntityManager::ProviderAgent::PushDestroyQueue(CEntityInstance *pEntity)
@@ -430,7 +448,7 @@ void EntityManager::ProviderAgent::ReleaseDestroyQueued()
 	m_vecEntityDestroyQueue.Purge();
 }
 
-int EntityManager::ProviderAgent::DestroyQueued()
+int EntityManager::ProviderAgent::ExecuteDestroyQueued()
 {
 	CEntitySystemProvider *pEntitySystem = (CEntitySystemProvider *)g_pGameEntitySystem;
 
@@ -663,8 +681,11 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "\"entity:%d:%s\"" : "\"entity:%d\"", iIndex, pszClassname);
 				}
 				default:
-					AssertMsg1(0, "KV3: Unrealized int subtype is %d\n", pMember->GetSubType());
-					return 0;
+				{
+					// AssertMsg1(0, "KV3: Unrealized int subtype is %d\n", pMember->GetSubType());
+					// return 0;
+					break;
+				}
 			}
 			break;
 		case KV3_TYPEEX_UINT:
@@ -710,8 +731,11 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 					return V_snprintf(psBuffer, nMaxLength, pszClassname && pszClassname[0] ? "\"entity:%d:%s\"" : "\"entity:%d\"", iIndex, pszClassname);
 				}
 				default:
-					AssertMsg1(0, "KV3: Unrealized uint subtype is %d\n", pMember->GetSubType());
-					return 0;
+				{
+					// AssertMsg1(0, "KV3: Unrealized uint subtype is %d\n", pMember->GetSubType());
+					// return 0;
+					break;
+				}
 			}
 			break;
 		case KV3_TYPEEX_DOUBLE:
@@ -723,16 +747,17 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 					return V_snprintf(psBuffer, nMaxLength, "%g", pMember->GetDouble());
 				default:
 				{
-					AssertMsg1(0, "KV3: Unrealized double subtype is %d\n", pMember->GetSubType());
-					return 0;
+					// AssertMsg1(0, "KV3: Unrealized double subtype is %d\n", pMember->GetSubType());
+					// return 0;
+					break;
 				}
 			}
 			break;
 		case KV3_TYPEEX_STRING:
 		case KV3_TYPEEX_STRING_SHORT:
 		case KV3_TYPEEX_STRING_EXTERN:
-		case KV3_TYPEEX_BINARY_BLOB:
-		case KV3_TYPEEX_BINARY_BLOB_EXTERN:
+		// case KV3_TYPEEX_BINARY_BLOB:
+		// case KV3_TYPEEX_BINARY_BLOB_EXTERN:
 			return V_snprintf(psBuffer, nMaxLength, "\"%s\"", pMember->GetString());
 		case KV3_TYPEEX_ARRAY:
 		case KV3_TYPEEX_ARRAY_FLOAT32:
@@ -751,31 +776,34 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 					{
 						KeyValues3 **pArray = pMember->GetArrayBase();
 
-						const int iArrayLength = pMember->GetArrayElementCount();
-
-						if(iArrayLength > 0)
+						if(pArray)
 						{
-							psBuffer[0] = '[';
-							iBufCur = 1;
+							const int iArrayLength = pMember->GetArrayElementCount();
 
-							int i = 0;
-
-							char *pArrayBuf = (char *)stackalloc(nMaxLength);
-
-							do
+							if(iArrayLength > 0)
 							{
-								if(ProviderAgent::DumpEntityKeyValue(pArray[i], pArrayBuf, nMaxLength))
+								psBuffer[0] = '[';
+								iBufCur = 1;
+
+								int i = 0;
+
+								char *pArrayBuf = (char *)stackalloc(nMaxLength);
+
+								do
 								{
-									iBufCur += V_snprintf(&psBuffer[iBufCur], nMaxLength - iBufCur, "%s, ", pArrayBuf);
+									if(ProviderAgent::DumpEntityKeyValue(pArray[i], pArrayBuf, nMaxLength))
+									{
+										iBufCur += V_snprintf(&psBuffer[iBufCur], nMaxLength - iBufCur, "%s, ", pArrayBuf);
+									}
+
+									i++;
 								}
+								while(i < iArrayLength);
 
-								i++;
+								iBufCur -= 2; // Strip ", " of end.
+								psBuffer[iBufCur++] = ']';
+								psBuffer[iBufCur] = '\0';
 							}
-							while(i < iArrayLength);
-
-							iBufCur -= 2; // Strip ", " of end.
-							psBuffer[iBufCur++] = ']';
-							psBuffer[iBufCur] = '\0';
 						}
 					}
 
@@ -813,8 +841,10 @@ int EntityManager::ProviderAgent::DumpEntityKeyValue(KeyValues3 *pMember, char *
 					                                        aMatrix3x4.m_flMatVal[2][0], aMatrix3x4.m_flMatVal[2][1], aMatrix3x4.m_flMatVal[2][2], aMatrix3x4.m_flMatVal[2][3]);
 				}
 				default:
-					AssertMsg1(0, "KV3: Unrealized array subtype is %d", pMember->GetSubType());
+				{
+					// AssertMsg1(0, "KV3: Unrealized array subtype is %d", pMember->GetSubType());
 					return 0;
+				}
 			}
 			break;
 		default:
@@ -839,17 +869,15 @@ bool EntityManager::ProviderAgent::MakeDumpColorAlpha(Color &rgba)
 }
 
 EntityManager::ProviderAgent::SpawnData::SpawnData(CEntityKeyValues *pKeyValues)
+ :  SpawnData(pKeyValues, ANY_SPAWN_GROUP)
 {
-	pKeyValues->AddRef();
-	m_pKeyValues = pKeyValues;
-	m_hSpawnGroup = ThisClass::GetAnySpawnGroup();
 }
 
 EntityManager::ProviderAgent::SpawnData::SpawnData(CEntityKeyValues *pKeyValues, SpawnGroupHandle_t hSpawnGroup)
+ :  m_pKeyValues(pKeyValues),
+    m_hSpawnGroup(hSpawnGroup)
 {
 	pKeyValues->AddRef();
-	m_pKeyValues = pKeyValues;
-	m_hSpawnGroup = hSpawnGroup;
 }
 
 EntityManager::ProviderAgent::SpawnData::~SpawnData()
@@ -857,7 +885,7 @@ EntityManager::ProviderAgent::SpawnData::~SpawnData()
 	Release();
 }
 
-CEntityKeyValues *EntityManager::ProviderAgent::SpawnData::GetKeyValues() const
+const CEntityKeyValues *EntityManager::ProviderAgent::SpawnData::GetKeyValues() const
 {
 	return m_pKeyValues;
 }
@@ -867,19 +895,14 @@ SpawnGroupHandle_t EntityManager::ProviderAgent::SpawnData::GetSpawnGroup() cons
 	return m_hSpawnGroup;
 }
 
-SpawnGroupHandle_t EntityManager::ProviderAgent::SpawnData::GetAnySpawnGroup()
-{
-	return INVALID_SPAWN_GROUP;
-}
-
 bool EntityManager::ProviderAgent::SpawnData::IsAnySpawnGroup() const
 {
-	return GetSpawnGroup() == ThisClass::GetAnySpawnGroup();
+	return GetSpawnGroup() == ANY_SPAWN_GROUP;
 }
 
 void EntityManager::ProviderAgent::SpawnData::Release()
 {
-	GetKeyValues()->Release();
+	m_pKeyValues->Release();
 }
 
 EntityManager::ProviderAgent::DestoryData::DestoryData(CEntityInstance *pInstance)

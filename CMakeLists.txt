@@ -10,7 +10,7 @@ endif()
 
 
 project(mms2-entity_manager
-	VERSION 1.0.2
+	VERSION 1.0.3
 	DESCRIPTION "Entity Manager"
 	HOMEPAGE_URL "https://github.com/Wend4r/mms2-entity_manager"
 	LANGUAGES C CXX ASM
@@ -32,6 +32,12 @@ set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(SOURCE_PROJECT_DIR "${SOURCE_DIR}/${PROJECT_NAME_SUBSTRING}")
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(PUBLIC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/public")
+
+set(INCLUDE_DIRS
+	${INCLUDE_DIR}
+	${PUBLIC_DIR}
+)
 
 function(set_or_external_dir VAR_NAME DEFAULT_DIR)
 	if(${VAR_NAME})
@@ -59,12 +65,6 @@ set(SOURCESDK_PROTOS
 
 include(cmake/platform/shared.cmake)
 
-if(LINUX)
-	include(cmake/platform/linux.cmake)
-elseif(WINDOWS)
-	include(cmake/platform/windows.cmake)
-endif()
-
 # Libraries.
 include(cmake/any_config.cmake)
 include(cmake/dynlibutils.cmake)
@@ -76,6 +76,7 @@ include(cmake/sourcesdk.cmake)
 set(SOURCE_FILES
 	${SOURCE_PROJECT_DIR}/provider_agent/resourcemanifest.cpp
 	${SOURCE_PROJECT_DIR}/provider_agent/spawngroup.cpp
+	${SOURCE_PROJECT_DIR}/provider/gamedata/entityresourcemanifest.cpp
 	${SOURCE_PROJECT_DIR}/provider/gamedata/entitysystem.cpp
 	${SOURCE_PROJECT_DIR}/provider/gamedata/gameresource.cpp
 	${SOURCE_PROJECT_DIR}/provider/gamedata/gamesystem.cpp
@@ -86,6 +87,7 @@ set(SOURCE_FILES
 	${SOURCE_PROJECT_DIR}/provider/gamesystem.cpp
 	${SOURCE_PROJECT_DIR}/provider/source2server.cpp
 	${SOURCE_PROJECT_DIR}/provider/spawngroup.cpp
+	${SOURCE_PROJECT_DIR}/path_resolver.cpp
 	${SOURCE_PROJECT_DIR}/provider_agent.cpp
 	${SOURCE_PROJECT_DIR}/provider.cpp
 	${SOURCE_PROJECT_DIR}/settings.cpp
@@ -107,16 +109,14 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_OUTPUT_NAME})
 
 if(WINDOWS)
-	if(SOURCESDK_MSVC_RUNTIME_LIBRARY)
-		set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-	endif()
+	set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif(MACOS)
 	set_target_properties(${PROJECT_NAME} PROPERTIES OSX_ARCHITECTURES "x86_64")
 endif()
 
-target_compile_options(${PROJECT_NAME} PRIVATE ${COMPILER_OPTIONS} ${PLATFORM_COMPILER_OPTIONS} ${COMPILE_OPTIONS} ${SOURCESDK_COMPILE_OPTIONS})
-target_link_options(${PROJECT_NAME} PRIVATE ${LINKER_OPTIONS} ${PLATFORM_LINKER_OPTIONS} ${SOURCESDK_LINK_OPTIONS})
+target_compile_options(${PROJECT_NAME} PRIVATE ${COMPILER_OPTIONS} ${SOURCESDK_COMPILER_OPTIONS})
+target_link_options(${PROJECT_NAME} PRIVATE ${LINKER_OPTIONS} ${SOURCESDK_LINKER_OPTIONS})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE ${COMPILER_DEFINITIONS} ${PLATFORM_COMPILE_DEFINITIONS} ${METAMOD_COMPILE_DEFINITIONS} ${SOURCESDK_COMPILE_DEFINTIONS})
-target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR} ${ANY_CONFIG_INCLUDE_DIR} ${DYNLIBUTILS_INCLUDE_DIR} ${DYNOHOOK_INCLUDE_DIR} ${GAMEDATA_INCLUDE_DIR} ${LOGGER_INCLUDE_DIR} ${METAMOD_INCLUDE_DIR} ${SOURCESDK_INCLUDE_DIR})
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${COMPILER_DEFINITIONS} ${METAMOD_COMPILE_DEFINITIONS} ${SOURCESDK_COMPILER_DEFINTIONS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS} ${ANY_CONFIG_INCLUDE_DIRS} ${DYNLIBUTILS_INCLUDE_DIRS} ${DYNOHOOK_INCLUDE_DIRS} ${GAMEDATA_INCLUDE_DIRS} ${LOGGER_INCLUDE_DIRS} ${METAMOD_INCLUDE_DIRS} ${SOURCESDK_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES} ${ANY_CONFIG_BINARY_DIR} ${DYNLIBUTILS_BINARY_DIR} ${DYNOHOOK_BINARY_DIR} ${GAMEDATA_BINARY_DIR} ${LOGGER_BINARY_DIR} ${SOURCESDK_BINARY_DIR})

@@ -1,18 +1,18 @@
 #include <entity_manager/provider_agent.hpp>
 #include <entity_manager/provider.hpp>
 
-DLL_IMPORT EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
+extern EntityManager::ProviderAgent *g_pEntityManagerProviderAgent;
 
 EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
 {
 	{
 		auto &aCallbacks = m_aAddressCallbacks;
 
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("&g_pSpawnGroupMgr"), [this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("&g_pSpawnGroupMgr"), {[this](const CUtlSymbolLarge &, const DynLibUtils::CMemory &pFunction)
 		{
 			m_ppSpawnGroupMgrAddress = pFunction.RCast<decltype(m_ppSpawnGroupMgrAddress)>();
-			// g_pEntityManagerProviderAgent->NotifySpawnGroupMgrUpdated();
-		});
+			g_pEntityManagerProviderAgent->NotifySpawnGroupMgrUpdated();
+		}});
 
 		m_aGameConfig.GetAddresses().AddListener(&aCallbacks);
 	}
@@ -20,18 +20,18 @@ EntityManager::Provider::GameDataStorage::SpawnGroup::SpawnGroup()
 	{
 		auto &aCallbacks = m_aOffsetCallbacks;
 
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CSpawnGroupMgrGameSystem::m_SpawnGroups"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CSpawnGroupMgrGameSystem::m_SpawnGroups"), {[this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			m_nMgrGameSystemSpawnGroupsOffset = nOffset;
-		});
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CLoadingMapGroup::m_spawnInfo"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
+		}});
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CLoadingMapGroup::m_spawnInfo"), {[this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			m_nLoadingMapSpawnInfoOffset = nOffset;
-		});
-		aCallbacks.Insert(m_aGameConfig.GetSymbol("CBaseSpawnGroup::m_pEntityFilterName"), [this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
+		}});
+		aCallbacks.Insert(m_aGameConfig.GetSymbol("CBaseSpawnGroup::m_pEntityFilterName"), {[this](const CUtlSymbolLarge &, const ptrdiff_t &nOffset)
 		{
 			m_nBaseSpawnGroupEntityFilterNameOffset = nOffset;
-		});
+		}});
 
 		m_aGameConfig.GetOffsets().AddListener(&aCallbacks);
 	}

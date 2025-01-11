@@ -3,7 +3,7 @@
 
 #include <dynlibutils/virtual.hpp>
 
-DLL_IMPORT EntityManager::Provider *g_pEntityManagerProvider;
+extern EntityManager::Provider *g_pEntityManagerProvider;
 
 void EntityManager::CGameResourceServiceProvider::DestroyResourceManifest(CGameResourceManifest *pTarget)
 {
@@ -27,10 +27,10 @@ bool EntityManager::CGameResourceServiceProvider::AppendToAndCreateGameResourceM
 
 CEntityResourceManifest *EntityManager::CGameResourceManifestProvider::GetEntityPart()
 {
-	return *(CEntityResourceManifest **)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntityManifestOffset());
+	return *(CEntityResourceManifest **)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetResouceManifestOffset());
 }
 
 IEntityResourceManifest *EntityManager::CEntityResourceManifestProvider::GetInterface()
 {
-	return *(IEntityResourceManifest **)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetEntityManifestVFTableOffset());
+	return *(IEntityResourceManifest **)((uintptr_t)this + g_pEntityManagerProvider->GetGameDataStorage().GetGameResource().GetResouceManifestVFTableOffset());
 }
