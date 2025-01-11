@@ -91,7 +91,7 @@ public: // Provider agent ones.
 			 * @param hSpawnGroup       A spawn group handle to allocate.
 			 * @param pSpawnGroup       A spawn group pointer.
 			 */
-			virtual void OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup) = 0;
+			virtual void OnSpawnGroupAllocated(SpawnGroupHandle_t hSpawnGroup, ISpawnGroup *pSpawnGroup) {}
 
 			/**
 			 * @brief Calls when spawn group are initialize.
@@ -101,7 +101,7 @@ public: // Provider agent ones.
 			 * @param pConfig           A entity precache configuration pointer.
 			 * @param pRegistry         A spawn group prerequisite registry pointer.
 			 */
-			virtual void OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) = 0;
+			virtual void OnSpawnGroupInit(SpawnGroupHandle_t hSpawnGroup, IEntityResourceManifest *pManifest, IEntityPrecacheConfiguration *pConfig, ISpawnGroupPrerequisiteRegistry *pRegistry) {}
 
 			/**
 			 * @brief Calls when spawn group are create loading one.
@@ -112,14 +112,14 @@ public: // Provider agent ones.
 			 * @param bConfirmResourcesLoaded       A connfirm resource are loaded.
 			 * @param vecKeyValues      A spawn group entity key values to add/remove.
 			 */
-			virtual void OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues) = 0;
+			virtual void OnSpawnGroupCreateLoading(SpawnGroupHandle_t hSpawnGroup, CMapSpawnGroup *pMapSpawnGroup, bool bSynchronouslySpawnEntities, bool bConfirmResourcesLoaded, CUtlVector<const CEntityKeyValues *> &vecKeyValues) {}
 
 			/**
 			 * @brief Calls when spawn group are destroyed.
 			 * 
 			 * @param hSpawnGroup       A spawn group handle to destroy.
 			 */
-			virtual void OnSpawnGroupDestroyed(SpawnGroupHandle_t hSpawnGroup) = 0;
+			virtual void OnSpawnGroupDestroyed(SpawnGroupHandle_t hSpawnGroup) {}
 		}; // ISpawnGroupNotifications
 
 		/**
