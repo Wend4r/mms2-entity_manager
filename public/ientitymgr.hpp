@@ -19,7 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef _INCLUDE_METAMOD_SOURCE_IENTITYMGR_HPP_
 #	define _INCLUDE_METAMOD_SOURCE_IENTITYMGR_HPP_
 
