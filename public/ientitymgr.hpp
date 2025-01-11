@@ -35,7 +35,7 @@
 #	include <entity2/entityidentity.h>
 #	include <gamesystems/spawngroup_manager.h>
 
-#	define ENTITY_MANAGER_INTERFACE_NAME "Entity Manager v1.0"
+#	define ENTITY_MANAGER_INTERFACE_NAME "Entity Manager v1.0.3"
 
 #	define INVALID_SPAWN_GROUP ((SpawnGroupHandle_t)-1)
 #	define ANY_SPAWN_GROUP INVALID_SPAWN_GROUP
