@@ -259,7 +259,7 @@ public: // Provider agent ones.
 		 * 
 		 * @return                  An entity manifest pointer.
 		 */
-		virtual IEntityResourceManifest *GetEntityManifest() = 0;
+		virtual IEntityResourceManifest *GetResouceManifest() = 0;
 
 		/**
 		 * @brief Adds a resource to the entity resource manifest.

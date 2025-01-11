@@ -83,12 +83,12 @@ ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetEntitySyste
 	return m_nEntitySystemOffset;
 }
 
-ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetEntityManifestOffset() const
+ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetResouceManifestOffset() const
 {
 	return m_nEntityManifestOffset;
 }
 
-ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetEntityManifestVFTableOffset() const
+ptrdiff_t EntityManager::Provider::GameDataStorage::GameResource::GetResouceManifestVFTableOffset() const
 {
 	return m_nEntityManifestVFTableOffset;
 }

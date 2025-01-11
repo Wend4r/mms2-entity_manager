@@ -52,7 +52,7 @@ namespace EntityManager
 
 	public:
 		bool ErectResourceManifest(ISpawnGroup *pSpawnGroup, int nCount, const EntitySpawnInfo_t *pEntities, const matrix3x4a_t *const vWorldOffset) override;
-		IEntityResourceManifest *GetEntityManifest() override;
+		IEntityResourceManifest *GetResouceManifest() override;
 		void AddResourceToEntityManifest(IEntityResourceManifest *pManifest, const char *pszPath) override;
 
 	public:

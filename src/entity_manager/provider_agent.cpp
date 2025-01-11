@@ -118,7 +118,7 @@ bool EntityManager::ProviderAgent::ErectResourceManifest(ISpawnGroup *pSpawnGrou
 	return m_aResourceManifest.Erect(pSpawnGroup, nCount, pEntities, vWorldOffset);
 }
 
-IEntityResourceManifest *EntityManager::ProviderAgent::GetEntityManifest()
+IEntityResourceManifest *EntityManager::ProviderAgent::GetResouceManifest()
 {
 	return m_aResourceManifest.GetEntityPart();
 }

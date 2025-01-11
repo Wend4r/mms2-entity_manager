@@ -134,8 +134,8 @@ namespace EntityManager
 				ptrdiff_t GetAllocGameResourceManifestOffset() const;
 				ptrdiff_t GetAppendToAndCreateGameResourceManifestOffset() const;
 				ptrdiff_t GetEntitySystemOffset() const;
-				ptrdiff_t GetEntityManifestOffset() const;
-				ptrdiff_t GetEntityManifestVFTableOffset() const;
+				ptrdiff_t GetResouceManifestOffset() const;
+				ptrdiff_t GetResouceManifestVFTableOffset() const;
 
 			private:
 				// GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
