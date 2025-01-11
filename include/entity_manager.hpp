@@ -108,7 +108,6 @@ protected:
 
 public: // SourceHooks.
 	void OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *);
-	int OnLoadEventsFromFileHook(const char *pszFilename, bool bSearchAll);
 	void OnEntitySystemSpawnHook(int iCount, const EntitySpawnInfo_t *pInfo);
 	void OnEntitySystemUpdateOnRemoveHook(int iCount, const EntityDeletion_t *pInfo);
 	void OnGSFactoryCSpawnGroupMgrGameSystemSetGlobalStrHook(void *pValue);
