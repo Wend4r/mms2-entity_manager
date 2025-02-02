@@ -139,7 +139,14 @@ EntityManager::ProviderAgent::ISpawnGroupInstance *EntityManager::ProviderAgent:
 
 bool EntityManager::ProviderAgent::ReleaseSpawnGroup(EntityManager::ProviderAgent::ISpawnGroupInstance *pSpawnGroup)
 {
-	return m_vecSpawnGroups.FindAndFastRemove(pSpawnGroup);
+	bool bResult = m_vecSpawnGroups.FindAndFastRemove(pSpawnGroup);
+
+	if(bResult)
+	{
+		delete pSpawnGroup;
+	}
+
+	return bResult;
 }
 
 void EntityManager::ProviderAgent::ReleaseSpawnGroups()
