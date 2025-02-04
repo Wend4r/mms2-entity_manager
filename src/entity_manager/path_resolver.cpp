@@ -17,19 +17,19 @@ EntityManager::PathResolver::PathResolver(const void *pInitModule)
 
 bool EntityManager::PathResolver::Init(char *psError, size_t nMaxLength)
 {
-	m_sModuleFilename = DynLibUtils::CModule(m_pModule).GetModulePath();
+	m_aModule.InitFromMemory(m_pModule);
 
 	return true;
 }
 
 std::string_view EntityManager::PathResolver::GetAbsoluteModuleFilename()
 {
-	return m_sModuleFilename;
+	return m_aModule.GetModulePath();
 }
 
 std::string_view EntityManager::PathResolver::ExtractSubpath(std::string_view sStartMarker, std::string_view sEndMarker)
 {
-	auto &sFullPath = m_sModuleFilename;
+	auto sFullPath = GetAbsoluteModuleFilename();
 
 	std::size_t nStartPosition = sFullPath.find(sStartMarker);
 

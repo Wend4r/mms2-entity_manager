@@ -260,13 +260,15 @@ int EntityManager::ProviderAgent::CopySpawnQueueWithEntitySystemOwnership(CUtlVe
 {
 	const int nOldCount = vecTarget.Count();
 
+	auto *pEntitySystemAllocator = g_pGameEntitySystem->GetEntityKeyValuesAllocator();
+
 	for(const auto &aSpawnEntity : m_vecEntitySpawnQueue)
 	{
 		if(hSpawnGroup == ANY_SPAWN_GROUP || hSpawnGroup == aSpawnEntity.GetSpawnGroup())
 		{
-			CEntityKeyValues *pESKeyValues = new CEntityKeyValues(g_pGameEntitySystem->GetEntityKeyValuesAllocator(), EKV_ALLOCATOR_EXTERNAL);
+			CEntityKeyValues *pESKeyValues = new CEntityKeyValues(pEntitySystemAllocator, EKV_ALLOCATOR_EXTERNAL);
 
-			pESKeyValues->CopyFrom(aSpawnEntity.GetKeyValues());
+			pESKeyValues->CopyFrom(aSpawnEntity.GetKeyValues(), false, false);
 			g_pGameEntitySystem->AddRefKeyValues(pESKeyValues);
 			vecTarget.AddToTail(pESKeyValues);
 		}

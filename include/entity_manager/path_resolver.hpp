@@ -9,6 +9,8 @@
 #	include <string>
 #	include <string_view>
 
+#	include <dynlibutils/module.hpp>
+
 namespace EntityManager
 {
 	class PathResolver
@@ -25,6 +27,7 @@ namespace EntityManager
 
 	private:
 		const void *m_pModule;
+		DynLibUtils::CModule m_aModule;
 
 		std::string_view m_sModuleFilename;
 	};

@@ -892,9 +892,6 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 	auto funcCreateLoadingSpawnGroup = &CSpawnGroupMgrGameSystem::CreateLoadingSpawnGroup;
 
-	SET_META_RESULT(MRES_HANDLED);
-	SH_GLOB_SHPTR->DoRecall();
-
 	auto *pSpawnGroupMgr = reinterpret_cast<CSpawnGroupMgrGameSystem *>(SourceHook::RecallGetIface(SH_GLOB_SHPTR, funcCreateLoadingSpawnGroup));
 
 	auto aSpawnGroupMgr = EntityManager::CSpawnGroupAccessor(pSpawnGroupMgr);
@@ -919,23 +916,26 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 			SpawnGroupHandle_t hTargetSpawnGroup = bIsMySpawnGroup ? pMapSpawnGroup->GetOwnerSpawnGroup() : hSpawnGroup;
 
-			bool bHasInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(hTargetSpawnGroup);
+			// bool bHasInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(hTargetSpawnGroup);
 
-			if(bHasInSpawnQueue)
-			{
-				s_aEntityManagerProviderAgent.CopySpawnQueueWithEntitySystemOwnership(vecLayerEntities, hTargetSpawnGroup);
-			}
+			// if(bHasInSpawnQueue)
+			// {
+			// 	s_aEntityManagerProviderAgent.CopySpawnQueueWithEntitySystemOwnership(vecLayerEntities, hTargetSpawnGroup);
+			// }
 
 			int iOldEntitiesCount = vecLayerEntities.Count();
 
 			s_aEntityManagerProviderAgent.OnSpawnGroupCreateLoading(hSpawnGroup, pMapSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, vecLayerEntities);
 
-			if(bHasInSpawnQueue || iOldEntitiesCount != vecLayerEntities.Count())
+			if(iOldEntitiesCount != vecLayerEntities.Count())
 			{
 				pKeyValues = &vecLayerEntities;
 			}
 		}
 	}
+
+	SET_META_RESULT(MRES_HANDLED);
+	SH_GLOB_SHPTR->DoRecall();
 
 	ILoadingSpawnGroup *pLoading = (pSpawnGroupMgr->*(funcCreateLoadingSpawnGroup))(hSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, pKeyValues);
 
