@@ -134,7 +134,7 @@ EntityManager::ProviderAgent::ISpawnGroupInstance *EntityManager::ProviderAgent:
 		m_vecSpawnGroups.AddToTail(pSpawnGroup);
 	}
 
-	return dynamic_cast<IEntityManager::IProviderAgent::ISpawnGroupInstance *>(pSpawnGroup);
+	return static_cast<IEntityManager::IProviderAgent::ISpawnGroupInstance *>(pSpawnGroup);
 }
 
 bool EntityManager::ProviderAgent::ReleaseSpawnGroup(EntityManager::ProviderAgent::ISpawnGroupInstance *pSpawnGroup)
@@ -205,7 +205,7 @@ void EntityManager::ProviderAgent::OnSpawnGroupCreateLoading(SpawnGroupHandle_t 
 
 void EntityManager::ProviderAgent::OnSpawnGroupDestroyed(SpawnGroupHandle_t handle)
 {
-	FOR_EACH_VEC(m_vecSpawnGroups, i)
+	FOR_EACH_VEC_BACK(m_vecSpawnGroups, i)
 	{
 		ISpawnGroupInstance *pSpawnGroupAgent = m_vecSpawnGroups[i];
 
@@ -214,7 +214,7 @@ void EntityManager::ProviderAgent::OnSpawnGroupDestroyed(SpawnGroupHandle_t hand
 			pSpawnGroupAgent->OnSpawnGroupDestroyed(handle);
 
 			delete pSpawnGroupAgent;
-			m_vecSpawnGroups.FastRemove(i);
+			m_vecSpawnGroups.Remove(i);
 		}
 	}
 }

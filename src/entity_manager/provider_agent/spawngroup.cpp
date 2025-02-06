@@ -5,10 +5,10 @@
 
 EntityManager::CSpawnGroupInstance::~CSpawnGroupInstance()
 {
-	if(m_hSpawnGroup != INVALID_SPAWN_GROUP)
-	{
-		Unload();
-	}
+	// if(m_hSpawnGroup != INVALID_SPAWN_GROUP)
+	// {
+	// 	Unload();
+	// }
 }
 
 /*

@@ -476,6 +476,7 @@ bool EntityManagerPlugin::InitSpawnGroup(CSpawnGroupMgrGameSystem *pSpawnGroupMa
 void EntityManagerPlugin::DestroySpawnGroup()
 {
 	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, AllocateSpawnGroup, g_pSpawnGroupMgr, this, &EntityManagerPlugin::OnAllocateSpawnGroupHook, true);
+	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, SpawnGroupInit, g_pSpawnGroupMgr, this, &EntityManagerPlugin::OnSpawnGroupInitHook, true);
 	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, CreateLoadingSpawnGroup, g_pSpawnGroupMgr, this, &EntityManagerPlugin::OnCreateLoadingSpawnGroupHook, false);
 	SH_REMOVE_HOOK_MEMFUNC(CSpawnGroupMgrGameSystem, SpawnGroupShutdown, g_pSpawnGroupMgr, this, &EntityManagerPlugin::OnSpawnGroupShutdownHook, true);
 }
@@ -735,8 +736,6 @@ bool EntityManagerPlugin::EraseMyEntity(CEntityInstance *pEntity)
 
 void EntityManagerPlugin::OnStartupServerHook(const GameSessionConfiguration_t &config, ISource2WorldSession *pWorldSession, const char *)
 {
-	s_aEntityManagerProviderAgent.Clear();
-
 	INetworkGameServer *pNetServer = g_pNetworkServerService->GetIGameServer();
 
 	if(pNetServer)
