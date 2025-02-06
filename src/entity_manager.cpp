@@ -915,14 +915,14 @@ ILoadingSpawnGroup *EntityManagerPlugin::OnCreateLoadingSpawnGroupHook(SpawnGrou
 
 			SpawnGroupHandle_t hTargetSpawnGroup = bIsMySpawnGroup ? pMapSpawnGroup->GetOwnerSpawnGroup() : hSpawnGroup;
 
-			// bool bHasInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(hTargetSpawnGroup);
-
-			// if(bHasInSpawnQueue)
-			// {
-			// 	s_aEntityManagerProviderAgent.CopySpawnQueueWithEntitySystemOwnership(vecLayerEntities, hTargetSpawnGroup);
-			// }
-
 			int iOldEntitiesCount = vecLayerEntities.Count();
+
+			bool bHasInSpawnQueue = s_aEntityManagerProviderAgent.HasInSpawnQueue(hTargetSpawnGroup);
+
+			if(bHasInSpawnQueue)
+			{
+				s_aEntityManagerProviderAgent.CopySpawnQueueWithEntitySystemOwnership(vecLayerEntities, hTargetSpawnGroup);
+			}
 
 			s_aEntityManagerProviderAgent.OnSpawnGroupCreateLoading(hSpawnGroup, pMapSpawnGroup, bSynchronouslySpawnEntities, bConfirmResourcesLoaded, vecLayerEntities);
 
