@@ -148,7 +148,7 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 
 	CUtlString sError;
 
-	AnyConfig::LoadFromFile_Generic_t aLoadPresets({{&sError, NULL, pszConfigPathID}, g_KV3Format_Generic});
+	AnyConfig::CLoadFromFile_General aLoadPresets({{&sError, NULL, pszConfigPathID}, g_KV3Format_Generic});
 
 	for(size_t n = 0, nSize = std::size(aConfigs); n < nSize; n++)
 	{

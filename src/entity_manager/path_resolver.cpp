@@ -24,7 +24,7 @@ bool EntityManager::PathResolver::Init(char *psError, size_t nMaxLength)
 
 std::string_view EntityManager::PathResolver::GetAbsoluteModuleFilename()
 {
-	return m_aModule.GetModulePath();
+	return m_aModule.GetPath();
 }
 
 std::string_view EntityManager::PathResolver::ExtractSubpath(std::string_view sStartMarker, std::string_view sEndMarker)
