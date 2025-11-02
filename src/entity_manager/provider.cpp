@@ -28,7 +28,7 @@ EntityManager::Provider::Provider()
 {
 }
 
-bool EntityManager::Provider::Init(GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::Init(GameData::CStringVector &vecMessages)
 {
 	// Enigne 2.
 	{
@@ -61,7 +61,7 @@ bool EntityManager::Provider::Init(GameData::CBufferStringVector &vecMessages)
 	return true;
 }
 
-bool EntityManager::Provider::Load(const char *pszBaseDir, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::Load(const char *pszBaseDir, GameData::CStringVector &vecMessages)
 {
 	bool bResult = LoadGameData(pszBaseDir, vecMessages);
 
@@ -94,10 +94,10 @@ CUtlSymbolLarge EntityManager::Provider::GetSymbol(const char *pszText)
 
 CUtlSymbolLarge EntityManager::Provider::FindSymbol(const char *pszText) const
 {
-	return m_aSymbolTable.Find(pszText);
+	return m_aSymbolTable.FindString(pszText);
 }
 
-bool EntityManager::Provider::LoadGameData(const char *pszBaseDir, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::LoadGameData(const char *pszBaseDir, GameData::CStringVector &vecMessages)
 {
 	char sBaseConfigDir[MAX_PATH];
 
@@ -106,14 +106,14 @@ bool EntityManager::Provider::LoadGameData(const char *pszBaseDir, GameData::CBu
 	return m_aStorage.Load(this, sBaseConfigDir, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char *pszBaseConfigDir, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char *pszBaseConfigDir, GameData::CStringVector &vecMessages)
 {
 	bool bResult = true;
 
 	struct
 	{
 		const char *pszFilename;
-		bool (EntityManager::Provider::GameDataStorage::*pfnLoad)(IGameData *, KeyValues3 *, GameData::CBufferStringVector &);
+		bool (EntityManager::Provider::GameDataStorage::*pfnLoad)(IGameData *, KeyValues3 *, GameData::CStringVector &);
 	} aConfigs[] =
 	{
 		{
@@ -189,32 +189,32 @@ bool EntityManager::Provider::GameDataStorage::Load(IGameData *pRoot, const char
 	return bResult;
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadEntityResourceManifest(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::GameDataStorage::LoadEntityResourceManifest(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages)
 {
 	return m_aEntityResourceManifest.Load(pRoot, pGameConfig, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadEntitySystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::GameDataStorage::LoadEntitySystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages)
 {
 	return m_aEntitySystem.Load(pRoot, pGameConfig, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadGameResource(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::GameDataStorage::LoadGameResource(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages)
 {
 	return m_aGameResource.Load(pRoot, pGameConfig, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadGameSystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::GameDataStorage::LoadGameSystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages)
 {
 	return m_aGameSystem.Load(pRoot, pGameConfig, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadSource2Server(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::GameDataStorage::LoadSource2Server(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages)
 {
 	return m_aSource2Server.Load(pRoot, pGameConfig, vecMessages);
 }
 
-bool EntityManager::Provider::GameDataStorage::LoadEntitySpawnGroup(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::GameDataStorage::LoadEntitySpawnGroup(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages)
 {
 	return m_aSpawnGroup.Load(pRoot, pGameConfig, vecMessages);
 }

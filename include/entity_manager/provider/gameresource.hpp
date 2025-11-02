@@ -1,7 +1,7 @@
 #ifndef _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_GAMERESOURCE_HPP_
 #define _INCLUDE_METAMOD_SOURCE_ENTITY_MANAGER_PROVIDER_GAMERESOURCE_HPP_
 
-#include <gamesystems/spawngroup_manager.h>
+#include <spawngroupmgr.h>
 
 class IGameResourceService
 {

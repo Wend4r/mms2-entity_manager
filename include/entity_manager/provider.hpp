@@ -25,8 +25,8 @@ namespace EntityManager
 	public:
 		Provider();
 
-		bool Init(GameData::CBufferStringVector &vecMessages);
-		bool Load(const char *pszBaseDir, GameData::CBufferStringVector &vecMessages);
+		bool Init(GameData::CStringVector &vecMessages);
+		bool Load(const char *pszBaseDir, GameData::CStringVector &vecMessages);
 		void Destroy();
 
 	public: // IGameData
@@ -37,21 +37,21 @@ namespace EntityManager
 		CUtlSymbolLarge FindSymbol(const char *pszText) const;
 
 	protected:
-		bool LoadGameData(const char *pszBaseDir, GameData::CBufferStringVector &vecMessages);
+		bool LoadGameData(const char *pszBaseDir, GameData::CStringVector &vecMessages);
 
 	public:
 		class GameDataStorage
 		{
 		public:
-			bool Load(IGameData *pRoot, const char *pszBaseConfigDir, GameData::CBufferStringVector &vecMessages);
+			bool Load(IGameData *pRoot, const char *pszBaseConfigDir, GameData::CStringVector &vecMessages);
 
 		protected:
-			bool LoadEntityResourceManifest(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
-			bool LoadEntitySystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
-			bool LoadGameResource(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
-			bool LoadGameSystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
-			bool LoadSource2Server(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
-			bool LoadEntitySpawnGroup(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+			bool LoadEntityResourceManifest(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
+			bool LoadEntitySystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
+			bool LoadGameResource(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
+			bool LoadGameSystem(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
+			bool LoadSource2Server(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
+			bool LoadEntitySpawnGroup(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
 
 		public:
 			class EntityResourceManifest
@@ -60,14 +60,14 @@ namespace EntityManager
 				EntityResourceManifest();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
 				void Reset();
 
 			public:
 				void AddResource(IEntityResourceManifest *pEntityManifest, const char *pszPath) const;
 
 			private:
-				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
+				GameData::Config::Offsets_t::CListenerCallbacksCollector m_aOffsetCallbacks;
 				GameData::Config m_aGameConfig;
 
 			private: // Offsets.
@@ -80,7 +80,7 @@ namespace EntityManager
 				EntitySystem();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
 				void Reset();
 
 			public:
@@ -102,8 +102,8 @@ namespace EntityManager
 				ptrdiff_t GetKeyValuesContextAllocatorOffset() const;
 
 			private:
-				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
-				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
+				GameData::Config::Addresses_t::CListenerCallbacksCollector m_aAddressCallbacks;
+				GameData::Config::Offsets_t::CListenerCallbacksCollector m_aOffsetCallbacks;
 				GameData::Config m_aGameConfig;
 
 			private: // Signatures.
@@ -125,7 +125,7 @@ namespace EntityManager
 				GameResource();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
 				void Reset();
 
 			public:
@@ -138,8 +138,8 @@ namespace EntityManager
 				ptrdiff_t GetResouceManifestVFTableOffset() const;
 
 			private:
-				// GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
-				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
+				// GameData::Config::Addresses_t::CListenerCallbacksCollector m_aAddressCallbacks;
+				GameData::Config::Offsets_t::CListenerCallbacksCollector m_aOffsetCallbacks;
 				GameData::Config m_aGameConfig;
 
 			private: // Offsets.
@@ -158,7 +158,7 @@ namespace EntityManager
 				GameSystem();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
 				void Reset();
 
 			public:
@@ -168,8 +168,8 @@ namespace EntityManager
 				OnGameSystemInitPtr GameSystemInitFunction() const;
 
 			private:
-				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
-				// GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
+				GameData::Config::Addresses_t::CListenerCallbacksCollector m_aAddressCallbacks;
+				// GameData::Config::Offsets_t::CListenerCallbacksCollector m_aOffsetCallbacks;
 				GameData::Config m_aGameConfig;
 
 			private: // Addresses.
@@ -183,7 +183,7 @@ namespace EntityManager
 				Source2Server();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
 				void Reset();
 
 			public:
@@ -191,8 +191,8 @@ namespace EntityManager
 				ptrdiff_t GetGameEventManagerOffset() const;
 
 			private:
-				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
-				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
+				GameData::Config::Addresses_t::CListenerCallbacksCollector m_aAddressCallbacks;
+				GameData::Config::Offsets_t::CListenerCallbacksCollector m_aOffsetCallbacks;
 				GameData::Config m_aGameConfig;
 
 			private: // Addresses.
@@ -208,7 +208,7 @@ namespace EntityManager
 				SpawnGroup();
 
 			public:
-				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages);
+				bool Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages);
 				void Reset();
 
 			public:
@@ -224,8 +224,8 @@ namespace EntityManager
 				ptrdiff_t m_nBaseSpawnGroupEntityFilterNameOffset = -1;
 
 			private:
-				GameData::Config::Addresses::ListenerCallbacksCollector m_aAddressCallbacks;
-				GameData::Config::Offsets::ListenerCallbacksCollector m_aOffsetCallbacks;
+				GameData::Config::Addresses_t::CListenerCallbacksCollector m_aAddressCallbacks;
+				GameData::Config::Offsets_t::CListenerCallbacksCollector m_aOffsetCallbacks;
 				GameData::Config m_aGameConfig;
 			};
 

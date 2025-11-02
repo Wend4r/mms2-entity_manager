@@ -33,7 +33,7 @@
 #include <igamesystemfactory.h>
 #include <iserver.h>
 #include <entity2/entitysystem.h>
-#include <gamesystems/spawngroup_manager.h>
+#include <spawngroupmgr.h>
 #include <worldrenderer/iworld.h>
 #include <worldrenderer/iworldrenderermgr.h>
 #include <tier0/dbg.h>
@@ -101,11 +101,6 @@ CGameEntitySystem *GameEntitySystem()
 	return g_pGameEntitySystem;
 }
 
-CEntityInstance* CEntityHandle::Get() const
-{
-	return GameEntitySystem()->GetEntityInstance( *this );
-}
-
 PLUGIN_EXPOSE(EntityManagerPlugin, s_aEntityManager);
 
 EntityManagerPlugin::EntityManagerPlugin()
@@ -167,7 +162,7 @@ bool EntityManagerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t m
 
 	// Initialize and load a provider.
 	{
-		GameData::CBufferStringVector vecMessages;
+		GameData::CStringVector vecMessages;
 
 		bool bResult = s_aEntityManagerProvider.Init(vecMessages);
 
@@ -511,7 +506,7 @@ void EntityManagerPlugin::UnhookEvents()
 
 bool EntityManagerPlugin::LoadProvider()
 {
-	GameData::CBufferStringVector vecMessages;
+	GameData::CStringVector vecMessages;
 
 	bool bResult = s_aEntityManagerProvider.Load(m_sBasePath.c_str(), vecMessages);
 

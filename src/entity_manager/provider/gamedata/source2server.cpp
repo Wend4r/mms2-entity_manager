@@ -25,7 +25,7 @@ EntityManager::Provider::GameDataStorage::Source2Server::Source2Server()
 	}
 }
 
-bool EntityManager::Provider::GameDataStorage::Source2Server::Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::GameDataStorage::Source2Server::Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages)
 {
 	return m_aGameConfig.Load(pRoot, pGameConfig, vecMessages);
 }

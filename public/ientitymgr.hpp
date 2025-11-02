@@ -32,7 +32,7 @@
 #	include <tier1/utlmap.h>
 #	include <tier1/utlvector.h>
 #	include <entity2/entityidentity.h>
-#	include <gamesystems/spawngroup_manager.h>
+#	include <spawngroupmgr.h>
 
 #	define ENTITY_MANAGER_INTERFACE_NAME "Entity Manager v1.0.3"
 

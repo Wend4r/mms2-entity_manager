@@ -5,13 +5,6 @@
 #include <entity2/entityidentity.h>
 #include <entity2/entitysystem.h>
 
-enum EntityNetworkingMode_t
-{
-	ENTITY_NETWORKING_MODE_DEFAULT = 0,
-	ENTITY_NETWORKING_MODE_NETWORKED,
-	ENTITY_NETWORKING_MODE_NOT_NETWORKED,
-};
-
 namespace EntityManager
 {
 	class CEntitySystemProvider : public CGameEntitySystem

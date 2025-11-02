@@ -42,7 +42,7 @@ EntityManager::Provider::GameDataStorage::GameResource::GameResource()
 	}
 }
 
-bool EntityManager::Provider::GameDataStorage::GameResource::Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CBufferStringVector &vecMessages)
+bool EntityManager::Provider::GameDataStorage::GameResource::Load(IGameData *pRoot, KeyValues3 *pGameConfig, GameData::CStringVector &vecMessages)
 {
 	return m_aGameConfig.Load(pRoot, pGameConfig, vecMessages);
 }
