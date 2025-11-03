@@ -1,5 +1,5 @@
 {
-	"$schema": "https://raw.githubusercontent.com/Wend4r/s2u-gamedata/e7e9027389840b27054192e4a204a59e5b9f0016/gamedata/schema.json",
+	"$schema": "https://raw.githubusercontent.com/Wend4r/s2u-gamedata/63b639601d53f77e2b9fe398c79b73494d49b743/gamedata/schema.json",
 
 	"csgo":
 	{
@@ -11,12 +11,57 @@
 
 				"win64":
 				{
-					"read_offs32": 53
+					"read_offs32": 54
 				},
 
 				"linuxsteamrt64":
 				{
-					"read_offs32": 72
+					"read_offs32": 73
+				}
+			},
+
+			"&IGameSystem::sm_GameSystemFactories":
+			{
+				"signature": "IGameSystem::InitAllSystems",
+
+				"win64":
+				{
+					"read_offs32": 516
+				},
+
+				"linuxsteamrt64":
+				{
+					"read_offs32": 99
+				}
+			},
+
+			"&s_GameSystems":
+			{
+				"signature": "IGameSystem::LoopInitAllSystems",
+
+				"win64":
+				{
+					"read_offs32": 291
+				},
+
+				"linuxsteamrt64":
+				{
+					"read_offs32": 284
+				}
+			},
+
+			"&IGameSystem::sm_pEventDispatcher":
+			{
+				"signature": "IGameSystem::LoopInitAllSystems",
+
+				"win64":
+				{
+					"read_offs32": 671
+				},
+
+				"linuxsteamrt64":
+				{
+					"read_offs32": 1459
 				}
 			}
 		},
@@ -35,8 +80,22 @@
 					"IGameSystem::PostInit( %-80s ) %8.3f msec"
 				],
 
-				"win64": "40 53 56 57 41 55 48 83 EC 68",
-				"linuxsteamrt64": "55 48 8D 05 ? ? ? ? 48 89 E5 41 57 41 56 41 55 41 BD 00 00 00 80"
+				"win64": "48 89 5C 24 ? 55 56 57 48 83 EC ? 48 8D 05",
+				"linuxsteamrt64": "55 48 8D 05 ? ? ? ? 48 89 E5 41 57 41 56 41 55 4C 8D 6D ? 41 54 4C 8D 25"
+			},
+
+			"IGameSystem::LoopInitAllSystems":
+			{
+				"library": "server",
+
+				"used_strings":
+				[
+					"%s:  IGameSystem::LoopInitAllSystems(start)\n", "SV",
+					"%s:  IGameSystem::LoopInitAllSystems(finish)\n", "SV"
+				],
+
+				"win64": "48 8B C4 48 89 50 ? 48 89 48 ? 53 48 83 EC",
+				"linuxsteamrt64": "55 66 48 0F 6E D7"
 			}
 		}
 	}
